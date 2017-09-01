@@ -1,0 +1,48 @@
+{
+  "name": "mapbox-plugins",
+  "version": "1.0.0",
+  "description": "Customized Mapbox plugins, including game control, canvasOverlayer, scene animation",
+  "main": "index.js",
+  "dependencies": {
+    "core-decorators": "^0.15.0",
+    "core-js": "^2.4.1",
+    "lowpoly": "^0.1.0",
+    "reflect-metadata": "^0.1.8",
+    "request": "^2.81.0",
+    "systemjs": "^0.19.41",
+    "ws": "^2.0.3",
+    "zone.js": "^0.7.2",
+    "mapbox-gl": "^0.38.0"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-core": "^6.18.2",
+    "babel-loader": "^6.2.8",
+    "babel-plugin-transform-decorators": "^6.13.0",
+    "babel-preset-latest": "^6.16.0",
+    "gulp": "^3.9.1",
+    "webpack": "^1.13.3"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "server": "http-server",
+    "build": "babel src -d lib",
+    "start": "webpack && npm run server"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alex2wong/mapbox-plugins.git"
+  },
+  "keywords": [
+    "mapbox",
+    "plugins",
+    "es6",
+    "webpack"
+  ],
+  "author": "alex2wong",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/alex2wong/mapbox-plugins/issues"
+  },
+  "homepage": "https://github.com/alex2wong/mapbox-plugins#readme"
+}

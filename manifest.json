@@ -1,0 +1,25 @@
+{
+  "short_name": "Mapbox-plugin",
+  "name": "Alex's Mapbox-plugins",
+  "icons": [
+    {
+      "src": "asset/drone.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "asset/drone.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "asset/drone.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#2C3E50",
+  "display": "standalone",
+  "theme_color": "#2C3E50"
+}
