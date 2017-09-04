@@ -48,5 +48,8 @@ function init() {
     objs = Alex.Util.rdObjs(objNum, mapCenter);
     // myTween.loop = false;
     targets = Alex.Util.rdObjs(objNum, mapCenter);
-    Alex.myTween.get(objs).to(targets, 4000, canvasLayer.redraw);
+    Alex.myTween.get(objs).to(targets, 8000, canvasLayer.redraw);
+    map.on('move', function(){
+        canvasLayer.redraw(objs);
+    });
 }

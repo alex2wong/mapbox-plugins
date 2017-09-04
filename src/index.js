@@ -2,7 +2,7 @@
 import Drone from './drone';
 import Canvas from "./chart/canvas";
 import Chart from "./chart/chartmodel";
-import { Util } from "./util";
+import Util from "./util";
 import Controllers from "./controller";
 
 import { myTween, sleep} from "./tween/Tween";

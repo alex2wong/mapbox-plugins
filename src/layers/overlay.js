@@ -1,9 +1,10 @@
 /**
  * Base class of Overlayer
  */
-export class Overlayer {
+export default class Overlayer {
     constructor(opts){
-        this.map = opts.map || undefined;
+        if (opts)
+            this.map = opts.map || undefined;
     }
 
     // @setter
@@ -16,10 +17,9 @@ export class Overlayer {
      */
     lnglat2pix(lng, lat) {
         if (map != undefined && map.project instanceof Function) {
-            var lnglat = map.project(new mapboxgl.LngLat(
+            let lnglat = map.project(new mapboxgl.LngLat(
                 lng, lat));
-            var x = lnglat.x;
-            var y = lnglat.y;
+            let x = lnglat.x, y = lnglat.y;
             return [x, y];
         }
         return [lng, lat];

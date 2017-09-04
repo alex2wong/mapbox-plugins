@@ -82,6 +82,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _util = __webpack_require__(5);
 
+	var _util2 = _interopRequireDefault(_util);
+
 	var _controller = __webpack_require__(9);
 
 	var _controller2 = _interopRequireDefault(_controller);
@@ -96,7 +98,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.Drone = _drone2.default;
 	exports.Canvas = _canvas2.default;
 	exports.Chart = _chartmodel2.default;
-	exports.Util = _util.Util;
+	exports.Util = _util2.default;
 	exports.Controllers = _controller2.default;
 	exports.myTween = _Tween.myTween;
 	exports.CanvasOverlayer = _canvasOverlay.CanvasOverlayer; // this is Root Module for Whole app, require lib we need.
@@ -2740,7 +2742,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this));
 
 	        _this.canvas = _this._initCanvas();
-	        _this.source = opts.objs;
+	        _this.redraw = _redraw.bind(_this);
+	        if (opts) _this.source = opts.objs;
 	        return _this;
 	    }
 
@@ -2748,52 +2751,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "_initCanvas",
 	        value: function _initCanvas() {
 	            var canvasContainer = document.querySelector(".mapboxgl-canvas-container"),
-	                mapboxCanvas = document.querySelector(".mapboxgl-canvas");
-	            if (domElement && domElement.tagName == "CANVAS") {
-	                canvasOverlay = domElement;
-	            } else {
+	                mapboxCanvas = document.querySelector(".mapboxgl-canvas"),
 	                canvasOverlay = document.createElement("canvas");
-	            }
 	            canvasOverlay.style.position = "absolute";
 	            canvasOverlay.className = "overlay-canvas";
 	            canvasOverlay.width = parseInt(mapboxCanvas.style.width);
 	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
 	            canvasContainer.appendChild(canvasOverlay);
 	            return canvasOverlay;
-	        }
-
-	        /**
-	         * expoid this method, can be overwritten
-	         * for special render requirements..
-	         * Important ! redraw may use this.map as projector!
-	         */
-
-	    }, {
-	        key: "redraw",
-	        value: function redraw(objs) {
-	            if (this.canvas) {
-	                ctx = this.canvas.getContext("2d");
-	                // ctx.clearRect(0,0,canv.width, canv.height);
-	                _preSetCtx(ctx);
-	                ctx.save();
-	                // ctx.fillStyle = "rgba(240,200,20,.7)";
-	                // ctx.fillRect(0,0,canv.width, canv.height);
-	                ctx.shadowBlur = 4;
-	                ctx.shadowColor = "rgba(255,255,255,.4)";
-	                for (var i = 0; i < objs.length; i++) {
-	                    var x = objs[i]['lon'],
-	                        y = objs[i]['lat'],
-	                        radius = objs[i]['radius'] || 2;
-	                    pix = this.lnglat2pix(x, y);
-	                    if (pix == null) continue;
-	                    ctx.fillStyle = objs[i]['color'];
-	                    ctx.beginPath();
-	                    ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
-	                    ctx.fill();
-	                    ctx.closePath();
-	                }
-	                ctx.restore();
-	            }
 	        }
 	    }]);
 
@@ -2814,6 +2779,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    context.globalCompositeOperation = prev;
 	}
 
+	/**
+	 * expoid this method, can be overwritten
+	 * for special render requirements..
+	 * Important ! redraw may use this.map as projector!
+	 */
+	function _redraw(objs) {
+	    if (this.canvas) {
+	        var ctx = this.canvas.getContext("2d");
+	        // ctx.clearRect(0,0,canv.width, canv.height);
+	        _preSetCtx(ctx);
+	        ctx.save();
+	        // ctx.fillStyle = "rgba(240,200,20,.7)";
+	        // ctx.fillRect(0,0,canv.width, canv.height);
+	        ctx.shadowBlur = 4;
+	        ctx.shadowColor = "rgba(255,255,255,.4)";
+	        for (var i = 0; i < objs.length; i++) {
+	            var x = objs[i]['lon'],
+	                y = objs[i]['lat'],
+	                radius = objs[i]['radius'] || 2;
+	            var pix = this.lnglat2pix(x, y);
+	            if (pix == null) continue;
+	            ctx.fillStyle = objs[i]['color'];
+	            ctx.beginPath();
+	            ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
+	            ctx.fill();
+	            ctx.closePath();
+	        }
+	        ctx.restore();
+	    }
+	}
+
 /***/ }),
 /* 31 */
 /***/ (function(module, exports) {
@@ -2831,11 +2827,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Base class of Overlayer
 	 */
-	var Overlayer = exports.Overlayer = function () {
+	var Overlayer = function () {
 	    function Overlayer(opts) {
 	        _classCallCheck(this, Overlayer);
 
-	        this.map = opts.map || undefined;
+	        if (opts) this.map = opts.map || undefined;
 	    }
 
 	    // @setter
@@ -2856,8 +2852,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function lnglat2pix(lng, lat) {
 	            if (map != undefined && map.project instanceof Function) {
 	                var lnglat = map.project(new mapboxgl.LngLat(lng, lat));
-	                var x = lnglat.x;
-	                var y = lnglat.y;
+	                var x = lnglat.x,
+	                    y = lnglat.y;
 	                return [x, y];
 	            }
 	            return [lng, lat];
@@ -2866,6 +2862,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return Overlayer;
 	}();
+
+	exports.default = Overlayer;
 
 /***/ })
 /******/ ])
