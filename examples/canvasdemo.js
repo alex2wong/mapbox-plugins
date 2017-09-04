@@ -5,8 +5,8 @@ var mapCenter = [118.0066, 30.6135];
 var map = new mapboxgl.Map({
     style: {
         "version": 8,
-        "sprite": "../assets/sprite",
-        "glyphs": "../../{fontstack}/{range}.pbf",
+        "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+        "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
         "sources": {
             "custom-tms": {   
                 'type': 'raster',
@@ -40,6 +40,7 @@ var map = new mapboxgl.Map({
 
 map.on('load', function() {
     Alex.myTween.fps = 40;
+    Alex.myTween.loop = true;
     init();
 });
 
@@ -49,7 +50,10 @@ function init() {
     // myTween.loop = false;
     targets = Alex.Util.rdObjs(objNum, mapCenter);
     Alex.myTween.get(objs).to(targets, 8000, canvasLayer.redraw);
-    map.on('move', function(){
+    map.on('moveend', function(){
         canvasLayer.redraw(objs);
     });
+
+    var btn = document.querySelector("#pausePointbtn");
+    btn.addEventListener("click", Alex.myTween.toggleAni);
 }
