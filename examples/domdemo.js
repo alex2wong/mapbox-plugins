@@ -1,8 +1,9 @@
-// import { Alex } from '../dist/bundle.js';
+// import * as Alex from '../src/index';
 
+// Alex.Util.getJSON("../package.json");
 mapboxgl.accessToken = false;
 var mapCenter = [118.0066, 30.6135];
-var map = new mapboxgl.Map({
+var map1 = new mapboxgl.Map({
     style: {
         "version": 8,
         "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
@@ -35,25 +36,19 @@ var map = new mapboxgl.Map({
         'color':'white',
         'intensity':0.7
     },
-    container: 'map'
+    container: 'map1'
 });
 
-map.on('load', function() {
-    Alex.myTween.fps = 40;
-    Alex.myTween.loop = true;
-    init();
-});
-
-function init() {
-    var objNum = 10, canvasLayer = new Alex.CanvasOverlayer({map:map});
-    objs = Alex.Util.rdObjs(objNum, mapCenter);
-    // myTween.loop = false;
-    targets = Alex.Util.rdObjs(objNum, mapCenter);
-    Alex.myTween.get(objs).to(targets, 8000, canvasLayer.redraw);
-    map.on('moveend', function(){
-        canvasLayer.redraw(objs);
+map1.on('load', function() {
+    var domLayer = new Alex.DomOverlayer({
+        map: map1,
+        doms: [
+            {
+                icon: 'rocket-11',
+                content: "This is domOverlay",
+                lon: mapCenter[0],
+                lat: mapCenter[1]
+            }
+        ]
     });
-
-    var btn = document.querySelector("#pausePointbtn");
-    btn.addEventListener("click", Alex.myTween.toggleAni);
-}
+});

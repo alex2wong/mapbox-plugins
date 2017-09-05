@@ -3,8 +3,15 @@
  */
 export default class Overlayer {
     constructor(opts){
-        if (opts)
+        if(opts && opts.map)
             this.map = opts.map || undefined;
+    }
+
+    /**
+     * to be overwrite in subClass
+     */
+    _init(){
+
     }
 
     // @setter
@@ -16,8 +23,8 @@ export default class Overlayer {
      * use Global map or this.map instance to project
      */
     lnglat2pix(lng, lat) {
-        if (map != undefined && map.project instanceof Function) {
-            let lnglat = map.project(new mapboxgl.LngLat(
+        if (this.map != undefined && this.map.project instanceof Function) {
+            let lnglat = this.map.project(new mapboxgl.LngLat(
                 lng, lat));
             let x = lnglat.x, y = lnglat.y;
             return [x, y];

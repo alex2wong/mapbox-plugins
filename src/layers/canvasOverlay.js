@@ -5,16 +5,17 @@ import Overlayer from './overlay';
  */
 export class CanvasOverlayer extends Overlayer {
     constructor(opts) {
-        super();
-        this.canvas = this._initCanvas();
+        super(opts);        
+        this.canvas = this._init();
         this.redraw = _redraw.bind(this);
-        if (opts)
+        if (opts) {            
             this.source = opts.objs;
+        }
     }
 
-    _initCanvas() {
-        let canvasContainer = document.querySelector(".mapboxgl-canvas-container"),
-            mapboxCanvas = document.querySelector(".mapboxgl-canvas"),
+    _init() {
+        let canvasContainer = this.map._canvasContainer,
+            mapboxCanvas = this.map._canvas,
             canvasOverlay = document.createElement("canvas");
         canvasOverlay.style.position = "absolute";
         canvasOverlay.className = "overlay-canvas";

@@ -1,3 +1,4 @@
+import Const from './const';
 
 export default class util {
 
@@ -27,7 +28,7 @@ export default class util {
     /**
      * return promise obj.
      */
-    static getJSON(url) {
+    static getJSON(url, resolve, reject) {
         let promise = new Promise((resolve, reject) => {
             let xhr = new XMLHttpRequest();
             xhr.open("GET", url);
@@ -50,6 +51,26 @@ export default class util {
         })
 
         return promise;
+    }
+
+    /**
+     * return iconposition style by iconName
+     */
+    static setIconDiv(dom, iconName) {        
+        let icons = Const.Sprites;
+        if (iconName && icons[iconName]) {
+            let iconStyle = icons[iconName],
+                iconDiv = document.createElement("div");
+            iconDiv.style.width = iconStyle.width;
+            iconDiv.style.height = iconStyle.height;
+            iconDiv.style.overflow = 'hidden';
+            let iconImg = document.createElement("img");
+            iconImg.src = Const.SpritesUrl + ".png";
+            iconImg.style.marginLeft = "-" + iconStyle.x + "px";
+            iconImg.style.marginTop = "-" + iconStyle.y + "px";
+            iconDiv.appendChild(iconImg);
+            dom.appendChild(iconDiv);
+        }
     }
 
     // random point objs with given number

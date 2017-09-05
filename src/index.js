@@ -7,8 +7,9 @@ import Controllers from "./controller";
 
 import { myTween, sleep} from "./tween/Tween";
 import { CanvasOverlayer } from './layers/canvasOverlay';
+import { DomOverlayer } from './layers/domOverlay';
 
 // Static Props..
 export {
-    Drone, Canvas, Chart, Util, Controllers, myTween, CanvasOverlayer
+    Drone, Canvas, Chart, Util, Controllers, myTween, CanvasOverlayer, DomOverlayer
 }
