@@ -3038,6 +3038,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
+	// Forked from https://github.com/kronick/HexgridHeatmap
 	var rbush = __webpack_require__(34);
 	var turf = {
 	    center: __webpack_require__(36),
