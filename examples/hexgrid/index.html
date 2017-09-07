@@ -1,0 +1,61 @@
+<!doctype html>
+<head>
+    <title>Hexgrid Heatmap</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet' />    
+</head>
+
+<div id='map' style='width: 800px; height: 600px;'></div>
+<!--<script src='../../dist/mapbox-gl.js'></script>-->
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
+<script src='https://alex2wong.github.io/mapbox-plugins/examples/hexgrid/sightseeing-pois.js'></script>
+<script>
+    mapboxgl.accessToken = false;
+    var map = new mapboxgl.Map({
+        container: 'map',
+        style: {
+            "version": 8,
+            "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+            "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+            "sources": {
+                "custom-tms": {   
+                    'type': 'raster',
+                    'tiles': [
+                        // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+                        "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
+                    ],
+                    'tileSize': 256
+                },
+            },
+            "layers": [
+                {
+                    'id': 'custom-tms',
+                    'type': 'raster',
+                    'source': 'custom-tms',
+                    'paint': {}
+                },
+            ]
+        },
+        zoom: 12,
+        pitch: 15,
+        bearing: 0,
+        center: [-122.42534069839593, 37.77444125366313]
+    });
+    map.on("load", function() {
+        var heatmap = new Alex.HexgridHeatmap(map, "hexgrid-heatmap");
+        heatmap.setIntensity(15);
+        heatmap.setSpread(0.3);
+        heatmap.setData(sightseeingPOIs);
+        heatmap.update();
+        heatmap.setColorStops([
+            [0, "rgba(0,185,243,0)"],
+            [50, "rgba(0,185,243,0.6)"],
+            [130, "rgba(255,223,0,0.7)"],
+            [200, "rgba(255,105,0,0.7)"]
+        ])
+    });
+</script>
