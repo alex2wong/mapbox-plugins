@@ -61,8 +61,8 @@ export default class util {
         if (iconName && icons[iconName]) {
             let iconStyle = icons[iconName],
                 iconDiv = document.createElement("div");
-            iconDiv.style.width = iconStyle.width;
-            iconDiv.style.height = iconStyle.height;
+            iconDiv.style.width = iconStyle.width + "px";
+            iconDiv.style.height = iconStyle.height + "px";
             iconDiv.style.overflow = 'hidden';
             let iconImg = document.createElement("img");
             iconImg.src = Const.SpritesUrl + ".png";

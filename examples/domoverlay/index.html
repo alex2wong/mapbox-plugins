@@ -1,11 +1,12 @@
 <!doctype html>
 <head>
-    <title>Hexgrid Heatmap</title>
+    <title>Dom Overlay Demo</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">   
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.34.0/mapbox-gl.css' rel='stylesheet' />    
+    <link href="https://alex2wong.github.io/mapbox-plugins/styles.css" rel="stylesheet" />
 </head>
 
 <div id='map' style='width: 800px; height: 600px;'></div>
@@ -15,6 +16,7 @@
 <script src='https://alex2wong.github.io/mapbox-plugins/examples/hexgrid/sightseeing-pois.js'></script>
 <script>
     mapboxgl.accessToken = false;
+    var mapCenter = [118.0066, 30.6135];
     var map = new mapboxgl.Map({
         container: 'map',
         style: {
@@ -26,6 +28,7 @@
                     'type': 'raster',
                     'tiles': [
                         // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+                        // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
                         "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
                     ],
                     'tileSize': 256
@@ -40,22 +43,22 @@
                 },
             ]
         },
-        zoom: 12,
+        zoom: 7,
         pitch: 15,
         bearing: 0,
-        center: [-122.42534069839593, 37.77444125366313]
+        center: mapCenter
     });
-    map.on("load", function() {
-        var heatmap = new Alex.HexgridHeatmap(map, "hexgrid-heatmap");
-        heatmap.setIntensity(15);
-        heatmap.setSpread(0.3);
-        heatmap.setData(sightseeingPOIs);
-        heatmap.update();
-        heatmap.setColorStops([
-            [0, "rgba(0,185,243,0)"],
-            [50, "rgba(0,185,243,0.6)"],
-            [130, "rgba(255,223,0,0.7)"],
-            [200, "rgba(255,105,0,0.7)"]
-        ])
+    map.on('load', function() {
+        var domLayer = new Alex.DomOverlayer({
+            map: map,
+            doms: [
+                {
+                    icon: 'rocket-11',
+                    content: "This is domOverlay",
+                    lon: mapCenter[0],
+                    lat: mapCenter[1]
+                }
+            ]
+        });
     });
 </script>
