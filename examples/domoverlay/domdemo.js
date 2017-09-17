@@ -1,9 +1,9 @@
 // import * as Alex from '../src/index';
 
-// Alex.Util.getJSON("../package.json");
+var data = null;
 mapboxgl.accessToken = false;
 var mapCenter = [118.0066, 30.6135];
-var map1 = new mapboxgl.Map({
+var map = new mapboxgl.Map({
     style: {
         "version": 8,
         "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
@@ -12,8 +12,9 @@ var map1 = new mapboxgl.Map({
             "custom-tms": {   
                 'type': 'raster',
                 'tiles': [
-                    "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
-                    // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
+                    // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+                    // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}",
+                    "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
                 ],
                 'tileSize': 256
             },
@@ -29,19 +30,36 @@ var map1 = new mapboxgl.Map({
     },
     center: mapCenter,
     zoom: 6,
-    pitch: 45,
+    pitch: 15,
     bearing: 0,
     light: {
         'anchor':'viewport',
         'color':'white',
         'intensity':0.7
     },
-    container: 'map1'
+    container: 'map'
 });
 
-map1.on('load', function() {
+map.on('load', function() {
+    Alex.Util.getJSON("../../assets/countries.geojson", function(res){
+        console.log("got jsonData..");
+        data = res;
+        map.addSource("world", {
+            "type": "geojson",
+            "data": data
+        });
+        map.addLayer("world", {
+            "source": "world",
+            "type": "fill",
+            "paint": {
+                "fill-color": "#888888",
+                "fill-opacity": 0.4
+            },
+            "filter": ["==", "$type", "Polygon"]
+        });
+    });
     var domLayer = new Alex.DomOverlayer({
-        map: map1,
+        map: map,
         doms: [
             {
                 icon: 'rocket-11',

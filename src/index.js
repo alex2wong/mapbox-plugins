@@ -9,10 +9,10 @@ import { myTween, sleep} from "./tween/Tween";
 import { CanvasOverlayer } from './layers/canvasOverlay';
 import { DomOverlayer } from './layers/domOverlay';
 
-import HexgridHeatmap from './layers/hexgridHeatLayer';
+// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
 
 // Static Props..
 export {
     Drone, Canvas, Chart, Util, Controllers, myTween, 
-    CanvasOverlayer, DomOverlayer, HexgridHeatmap
+    CanvasOverlayer, DomOverlayer
 }
