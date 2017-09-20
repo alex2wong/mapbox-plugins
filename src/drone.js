@@ -24,8 +24,15 @@ export default class Drone extends Sprite {
      * maintask start interval to update its status.
      */
     updateStatus () {
-        this.loction.coordinates[0] += Math.sin(this.direction) * this.speed;
-        this.loction.coordinates[1] += Math.cos(this.direction) * this.speed;
+        // make sure Sprite in world..
+        let alY = Math.cos(this.direction*Math.PI/180) * this.speed * 0.001,
+            lat = this.lat + alY;
+        if (lat > 88 || lat < -88) {
+            alY = 0;
+            console.warn("latitude out of bbox");
+        }
+        this.lon += Math.sin(this.direction*Math.PI/180) * this.speed * 0.001;
+        this.lat += alY;
         // updateStatusView. toDO in maintask.js
     }
 

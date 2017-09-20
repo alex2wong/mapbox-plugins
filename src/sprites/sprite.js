@@ -3,13 +3,24 @@
  */
 export class Sprite {
     constructor(opts) {
+        // oye !! hack the Class() with no args.
+        let _opts = opts || {};
         this.id = genId();
-        this.speed = opts.speed || 1;
-        this.direction = opts.direction || 0;
-        this.name = opts.name || randomName();
-        this.loction = {
-            type: 'Point',
-            coordinates: [100, 30]
+        this.speed = _opts.speed || 1;
+        this.direction = _opts.direction || 0;
+        this.name = _opts.name || randomName();
+        this.lon = _opts.lon || 120;
+        this.lat = _opts.lat || 30;
+        this.iconUrl = _opts.icon;
+        this.icon = null;
+        this._init();
+    }
+
+    _init () {
+        let img = new Image();
+        img.src = this.iconUrl;
+        img.onload = () => {
+            this.icon = img;
         }
     }
 
@@ -22,12 +33,12 @@ export class Sprite {
     
     turnLeft () {
         if (this) {
-            this.direction -= 0.1;
+            this.direction -= 2;
         }
     }
         
     turnRight () {
-        this.direction += 0.1;
+        this.direction += 2;
     }
 
     brake () {
