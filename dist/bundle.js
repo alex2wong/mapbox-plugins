@@ -160,6 +160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.firing = false;
 	        _this.bulletNum = 2;
 	        _this.icon = _const2.default.Images.Plane;
+	        _this.manual = false;
 	        return _this;
 	    }
 
@@ -175,8 +176,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            var alY = Math.cos(this.direction * Math.PI / 180) * this.speed * 0.001,
 	                lat = this.lat + alY;
 	            if (lat > 88 || lat < -88) {
-	                alY = 0;
-	                console.warn("latitude out of bbox");
+	                alY = -alY;
+	                this.direction += 180;
+	                console.warn("latitude out of bbox, turn back..");
 	            }
 	            this.lon += Math.sin(this.direction * Math.PI / 180) * this.speed * 0.001;
 	            this.lat += alY;
@@ -1083,7 +1085,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            try {
 	                setInterval(function () {
-	                    ele.innerHTML = drone.name + "<br> coords: " + drone.point.coordinates[0].toFixed(1) + ", " + drone.point.coordinates[1].toFixed(1) + "<br>" + 'speed: ' + drone.speed + "<br>" + 'direction: ' + (drone.direction % (Math.PI * 2) * 180 / Math.PI).toFixed(1);
+	                    ele.innerHTML = drone.name + "<br> coords: " + drone.lon.toFixed(1) + ", " + drone.lat.toFixed(1) + "<br>" + 'speed: ' + drone.speed + "<br>" + 'direction: ' + (drone.direction % 360).toFixed(1);
 	                }, 200);
 	            } catch (e) {
 	                console.error(e);
@@ -2876,7 +2878,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.trackCtx.lineTo(pix[0], pix[1]);
 	                }
 	                this.trackCtx.stroke();
-	                console.warn("Redraw Tracks.. completed.");
 	            }
 	        }
 	    }]);
@@ -2952,6 +2953,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                    this.trackCtx.lineTo(pix[0], pix[1]);
 	                    this.tracks.push([x, y]);
 	                    setTimeout(function () {
+	                        //// closePath would auto-complete the path to polygon..
 	                        // this.trackCtx.closePath();
 	                        _this2.trackCtx.stroke();
 	                        _this2.initTrackCtx();
