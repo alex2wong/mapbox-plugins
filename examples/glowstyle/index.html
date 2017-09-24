@@ -5,16 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">   
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
-    <link href="../../styles.css" rel="stylesheet" />
-    <link href="../../dist/OSMBuildings.css" rel="stylesheet" />
+    <link href='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.css' rel='stylesheet' />    
+    <link href="https://alex2wong.github.io/mapbox-plugins/styles.css" rel="stylesheet" />
+    <link href="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.css" rel="stylesheet" />
 </head>
 
 <div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'></div>
 <!--<script src='../../dist/mapbox-gl.js'></script>-->
-<script src='../../dist/mapbox-gl.js'></script>
-<script src='../../dist/bundle.js'></script>
-<script src="../../dist/OSMBuildings.debug.js"></script>
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
+<script src="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.debug.js"></script>
 <script>
     // import * as Alex from '../src/index';
 
@@ -61,7 +61,7 @@
     });
 
     map.on('load', function() {
-        Alex.Util.getJSON("../../assets/countries.geojson")
+        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/countries.geojson")
             .then((res) => {
                 console.log("got jsonData..");
                 data = res;
@@ -81,7 +81,7 @@
                     // "filter": ["==", "$type", "Polygon"]
                 });
             });
-        Alex.Util.getJSON("../../assets/berlinRoad.geojson")
+        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/berlinRoad.geojson")
             .then((res) => {
                 console.log("got line data..");
                 map.addSource("roads", {
@@ -95,8 +95,8 @@
                     "paint": {
                         "line-color": "#fffb91",
                         "line-opacity": 0.8,
-                        "line-blur": 2,
-                        "line-width": 4,
+                        "line-blur": 4,
+                        "line-width": 6,
                         // {
                         //     "type": "identity",
                         //     "property":  "CLASS"
@@ -110,7 +110,7 @@
             zoom: (map.getZoom() + 1),
             minZoom: 15
         })
-        osmb.appendTo('map');
+        // osmb.appendTo('map');
 
         // // osmb.addMapTiles(
         // //     'https://{s}.tiles.mapbox.com/v3/osmbuildings.kbpalbpk/{z}/{x}/{y}.png',
@@ -119,7 +119,7 @@
         // //     }
         // // );
 
-        osmb.addGeoJSONTiles('http://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
+        // osmb.addGeoJSONTiles('http://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
         // var now = null;
         // function changeDate() {
         //     var Y = now.getFullYear(),

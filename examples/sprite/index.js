@@ -33,7 +33,7 @@
         },
         center: mapCenter,
         zoom: 7,
-        maxzoom: 9,
+        maxzoom: 8,
         pitch: 15,
         bearing: 0,
         light: {
@@ -74,23 +74,27 @@
     function init() {
         var objNum = 4, canvasLayer = new Alex.CanvasOverlayer({
             map: map,
-            shadow: true,
-            keepTrack: false
+            shadow: false,
+            keepTrack: true
         });
         objs = Alex.Util.rdObjs(objNum, mapCenter);
         // myTween.loop = false;
         targets = Alex.Util.rdObjs(objNum, mapCenter);
         var drone = new Alex.Drone({
             direction: 45,
-            icon: "https://alex2wong.github.io/mapbox-plugins/assets/plane.png"
+            icon: "https://alex2wong.github.io/mapbox-plugins/assets/tri2.png"
         });
 
         Alex.Controllers.gameControl(drone);
         Alex.myTween.get(objs).to(targets, 6000, canvasLayer.redraw);
+        canvasLayer.initTrackCtx();
         console.log("dom loaded !... register animation...");
 
-        setInterval(()=>{
+        
+        function update(){
             drone.updateStatus();
             canvasLayer.redraw([drone]);
-        }, 1000/40);
+            requestAnimationFrame(update);
+        }
+        update();
     }
