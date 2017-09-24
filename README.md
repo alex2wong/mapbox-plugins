@@ -7,8 +7,7 @@ Note: pls visit all demo with **HTTPS**..
 
 ![DEMO screenshot](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/ss.gif)
 
-![Sprite track screenshot]
-(https://github.com/alex2wong/mapbox-plugins/blob/master/assets/sprite_demo.png)
+![Sprite track screenshot](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/sprite_demo.png)
 
 [Sprite track DEMO](https://alex2wong.github.io/mapbox-plugins/examples/sprite)
 
