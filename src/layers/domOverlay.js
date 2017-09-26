@@ -1,6 +1,8 @@
 import Overlayer from './overlay';
 import Util from '../util';
 
+const duration = 1200;
+
 /**
  * initDomOverlayer
  */
@@ -57,20 +59,36 @@ function _redraw(domOpts) {
             let x = domOpt['lon'], y = domOpt['lat'], 
                 pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
-            let iconName = domOpt['icon'];
-            let dom = document.createElement("div");
+            let iconName = domOpt['icon'],
+                dom = document.createElement("div"),
+                line = document.createElement("div"),
+                point = document.createElement("div");
+            animLine(line);
+            point.style.borderRadius = '50%';
+            point.style.width = '4px';
+            point.style.height = '4px';
+
             dom.innerHTML = domOpt['content'];
             Util.setIconDiv(dom, iconName);
             dom.className = "dom-popup";
             dom.style.position = "absolute";
             dom.style.background = "#fff";
             dom.style.padding = '5px';
+            // set domOverlay position. dom box animation needed.
             dom.style.left = pix[0] + "px";
             dom.style.top = pix[1] + "px";
+            dom.style.zIndex = 100;
+            dom.style.animation
+            this.domContainer.appendChild(point);
+            this.domContainer.appendChild(line);
             this.domContainer.appendChild(dom);
             this.doms.push(dom);
         }
     }
+}
+
+function animLine (line){
+    line.className = "dom-line";    
 }
 
 const htmlTemplate = {
