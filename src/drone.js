@@ -18,14 +18,23 @@ export default class Drone extends Sprite {
         this.firing = false;
         this.bulletNum = 2;
         this.icon = Const.Images.Plane;
+        this.manual = false;
     }
 
     /**
      * maintask start interval to update its status.
      */
     updateStatus () {
-        this.loction.coordinates[0] += Math.sin(this.direction) * this.speed;
-        this.loction.coordinates[1] += Math.cos(this.direction) * this.speed;
+        // make sure Sprite in world..
+        let alY = Math.cos(this.direction*Math.PI/180) * this.speed * 0.001,
+            lat = this.lat + alY;
+        if (lat > 84 || lat < -84) {
+            alY = -alY;
+            this.direction += 180;
+            console.warn("latitude out of bbox, turn back..");
+        }
+        this.lon += Math.sin(this.direction*Math.PI/180) * this.speed * 0.001;
+        this.lat += alY;
         // updateStatusView. toDO in maintask.js
     }
 

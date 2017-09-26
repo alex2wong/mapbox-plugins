@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.HexgridHeatmap = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
+	exports.rbush = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
 
 	var _drone = __webpack_require__(2);
 
@@ -88,17 +88,18 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _controller2 = _interopRequireDefault(_controller);
 
-	var _Tween = __webpack_require__(30);
+	var _Tween = __webpack_require__(32);
 
-	var _canvasOverlay = __webpack_require__(31);
+	var _canvasOverlay = __webpack_require__(30);
 
 	var _domOverlay = __webpack_require__(33);
 
-	var _hexgridHeatLayer = __webpack_require__(34);
-
-	var _hexgridHeatLayer2 = _interopRequireDefault(_hexgridHeatLayer);
-
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	// this is Root Module for Whole app, require lib we need.
+	var rbush = __webpack_require__(34);
+
+	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
 
 	// Static Props..
 	exports.Drone = _drone2.default;
@@ -109,7 +110,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.myTween = _Tween.myTween;
 	exports.CanvasOverlayer = _canvasOverlay.CanvasOverlayer;
 	exports.DomOverlayer = _domOverlay.DomOverlayer;
-	exports.HexgridHeatmap = _hexgridHeatLayer2.default; // this is Root Module for Whole app, require lib we need.
+	exports.rbush = rbush;
 
 /***/ }),
 /* 2 */
@@ -162,6 +163,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.firing = false;
 	        _this.bulletNum = 2;
 	        _this.icon = _const2.default.Images.Plane;
+	        _this.manual = false;
 	        return _this;
 	    }
 
@@ -173,8 +175,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    _createClass(Drone, [{
 	        key: 'updateStatus',
 	        value: function updateStatus() {
-	            this.loction.coordinates[0] += Math.sin(this.direction) * this.speed;
-	            this.loction.coordinates[1] += Math.cos(this.direction) * this.speed;
+	            // make sure Sprite in world..
+	            var alY = Math.cos(this.direction * Math.PI / 180) * this.speed * 0.001,
+	                lat = this.lat + alY;
+	            if (lat > 84 || lat < -84) {
+	                alY = -alY;
+	                this.direction += 180;
+	                console.warn("latitude out of bbox, turn back..");
+	            }
+	            this.lon += Math.sin(this.direction * Math.PI / 180) * this.speed * 0.001;
+	            this.lat += alY;
 	            // updateStatusView. toDO in maintask.js
 	        }
 	    }, {
@@ -239,7 +249,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	exports.default = Const;
 	Const.DroneParam = {
-	    MAXSPEED: 5,
+	    MAXSPEED: 15,
 	    FIRINGTIME: 800,
 	    LIFE: 10,
 	    // Firing range.. 0.2 rad in LngLat
@@ -281,8 +291,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        coordinates: [0, 0]
 	    };
 	    // DeepCopy the drone coords to bullet.
-	    this.spoint.coordinates[0] = opts.point.coordinates[0];
-	    this.spoint.coordinates[1] = opts.point.coordinates[1];
+	    this.spoint.coordinates[0] = opts.lon;
+	    this.spoint.coordinates[1] = opts.lat;
 	};
 
 	exports.default = Bullet;
@@ -520,35 +530,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function Sprite(opts) {
 	        _classCallCheck(this, Sprite);
 
+	        // oye !! hack the Class() with no args.
+	        var _opts = opts || {};
 	        this.id = genId();
-	        this.speed = opts.speed || 1;
-	        this.direction = opts.direction || 0;
-	        this.name = opts.name || randomName();
-	        this.loction = {
-	            type: 'Point',
-	            coordinates: [100, 30]
-	        };
+	        this.speed = _opts.speed || 1;
+	        this.direction = _opts.direction || 0;
+	        this.name = _opts.name || randomName();
+	        this.lon = _opts.lon || 120;
+	        this.lat = _opts.lat || 30;
+	        this.iconUrl = _opts.icon;
+	        this.icon = null;
+	        this._init();
 	    }
 
-	    /**
-	     * to be overwrite.
-	     */
-
-
 	    _createClass(Sprite, [{
+	        key: "_init",
+	        value: function _init() {
+	            var _this = this;
+
+	            var img = new Image();
+	            img.src = this.iconUrl;
+	            img.onload = function () {
+	                _this.icon = img;
+	            };
+	        }
+
+	        /**
+	         * to be overwrite.
+	         */
+
+	    }, {
 	        key: "accelerate",
 	        value: function accelerate() {}
 	    }, {
 	        key: "turnLeft",
 	        value: function turnLeft() {
 	            if (this) {
-	                this.direction -= 0.1;
+	                this.direction -= 2;
 	            }
 	        }
 	    }, {
 	        key: "turnRight",
 	        value: function turnRight() {
-	            this.direction += 0.1;
+	            this.direction += 2;
 	        }
 	    }, {
 	        key: "brake",
@@ -585,7 +609,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function BBOX(opts) {
+	    var _opts = opts || {};
+	    this.minX = _opts.minX;
+	    this.minY = _opts.minY;
+	    this.maxX = _opts.maxX;
+	    this.maxY = _opts.maxY;
+	}
+
 	// Some Static Function bind with one Canvas context
+
 	var Canvas = function () {
 	    function Canvas() {
 	        _classCallCheck(this, Canvas);
@@ -596,18 +629,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Bound with a canvas element.
 	        value: function init(ele) {
-	            Canvas.canv = ele;
-	            Canvas.height = ele.height;
-	            Canvas.width = ele.width;
-	            // let the canvas's width/height cohere width DOM width/height. 
-	            Canvas.canv.width = ele.width;
-	            Canvas.canv.height = ele.height;
-	            Canvas.ctx = ele.getContext("2d");
-	            Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
-	            Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
-	            Canvas.ctx.strokeWidth = 2;
-	            Canvas.animate = false;
-	            Canvas.img = new Image();
+	            if (ele instanceof HTMLCanvasElement) {
+	                Canvas.canv = ele;
+	                Canvas.height = ele.height;
+	                Canvas.width = ele.width;
+	                // let the canvas's width/height cohere width DOM width/height. 
+	                Canvas.ctx = ele.getContext("2d");
+	                Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
+	                Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
+	                Canvas.ctx.strokeWidth = 1;
+	                Canvas.animate = false;
+	                Canvas.img = new Image();
+	            } else {
+	                console.error("ele is not instanceof CANVAS");
+	            }
 	        }
 
 	        /**
@@ -617,7 +652,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "setStroke",
 	        value: function setStroke(colorStr) {
-	            Canvas.ctx.strokeStyle = colorStr;
+	            if (Canvas.ctx) Canvas.ctx.strokeStyle = colorStr;
 	        }
 
 	        /**
@@ -627,7 +662,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "setFill",
 	        value: function setFill(colorStr) {
-	            Canvas.ctx.fillStyle = colorStr;
+	            if (Canvas.ctx) Canvas.ctx.fillStyle = colorStr;
 	        }
 
 	        /**
@@ -738,6 +773,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
+	         * drawRect with given BBox{minX, minY, maxX, maxY}
+	         */
+
+	    }, {
+	        key: "drawRect",
+	        value: function drawRect(bbox) {
+	            var fill = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	            var _bbox = new BBOX(bbox),
+	                rectWidth = _bbox.maxX - _bbox.minX,
+	                rectHeight = _bbox.maxY - _bbox.minY;
+	            if (fill) {
+	                Canvas.ctx.fillRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+	            } else {
+	                Canvas.ctx.strokeRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+	            }
+	        }
+
+	        /**
 	         * drawLine with given Value..@Array
 	         * lwidth : lineWidth @number
 	         * dash: default false @bool
@@ -813,8 +867,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "clearCanv",
 	        value: function clearCanv() {
 	            Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
-	            Canvas.setFill("#000");
-	            Canvas.ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+	            // Canvas.setFill("#000");
+	            // Canvas.ctx.fillRect(0,0,Canvas.width,Canvas.height);
 	        }
 	    }]);
 
@@ -983,6 +1037,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _coreDecorators = __webpack_require__(11);
 
+	var _canvasOverlay = __webpack_require__(30);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1024,6 +1080,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	            console.log("gameControl register success.");
+	        }
+
+	        /**
+	         * pickupObj control, need to bind with canvasOverlay, to fetch the objs drawn
+	         * each moveEnd, rebuild the pixList depend on objs in viewport!
+	         * pixList's index is vital for pickUp performance.
+	         */
+
+	    }, {
+	        key: 'pickupControl',
+	        value: function pickupControl(canvasOverlay) {
+	            if (canvasOverlay instanceof _canvasOverlay.CanvasOverlayer) {
+	                // establish pixList storing objs' location. canvasOverlay.source.lon, lat
+	                var pix = canvasOverlay.lnglat2pix(canvasOverlay.source[0].lon, canvasOverlay.source[1].lat);
+	            }
 	        }
 
 	        /**
@@ -1070,7 +1141,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	            try {
 	                setInterval(function () {
-	                    ele.innerHTML = drone.name + "<br> coords: " + drone.point.coordinates[0].toFixed(1) + ", " + drone.point.coordinates[1].toFixed(1) + "<br>" + 'speed: ' + drone.speed + "<br>" + 'direction: ' + (drone.direction % (Math.PI * 2) * 180 / Math.PI).toFixed(1);
+	                    ele.innerHTML = drone.name + "<br> coords: " + drone.lon.toFixed(1) + ", " + drone.lat.toFixed(1) + "<br>" + 'speed: ' + drone.speed + "<br>" + 'direction: ' + (drone.direction % 360).toFixed(1);
 	                }, 200);
 	            } catch (e) {
 	                console.error(e);
@@ -3958,6 +4029,315 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 30 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.CanvasOverlayer = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _overlay = __webpack_require__(31);
+
+	var _overlay2 = _interopRequireDefault(_overlay);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * initCanvasOverlayer based on mapboxgl-canvas
+	 */
+	var CanvasOverlayer = exports.CanvasOverlayer = function (_Overlayer) {
+	    _inherits(CanvasOverlayer, _Overlayer);
+
+	    function CanvasOverlayer(opts) {
+	        _classCallCheck(this, CanvasOverlayer);
+
+	        var _opts = opts || {};
+
+	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this, _opts));
+
+	        _this.canvas = _this._init();
+	        _this.redraw = _redraw.bind(_this);
+	        _this.shadow = _opts.shadow != undefined ? _opts.shadow : false;
+	        _this.keepTrack = _opts.keepTrack != undefined ? _opts.keepTrack : false;
+	        if (_this.keepTrack) {
+	            // create trackLayer to render history track lines..
+	            _this.trackLayer = _this._init();
+	            _this._initTrackCtx();
+	        }
+	        _this.tracks = [];
+	        _this.initTrackCtx = _this._initTrackCtx.bind(_this);
+	        if (_opts && _opts.map) {
+	            _this.setMap(_opts.map);
+	            // 绑定每次move 都重绘doms..
+	            _opts.map.on("move", function () {
+	                _this.redrawTrack();
+	            });
+	        }
+	        return _this;
+	    }
+
+	    _createClass(CanvasOverlayer, [{
+	        key: "_init",
+	        value: function _init() {
+	            var shadow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	            var keepTrack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	            var canvasContainer = this.map._canvasContainer,
+	                mapboxCanvas = this.map._canvas,
+	                canvasOverlay = document.createElement("canvas");
+	            canvasOverlay.style.position = "absolute";
+	            canvasOverlay.className = "overlay-canvas";
+	            canvasOverlay.width = parseInt(mapboxCanvas.style.width);
+	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
+	            canvasContainer.appendChild(canvasOverlay);
+	            return canvasOverlay;
+	        }
+
+	        /**
+	         * init track ctx for each track segment rendering..
+	         */
+
+	    }, {
+	        key: "_initTrackCtx",
+	        value: function _initTrackCtx() {
+	            if (this.trackLayer) {
+	                this.trackCtx = this.trackLayer.getContext("2d");
+	                this.movedTo = false;
+	                initCtx(this.trackCtx, "rgba(255,255,255,.4");
+	                this.trackCtx.lineWidth = 2;
+	                this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
+	                this.trackCtx.beginPath();
+	            }
+	        }
+
+	        /**
+	         * render cached tracks to line when map moved..
+	         */
+
+	    }, {
+	        key: "redrawTrack",
+	        value: function redrawTrack() {
+	            if (this.trackCtx && this.tracks && this.tracks.length > 0) {
+	                var pix = [0, 0];
+	                this.trackCtx.clearRect(0, 0, this.trackLayer.width, this.trackLayer.height);
+	                this.trackCtx.beginPath();
+	                pix = this.lnglat2pix(this.tracks[0][0], this.tracks[0][1]);
+	                this.trackCtx.moveTo(pix[0], pix[1]);
+	                for (var i = 1; i < this.tracks.length; i++) {
+	                    pix = this.lnglat2pix(this.tracks[i][0], this.tracks[i][1]);
+	                    this.trackCtx.lineTo(pix[0], pix[1]);
+	                }
+	                this.trackCtx.stroke();
+	            }
+	        }
+	    }]);
+
+	    return CanvasOverlayer;
+	}(_overlay2.default);
+
+	function _preSetCtx(context) {
+	    //默认值为source-over
+	    var prev = context.globalCompositeOperation;
+	    //只显示canvas上原图像的重叠部分 source-in, source, destination-in
+	    context.globalCompositeOperation = 'destination-in';
+	    //设置主canvas的绘制透明度
+	    context.globalAlpha = 0.95;
+	    //这一步目的是将canvas上的图像变的透明
+	    // context.fillStyle = "rgba(0,0,0,.95)";
+	    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+	    //在原图像上重叠新图像
+	    context.globalCompositeOperation = prev;
+	}
+
+	var iconSize = 32;
+	/**
+	 * expoid this method, can be overwritten
+	 * for special render requirements..
+	 * Important ! redraw may use this.map as projector!
+	 * @param: keepLog, keep render Sprites location log.. 
+	 */
+	function _redraw(objs) {
+	    var _this2 = this;
+
+	    if (this.canvas) {
+	        var ctx = this.canvas.getContext("2d");
+	        // ctx.clearRect(0,0,canv.width, canv.height);
+	        if (this.shadow) {
+	            _preSetCtx(ctx);
+	            ctx.save();
+	        } else {
+	            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	        }
+	        // ctx.fillStyle = "rgba(240,200,20,.7)";
+	        // ctx.fillRect(0,0,canv.width, canv.height);
+
+	        initCtx(ctx, "rgba(255,255,255,.4");
+	        for (var i = 0; i < objs.length; i++) {
+	            var x = objs[i]['lon'],
+	                y = objs[i]['lat'],
+	                radius = objs[i]['radius'] || 2,
+	                icon = objs[i]['icon'],
+	                label = objs[i]['name'],
+	                rotate = objs[i]['direction'];
+	            radius = Math.abs(radius);
+	            var pix = this.lnglat2pix(x, y);
+	            if (pix == null) continue;
+	            ctx.fillStyle = objs[i]['color'];
+	            ctx.beginPath();
+	            if (label.startsWith("Play")) radius = iconSize * 0.75;
+	            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
+	            if (icon !== undefined) {
+	                var min = icon.height > icon.width ? icon.width : icon.height;
+	                ctx.save();
+	                ctx.translate(pix[0], pix[1]);
+	                ctx.rotate(rotate * Math.PI / 180);
+	                try {
+	                    ctx.drawImage(icon, 0, 0, min, min, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+	                } catch (e) {
+	                    console.warn("ctx.drawImage.. error.");
+	                }
+	                if (this.trackCtx && !this.movedTo) {
+	                    this.trackCtx.moveTo(pix[0], pix[1]);
+	                    this.movedTo = true;
+	                } else if (this.trackCtx) {
+	                    this.trackCtx.lineTo(pix[0], pix[1]);
+	                    this.tracks.push([x, y]);
+	                    setTimeout(function () {
+	                        //// closePath would auto-complete the path to polygon..
+	                        // this.trackCtx.closePath();
+	                        _this2.trackCtx.stroke();
+	                        _this2.initTrackCtx();
+	                    }, 0);
+	                }
+	                ctx.restore();
+	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
+	                ctx.stroke();
+	                // or drawSome Triangle things to present the Sprites..
+	            } else {
+	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
+	                ctx.fill();
+	            }
+	            // if (label !== undefined) {
+	            //     ctx.strokeText(label, pix[0], pix[1]);
+	            // }
+	            ctx.closePath();
+	        }
+	        if (this.shadow) {
+	            ctx.restore();
+	        }
+	    }
+	}
+
+	function initCtx(ctx, shadowColor) {
+	    if (ctx === undefined) return;
+	    ctx.shadowBlur = 7;
+	    ctx.shadowColor = "rgba(255,255,255,.8)";
+	    ctx.strokeStyle = "rgba(255,255,255,.9)";
+	}
+
+	/**
+	 * draw tri on canvas by center and rotation..
+	 * @param rotate: degree number,
+	 * @param radius: number, tri radius..
+	 *      /\  default beta angle is 30 degree.
+	 *     /  \
+	 *    /____\ 
+	 * draw triangle 
+	 */
+	function drawTri(ctx, coord, rotate) {
+	    var radius = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : iconSize / 2;
+	    var beta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 30;
+
+	    // calc the head point of triangle.
+	    var headPoint = [undefined, undefined],
+	        tailPoint = [undefined, undefined],
+	        rad = rotate * Math.PI / 180;
+	    headPoint[0] = coord[0] + Math.cos(rad) * radius;
+	    headPoint[1] = coord[1] + Math.sin(rad) * radius;
+	    tailPoint[0] = coord[0] - Math.cos(rad) * radius;
+	    tailPoint[1] = coord[1] - Math.sin(rad) * radius;
+	    var rot = rotate - beta / 2,
+	        rPoint = [undefined, undefined];
+	    rPoint[0] = Math.cos(rot * Math.PI / 180);
+
+	    ctx.lineTo(headPoint);
+	}
+
+/***/ }),
+/* 31 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * Base class of Overlayer
+	 */
+	var Overlayer = function () {
+	    function Overlayer(opts) {
+	        _classCallCheck(this, Overlayer);
+
+	        if (opts && opts.map) this.map = opts.map || undefined;
+	    }
+
+	    /**
+	     * to be overwrite in subClass
+	     */
+
+
+	    _createClass(Overlayer, [{
+	        key: "_init",
+	        value: function _init() {}
+
+	        // @setter
+
+	    }, {
+	        key: "setMap",
+	        value: function setMap(map) {
+	            this.map = map;
+	            return this;
+	        }
+	        /**
+	         * use Global map or this.map instance to project
+	         */
+
+	    }, {
+	        key: "lnglat2pix",
+	        value: function lnglat2pix(lng, lat) {
+	            if (this.map != undefined && this.map.project instanceof Function) {
+	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
+	                var x = lnglat.x,
+	                    y = lnglat.y;
+	                return [x, y];
+	            }
+	            return [lng, lat];
+	        }
+	    }]);
+
+	    return Overlayer;
+	}();
+
+	exports.default = Overlayer;
+
+/***/ }),
+/* 32 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -4104,176 +4484,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ }),
-/* 31 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.CanvasOverlayer = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _overlay = __webpack_require__(32);
-
-	var _overlay2 = _interopRequireDefault(_overlay);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * initCanvasOverlayer based on mapboxgl-canvas
-	 */
-	var CanvasOverlayer = exports.CanvasOverlayer = function (_Overlayer) {
-	    _inherits(CanvasOverlayer, _Overlayer);
-
-	    function CanvasOverlayer(opts) {
-	        _classCallCheck(this, CanvasOverlayer);
-
-	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this, opts));
-
-	        _this.canvas = _this._init();
-	        _this.redraw = _redraw.bind(_this);
-	        if (opts) {
-	            _this.source = opts.objs;
-	        }
-	        return _this;
-	    }
-
-	    _createClass(CanvasOverlayer, [{
-	        key: "_init",
-	        value: function _init() {
-	            var canvasContainer = this.map._canvasContainer,
-	                mapboxCanvas = this.map._canvas,
-	                canvasOverlay = document.createElement("canvas");
-	            canvasOverlay.style.position = "absolute";
-	            canvasOverlay.className = "overlay-canvas";
-	            canvasOverlay.width = parseInt(mapboxCanvas.style.width);
-	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
-	            canvasContainer.appendChild(canvasOverlay);
-	            return canvasOverlay;
-	        }
-	    }]);
-
-	    return CanvasOverlayer;
-	}(_overlay2.default);
-
-	function _preSetCtx(context) {
-	    //默认值为source-over
-	    var prev = context.globalCompositeOperation;
-	    //只显示canvas上原图像的重叠部分 source-in, source, destination-in
-	    context.globalCompositeOperation = 'destination-in';
-	    //设置主canvas的绘制透明度
-	    context.globalAlpha = 0.95;
-	    //这一步目的是将canvas上的图像变的透明
-	    // context.fillStyle = "rgba(0,0,0,.95)";
-	    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-	    //在原图像上重叠新图像
-	    context.globalCompositeOperation = prev;
-	}
-
-	/**
-	 * expoid this method, can be overwritten
-	 * for special render requirements..
-	 * Important ! redraw may use this.map as projector!
-	 */
-	function _redraw(objs) {
-	    if (this.canvas) {
-	        var ctx = this.canvas.getContext("2d");
-	        // ctx.clearRect(0,0,canv.width, canv.height);
-	        _preSetCtx(ctx);
-	        ctx.save();
-	        // ctx.fillStyle = "rgba(240,200,20,.7)";
-	        // ctx.fillRect(0,0,canv.width, canv.height);
-	        ctx.shadowBlur = 4;
-	        ctx.shadowColor = "rgba(255,255,255,.4)";
-	        for (var i = 0; i < objs.length; i++) {
-	            var x = objs[i]['lon'],
-	                y = objs[i]['lat'],
-	                radius = objs[i]['radius'] || 2;
-	            var pix = this.lnglat2pix(x, y);
-	            if (pix == null) continue;
-	            ctx.fillStyle = objs[i]['color'];
-	            ctx.beginPath();
-	            ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
-	            ctx.fill();
-	            ctx.closePath();
-	        }
-	        ctx.restore();
-	    }
-	}
-
-/***/ }),
-/* 32 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Base class of Overlayer
-	 */
-	var Overlayer = function () {
-	    function Overlayer(opts) {
-	        _classCallCheck(this, Overlayer);
-
-	        if (opts && opts.map) this.map = opts.map || undefined;
-	    }
-
-	    /**
-	     * to be overwrite in subClass
-	     */
-
-
-	    _createClass(Overlayer, [{
-	        key: "_init",
-	        value: function _init() {}
-
-	        // @setter
-
-	    }, {
-	        key: "setMap",
-	        value: function setMap(map) {
-	            this.map = map;
-	            return this;
-	        }
-	        /**
-	         * use Global map or this.map instance to project
-	         */
-
-	    }, {
-	        key: "lnglat2pix",
-	        value: function lnglat2pix(lng, lat) {
-	            if (this.map != undefined && this.map.project instanceof Function) {
-	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
-	                var x = lnglat.x,
-	                    y = lnglat.y;
-	                return [x, y];
-	            }
-	            return [lng, lat];
-	        }
-	    }]);
-
-	    return Overlayer;
-	}();
-
-	exports.default = Overlayer;
-
-/***/ }),
 /* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -4286,7 +4496,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _overlay = __webpack_require__(32);
+	var _overlay = __webpack_require__(31);
 
 	var _overlay2 = _interopRequireDefault(_overlay);
 
@@ -4320,6 +4530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.redraw = _redraw.bind(_this);
 	        if (opts && opts.map) {
 	            _this.setMap(opts.map);
+	            // 绑定每次move 都重绘doms..
 	            opts.map.on("move", function () {
 	                _this.redraw(opts);
 	            });
@@ -4343,6 +4554,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            canvasContainer.appendChild(domContainer);
 	            return domContainer;
 	        }
+
+	        /**
+	         * updateDoms and redraw..
+	         */
+
+	    }, {
+	        key: 'findDom',
+	        value: function findDom(domId) {
+	            for (var i = 0; i < this.doms.length; i++) {
+	                try {
+	                    if (this.doms[i] === domId) {
+	                        return this.doms[i];
+	                    }
+	                } catch (error) {}
+	            }
+	        }
 	    }, {
 	        key: 'clearDoms',
 	        value: function clearDoms() {
@@ -4352,36 +4579,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	                } catch (error) {}
 	            }
 	        }
+	    }, {
+	        key: 'setDom',
+	        set: function set(opts) {
+	            var _this2 = this;
+
+	            opts.map.un("move", function () {
+	                _this2.redraw(opts);
+	            });
+	            this.redraw(opts);
+	        }
 	    }]);
 
 	    return DomOverlayer;
 	}(_overlay2.default);
 
+	var lineHeight = 100,
+	    dotRadius = 4;
 	/**
 	 * domOverlay register&render above default canvas..
 	 * keep in absolute geolocation..
 	 */
-
-
 	function _redraw(domOpts) {
 	    if (domOpts && domOpts.doms) {
 	        var doms = domOpts.doms;
 	        this.clearDoms();
 	        // append each of domPopups to domContainer.
 	        for (var i = 0; i < doms.length; i++) {
+	            var _doms;
+
 	            var domOpt = doms[i];
 	            var x = domOpt['lon'],
 	                y = domOpt['lat'],
 	                pix = this.lnglat2pix(x, y);
 	            if (pix == null) continue;
-	            var iconName = domOpt['icon'],
-	                dom = document.createElement("div"),
+	            var iconName = domOpt['icon'];
+	            var dom = document.createElement("div"),
 	                line = document.createElement("div"),
-	                point = document.createElement("div");
-	            animLine(line);
-	            point.style.borderRadius = '50%';
-	            point.style.width = '4px';
-	            point.style.height = '4px';
+	                dot = document.createElement("div");
+	            line.style.height = lineHeight - 10 + 'px';
+	            line.style.width = '1px';
+	            line.style.position = "absolute";
+	            dot.style.borderRadius = '50%';
+	            dot.style.width = dot.style.height = dotRadius * 2 + 'px';
+	            dot.style.position = "absolute";
 
 	            dom.innerHTML = domOpt['content'];
 	            _util2.default.setIconDiv(dom, iconName);
@@ -4391,13 +4632,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            dom.style.padding = '5px';
 	            // set domOverlay position. dom box animation needed.
 	            dom.style.left = pix[0] + "px";
-	            dom.style.top = pix[1] + "px";
-	            dom.style.zIndex = 100;
-	            dom.style.animation;
-	            this.domContainer.appendChild(point);
-	            this.domContainer.appendChild(line);
+	            // calc the dom bottom, depend on its height and canvas height..
+	            dom.style.top = pix[1] - lineHeight + "px";
+
+	            line.className = "dom-ele", dot.className = "dom-ele";
+	            line.style.left = pix[0] + "px";
+	            line.style.top = pix[1] - (lineHeight - 10) + "px";
+	            dot.style.left = pix[0] - dotRadius + "px";
+	            dot.style.top = pix[1] - dotRadius + "px";
+
 	            this.domContainer.appendChild(dom);
-	            this.doms.push(dom);
+	            this.domContainer.appendChild(line);
+	            this.domContainer.appendChild(dot);
+	            (_doms = this.doms).push.apply(_doms, [dom, line, dot]);
 	        }
 	    }
 	}
@@ -4414,213 +4661,9 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	// Forked from https://github.com/kronick/HexgridHeatmap
-	var rbush = __webpack_require__(35);
-	var turf = {
-	    center: __webpack_require__(37),
-	    hexGrid: __webpack_require__(41),
-	    destination: __webpack_require__(44),
-	    distance: __webpack_require__(42)
-	};
-	/** 
-	 * Creates a hexgrid-based vector heatmap on the specified map.
-	 * @constructor
-	 * @param {Map} map - The map object that this heatmap should add itself to and track.
-	 * @param {string} [layername=hexgrid-heatmap] - The layer name to use for the heatmap.
-	 * @param {string} [addBefore] - Name of a layer to insert this heatmap underneath.
-	 */
-	function HexgridHeatmap(map, layername, addBefore) {
-	    if (layername === undefined) layername = "hexgrid-heatmap";
-	    this.map = map;
-	    this.layername = layername;
-	    this._setupLayers(layername, addBefore);
-	    this._setupEvents();
-	    // Set up an R-tree to look for coordinates as they are stored in GeoJSON Feature objects
-	    this._tree = rbush(9, ['["geometry"]["coordinates"][0]', '["geometry"]["coordinates"][1]', '["geometry"]["coordinates"][0]', '["geometry"]["coordinates"][1]']);
-
-	    this._intensity = 8;
-	    this._spread = 0.1;
-	    this._minCellIntensity = 0; // Drop out cells that have less than this intensity
-	    this._maxPointIntensity = 20; // Don't let a single point have a greater weight than this
-	    this._cellDensity = 1;
-
-	    var thisthis = this;
-	    this._checkUpdateCompleteClosure = function (e) {
-	        thisthis._checkUpdateComplete(e);
-	    };
-	    this._calculatingGrid = false;
-	    this._recalcWhenReady = false;
-	}
-
-	HexgridHeatmap.prototype = {
-	    _setupLayers: function _setupLayers(layername, addBefore) {
-	        this.map.addSource(layername, {
-	            type: 'geojson',
-	            data: { type: "FeatureCollection", features: [] }
-	        });
-	        this.map.addLayer({
-	            'id': layername,
-	            'type': 'fill',
-	            'source': layername,
-	            'paint': {
-	                'fill-opacity': 1.0,
-	                'fill-color': {
-	                    property: 'count',
-	                    stops: [
-	                    // Short rainbow blue
-	                    [0, "rgba(0,185,243,0)"], [50, "rgba(0,185,243,0.24)"], [130, "rgba(255,223,0,0.3)"], [200, "rgba(255,105,0,0.3)"]]
-	                }
-	            }
-	        });
-
-	        this.layer = this.map.getLayer(layername);
-	        this.source = this.map.getSource(layername);
-	    },
-	    _setupEvents: function _setupEvents() {
-	        var thisthis = this;
-	        this.map.on("moveend", function () {
-	            thisthis._updateGrid();
-	        });
-	    },
-
-	    /**
-	     * Set the data to visualize with this heatmap layer
-	     * @param {FeatureCollection} data - A GeoJSON FeatureCollection containing data to visualize with this heatmap
-	     * @public
-	     */
-	    setData: function setData(data) {
-	        // Re-build R-tree index
-	        this._tree.clear();
-	        this._tree.load(data.features);
-	    },
-
-	    /**
-	      * Set how widely points affect their neighbors
-	      * @param {number} spread - A good starting point is 0.1. Higher values will result in more blurred heatmaps, lower values will highlight individual points more strongly.
-	      * @public
-	      */
-	    setSpread: function setSpread(spread) {
-	        this._spread = spread;
-	    },
-
-	    /**
-	      * Set the intensity value for all points.
-	      * @param {number} intensity - Setting this too low will result in no data displayed, setting it too high will result in an oversaturated map. The default is 8 so adjust up or down from there according to the density of your data.
-	      * @public
-	      */
-	    setIntensity: function setIntensity(intensity) {
-	        this._intensity = intensity;
-	    },
-
-	    /**
-	      * Set custom stops for the heatmap color schem
-	      * @param {array} stops - An array of `stops` in the format of the Mapbox GL Style Spec. Values should range from 0 to about 200, though you can control saturation by setting different values here.
-	      */
-	    setColorStops: function setColorStops(stops) {
-	        if (this.layer) this.layer.setPaintProperty("fill-color", { property: "count", stops: stops });
-	    },
-
-	    /**
-	      * Set the hexgrid cell density
-	      * @param {number} density - Values less than 1 will result in a decreased cell density from the default, values greater than 1 will result in increaded density/higher resolution. Setting this value too high will result in slow performance.
-	      * @public
-	      */
-	    setCellDensity: function setCellDensity(density) {
-	        this._cellDensity = density;
-	    },
-
-	    /**
-	      * Manually force an update to the heatmap
-	      * You can call this method to manually force the heatmap to be redrawn. Use this after calling `setData()`, `setSpread()`, or `setIntensity()`
-	      */
-	    update: function update() {
-	        this._updateGrid();
-	    },
-
-	    _generateGrid: function _generateGrid() {
-	        // Rebuild grid
-	        //var cellSize = Math.min(Math.max(1000/Math.pow(2,this.map.transform.zoom), 0.01), 0.1); // Constant screen size
-
-	        var cellSize = Math.max(500 / Math.pow(2, this.map.transform.zoom) / this._cellDensity, 0.01); // Constant screen size
-
-	        // TODO: These extents don't work when the map is rotated
-	        var extents = this.map.getBounds().toArray();
-	        extents = [extents[0][0], extents[0][1], extents[1][0], extents[1][1]];
-
-	        var hexgrid = turf.hexGrid(extents, cellSize, 'kilometers');
-
-	        var sigma = this._spread;
-	        var a = 1 / (sigma * Math.sqrt(2 * Math.PI));
-	        var amplitude = this._intensity;
-
-	        var cellsToSave = [];
-
-	        var thisthis = this;
-	        hexgrid.features.forEach(function (cell) {
-	            var center = turf.center(cell);
-	            var strength = 0;
-	            var SW = turf.destination(center, sigma * 4, -135);
-	            var NE = turf.destination(center, sigma * 4, 45);
-	            var pois = thisthis._tree.search({
-	                minX: SW.geometry.coordinates[0],
-	                minY: SW.geometry.coordinates[1],
-	                maxX: NE.geometry.coordinates[0],
-	                maxY: NE.geometry.coordinates[1]
-	            });
-
-	            pois.forEach(function (poi) {
-	                // TODO: Allow weight to be influenced by a property within the POI
-	                var distance = turf.distance(center, poi);
-
-	                var weighted = Math.min(Math.exp(-(distance * distance / (2 * sigma * sigma))) * a * amplitude, thisthis._maxPointIntensity);
-	                strength += weighted;
-	            });
-
-	            cell.properties.count = strength;
-
-	            if (cell.properties.count > thisthis._minCellIntensity) {
-	                cellsToSave.push(cell);
-	            }
-	        });
-
-	        hexgrid.features = cellsToSave;
-	        return hexgrid;
-	    },
-	    _updateGrid: function _updateGrid() {
-	        if (!this._calculatingGrid) {
-	            this._calculatingGrid = true;
-	            var hexgrid = this._generateGrid();
-	            if (hexgrid != null) {
-	                var thisthis = this;
-	                this.source.on("data", this._checkUpdateCompleteClosure);
-	                this.source.setData(hexgrid);
-	            } else {
-	                this._calculatingGrid = false;
-	            }
-	        } else {
-	            this._recalcWhenReady = true;
-	        }
-	    },
-	    _checkUpdateComplete: function _checkUpdateComplete(e) {
-	        if (e.dataType == "source") {
-	            this.source.off("data", this._checkUpdateCompleteClosure);
-	            this._calculatingGrid = false;
-	            if (this._recalcWhenReady) this._updateGrid();
-	        }
-	    }
-	};
-
-	module.exports = exports = HexgridHeatmap;
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	module.exports = rbush;
 
-	var quickselect = __webpack_require__(36);
+	var quickselect = __webpack_require__(35);
 
 	function rbush(maxEntries, format) {
 	    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
@@ -5180,7 +5223,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 36 */
+/* 35 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -5243,1573 +5286,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	function defaultCompare(a, b) {
 	    return a < b ? -1 : a > b ? 1 : 0;
 	}
-
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var bbox = __webpack_require__(38),
-	    point = __webpack_require__(40).point;
-
-	/**
-	 * Takes a {@link Feature} or {@link FeatureCollection} and returns the absolute center point of all features.
-	 *
-	 * @name center
-	 * @param {(Feature|FeatureCollection)} layer input features
-	 * @return {Feature<Point>} a Point feature at the absolute center point of all input features
-	 * @addToMap features, centerPt
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.522259, 35.4691]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.502754, 35.463455]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.508269, 35.463245]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.516809, 35.465779]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.515372, 35.467072]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.509363, 35.463053]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.511123, 35.466601]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.518547, 35.469327]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.519706, 35.469659]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.517839, 35.466998]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.508678, 35.464942]
-	 *       }
-	 *     }, {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [-97.514914, 35.463453]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 *
-	 * var centerPt = turf.center(features);
-	 * centerPt.properties['marker-size'] = 'large';
-	 * centerPt.properties['marker-color'] = '#000';
-	 *
-	 * var resultFeatures = features.features.concat(centerPt);
-	 * var result = {
-	 *   "type": "FeatureCollection",
-	 *   "features": resultFeatures
-	 * };
-	 *
-	 * //=result
-	 */
-
-	module.exports = function (layer) {
-	    var ext = bbox(layer);
-	    var x = (ext[0] + ext[2]) / 2;
-	    var y = (ext[1] + ext[3]) / 2;
-	    return point([x, y]);
-	};
-
-
-/***/ }),
-/* 38 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var each = __webpack_require__(39).coordEach;
-
-	/**
-	 * Takes a set of features, calculates the bbox of all input features, and returns a bounding box.
-	 *
-	 * @name bbox
-	 * @param {(Feature|FeatureCollection)} geojson input features
-	 * @returns {Array<number>} bbox extent in [minX, minY, maxX, maxY] order
-	 * @addToMap features, bboxPolygon
-	 * @example
-	 * var pt1 = turf.point([114.175329, 22.2524])
-	 * var pt2 = turf.point([114.170007, 22.267969])
-	 * var pt3 = turf.point([114.200649, 22.274641])
-	 * var pt4 = turf.point([114.200649, 22.274641])
-	 * var pt5 = turf.point([114.186744, 22.265745])
-	 * var features = turf.featureCollection([pt1, pt2, pt3, pt4, pt5])
-	 *
-	 * var bbox = turf.bbox(features);
-	 *
-	 * var bboxPolygon = turf.bboxPolygon(bbox);
-	 *
-	 * //=bbox
-	 *
-	 * //=bboxPolygon
-	 */
-	module.exports = function (geojson) {
-	    var bbox = [Infinity, Infinity, -Infinity, -Infinity];
-	    each(geojson, function (coord) {
-	        if (bbox[0] > coord[0]) bbox[0] = coord[0];
-	        if (bbox[1] > coord[1]) bbox[1] = coord[1];
-	        if (bbox[2] < coord[0]) bbox[2] = coord[0];
-	        if (bbox[3] < coord[1]) bbox[3] = coord[1];
-	    });
-	    return bbox;
-	};
-
-
-/***/ }),
-/* 39 */
-/***/ (function(module, exports) {
-
-	/**
-	 * Callback for coordEach
-	 *
-	 * @private
-	 * @callback coordEachCallback
-	 * @param {[number, number]} currentCoords The current coordinates being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Iterate over coordinates in any GeoJSON object, similar to Array.forEach()
-	 *
-	 * @name coordEach
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (currentCoords, currentIndex)
-	 * @param {boolean} [excludeWrapCoord=false] whether or not to include
-	 * the final coordinate of LinearRings that wraps the ring in its iteration.
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.coordEach(features, function (currentCoords, currentIndex) {
-	 *   //=currentCoords
-	 *   //=currentIndex
-	 * });
-	 */
-	function coordEach(layer, callback, excludeWrapCoord) {
-	    var i, j, k, g, l, geometry, stopG, coords,
-	        geometryMaybeCollection,
-	        wrapShrink = 0,
-	        currentIndex = 0,
-	        isGeometryCollection,
-	        isFeatureCollection = layer.type === 'FeatureCollection',
-	        isFeature = layer.type === 'Feature',
-	        stop = isFeatureCollection ? layer.features.length : 1;
-
-	  // This logic may look a little weird. The reason why it is that way
-	  // is because it's trying to be fast. GeoJSON supports multiple kinds
-	  // of objects at its root: FeatureCollection, Features, Geometries.
-	  // This function has the responsibility of handling all of them, and that
-	  // means that some of the `for` loops you see below actually just don't apply
-	  // to certain inputs. For instance, if you give this just a
-	  // Point geometry, then both loops are short-circuited and all we do
-	  // is gradually rename the input until it's called 'geometry'.
-	  //
-	  // This also aims to allocate as few resources as possible: just a
-	  // few numbers and booleans, rather than any temporary arrays as would
-	  // be required with the normalization approach.
-	    for (i = 0; i < stop; i++) {
-
-	        geometryMaybeCollection = (isFeatureCollection ? layer.features[i].geometry :
-	        (isFeature ? layer.geometry : layer));
-	        isGeometryCollection = geometryMaybeCollection.type === 'GeometryCollection';
-	        stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
-
-	        for (g = 0; g < stopG; g++) {
-	            geometry = isGeometryCollection ?
-	            geometryMaybeCollection.geometries[g] : geometryMaybeCollection;
-	            coords = geometry.coordinates;
-
-	            wrapShrink = (excludeWrapCoord &&
-	                (geometry.type === 'Polygon' || geometry.type === 'MultiPolygon')) ?
-	                1 : 0;
-
-	            if (geometry.type === 'Point') {
-	                callback(coords, currentIndex);
-	                currentIndex++;
-	            } else if (geometry.type === 'LineString' || geometry.type === 'MultiPoint') {
-	                for (j = 0; j < coords.length; j++) {
-	                    callback(coords[j], currentIndex);
-	                    currentIndex++;
-	                }
-	            } else if (geometry.type === 'Polygon' || geometry.type === 'MultiLineString') {
-	                for (j = 0; j < coords.length; j++)
-	                    for (k = 0; k < coords[j].length - wrapShrink; k++) {
-	                        callback(coords[j][k], currentIndex);
-	                        currentIndex++;
-	                    }
-	            } else if (geometry.type === 'MultiPolygon') {
-	                for (j = 0; j < coords.length; j++)
-	                    for (k = 0; k < coords[j].length; k++)
-	                        for (l = 0; l < coords[j][k].length - wrapShrink; l++) {
-	                            callback(coords[j][k][l], currentIndex);
-	                            currentIndex++;
-	                        }
-	            } else if (geometry.type === 'GeometryCollection') {
-	                for (j = 0; j < geometry.geometries.length; j++)
-	                    coordEach(geometry.geometries[j], callback, excludeWrapCoord);
-	            } else {
-	                throw new Error('Unknown Geometry Type');
-	            }
-	        }
-	    }
-	}
-	module.exports.coordEach = coordEach;
-
-	/**
-	 * Callback for coordReduce
-	 *
-	 * The first time the callback function is called, the values provided as arguments depend
-	 * on whether the reduce method has an initialValue argument.
-	 *
-	 * If an initialValue is provided to the reduce method:
-	 *  - The previousValue argument is initialValue.
-	 *  - The currentValue argument is the value of the first element present in the array.
-	 *
-	 * If an initialValue is not provided:
-	 *  - The previousValue argument is the value of the first element present in the array.
-	 *  - The currentValue argument is the value of the second element present in the array.
-	 *
-	 * @private
-	 * @callback coordReduceCallback
-	 * @param {*} previousValue The accumulated value previously returned in the last invocation
-	 * of the callback, or initialValue, if supplied.
-	 * @param {[number, number]} currentCoords The current coordinate being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Reduce coordinates in any GeoJSON object, similar to Array.reduce()
-	 *
-	 * @name coordReduce
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (previousValue, currentCoords, currentIndex)
-	 * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
-	 * @param {boolean} [excludeWrapCoord=false] whether or not to include
-	 * the final coordinate of LinearRings that wraps the ring in its iteration.
-	 * @returns {*} The value that results from the reduction.
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.coordReduce(features, function (previousValue, currentCoords, currentIndex) {
-	 *   //=previousValue
-	 *   //=currentCoords
-	 *   //=currentIndex
-	 *   return currentCoords;
-	 * });
-	 */
-	function coordReduce(layer, callback, initialValue, excludeWrapCoord) {
-	    var previousValue = initialValue;
-	    coordEach(layer, function (currentCoords, currentIndex) {
-	        if (currentIndex === 0 && initialValue === undefined) {
-	            previousValue = currentCoords;
-	        } else {
-	            previousValue = callback(previousValue, currentCoords, currentIndex);
-	        }
-	    }, excludeWrapCoord);
-	    return previousValue;
-	}
-	module.exports.coordReduce = coordReduce;
-
-	/**
-	 * Callback for propEach
-	 *
-	 * @private
-	 * @callback propEachCallback
-	 * @param {*} currentProperties The current properties being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Iterate over properties in any GeoJSON object, similar to Array.forEach()
-	 *
-	 * @name propEach
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (currentProperties, currentIndex)
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"foo": "bar"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"hello": "world"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.propEach(features, function (currentProperties, currentIndex) {
-	 *   //=currentProperties
-	 *   //=currentIndex
-	 * });
-	 */
-	function propEach(layer, callback) {
-	    var i;
-	    switch (layer.type) {
-	    case 'FeatureCollection':
-	        for (i = 0; i < layer.features.length; i++) {
-	            callback(layer.features[i].properties, i);
-	        }
-	        break;
-	    case 'Feature':
-	        callback(layer.properties, 0);
-	        break;
-	    }
-	}
-	module.exports.propEach = propEach;
-
-
-	/**
-	 * Callback for propReduce
-	 *
-	 * The first time the callback function is called, the values provided as arguments depend
-	 * on whether the reduce method has an initialValue argument.
-	 *
-	 * If an initialValue is provided to the reduce method:
-	 *  - The previousValue argument is initialValue.
-	 *  - The currentValue argument is the value of the first element present in the array.
-	 *
-	 * If an initialValue is not provided:
-	 *  - The previousValue argument is the value of the first element present in the array.
-	 *  - The currentValue argument is the value of the second element present in the array.
-	 *
-	 * @private
-	 * @callback propReduceCallback
-	 * @param {*} previousValue The accumulated value previously returned in the last invocation
-	 * of the callback, or initialValue, if supplied.
-	 * @param {*} currentProperties The current properties being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Reduce properties in any GeoJSON object into a single value,
-	 * similar to how Array.reduce works. However, in this case we lazily run
-	 * the reduction, so an array of all properties is unnecessary.
-	 *
-	 * @name propReduce
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (previousValue, currentProperties, currentIndex)
-	 * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
-	 * @returns {*} The value that results from the reduction.
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"foo": "bar"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"hello": "world"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.propReduce(features, function (previousValue, currentProperties, currentIndex) {
-	 *   //=previousValue
-	 *   //=currentProperties
-	 *   //=currentIndex
-	 *   return currentProperties
-	 * });
-	 */
-	function propReduce(layer, callback, initialValue) {
-	    var previousValue = initialValue;
-	    propEach(layer, function (currentProperties, currentIndex) {
-	        if (currentIndex === 0 && initialValue === undefined) {
-	            previousValue = currentProperties;
-	        } else {
-	            previousValue = callback(previousValue, currentProperties, currentIndex);
-	        }
-	    });
-	    return previousValue;
-	}
-	module.exports.propReduce = propReduce;
-
-	/**
-	 * Callback for featureEach
-	 *
-	 * @private
-	 * @callback featureEachCallback
-	 * @param {Feature<any>} currentFeature The current feature being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Iterate over features in any GeoJSON object, similar to
-	 * Array.forEach.
-	 *
-	 * @name featureEach
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (currentFeature, currentIndex)
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.featureEach(features, function (currentFeature, currentIndex) {
-	 *   //=currentFeature
-	 *   //=currentIndex
-	 * });
-	 */
-	function featureEach(layer, callback) {
-	    if (layer.type === 'Feature') {
-	        callback(layer, 0);
-	    } else if (layer.type === 'FeatureCollection') {
-	        for (var i = 0; i < layer.features.length; i++) {
-	            callback(layer.features[i], i);
-	        }
-	    }
-	}
-	module.exports.featureEach = featureEach;
-
-	/**
-	 * Callback for featureReduce
-	 *
-	 * The first time the callback function is called, the values provided as arguments depend
-	 * on whether the reduce method has an initialValue argument.
-	 *
-	 * If an initialValue is provided to the reduce method:
-	 *  - The previousValue argument is initialValue.
-	 *  - The currentValue argument is the value of the first element present in the array.
-	 *
-	 * If an initialValue is not provided:
-	 *  - The previousValue argument is the value of the first element present in the array.
-	 *  - The currentValue argument is the value of the second element present in the array.
-	 *
-	 * @private
-	 * @callback featureReduceCallback
-	 * @param {*} previousValue The accumulated value previously returned in the last invocation
-	 * of the callback, or initialValue, if supplied.
-	 * @param {Feature<any>} currentFeature The current Feature being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Reduce features in any GeoJSON object, similar to Array.reduce().
-	 *
-	 * @name featureReduce
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (previousValue, currentFeature, currentIndex)
-	 * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
-	 * @returns {*} The value that results from the reduction.
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"foo": "bar"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"hello": "world"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.featureReduce(features, function (previousValue, currentFeature, currentIndex) {
-	 *   //=previousValue
-	 *   //=currentFeature
-	 *   //=currentIndex
-	 *   return currentFeature
-	 * });
-	 */
-	function featureReduce(layer, callback, initialValue) {
-	    var previousValue = initialValue;
-	    featureEach(layer, function (currentFeature, currentIndex) {
-	        if (currentIndex === 0 && initialValue === undefined) {
-	            previousValue = currentFeature;
-	        } else {
-	            previousValue = callback(previousValue, currentFeature, currentIndex);
-	        }
-	    });
-	    return previousValue;
-	}
-	module.exports.featureReduce = featureReduce;
-
-	/**
-	 * Get all coordinates from any GeoJSON object.
-	 *
-	 * @name coordAll
-	 * @param {Object} layer any GeoJSON object
-	 * @returns {Array<Array<number>>} coordinate position array
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * var coords = turf.coordAll(features);
-	 * //=coords
-	 */
-	function coordAll(layer) {
-	    var coords = [];
-	    coordEach(layer, function (coord) {
-	        coords.push(coord);
-	    });
-	    return coords;
-	}
-	module.exports.coordAll = coordAll;
-
-	/**
-	 * Iterate over each geometry in any GeoJSON object, similar to Array.forEach()
-	 *
-	 * @name geomEach
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (currentGeometry, currentIndex)
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.geomEach(features, function (currentGeometry, currentIndex) {
-	 *   //=currentGeometry
-	 *   //=currentIndex
-	 * });
-	 */
-	function geomEach(layer, callback) {
-	    var i, j, g, geometry, stopG,
-	        geometryMaybeCollection,
-	        isGeometryCollection,
-	        currentIndex = 0,
-	        isFeatureCollection = layer.type === 'FeatureCollection',
-	        isFeature = layer.type === 'Feature',
-	        stop = isFeatureCollection ? layer.features.length : 1;
-
-	  // This logic may look a little weird. The reason why it is that way
-	  // is because it's trying to be fast. GeoJSON supports multiple kinds
-	  // of objects at its root: FeatureCollection, Features, Geometries.
-	  // This function has the responsibility of handling all of them, and that
-	  // means that some of the `for` loops you see below actually just don't apply
-	  // to certain inputs. For instance, if you give this just a
-	  // Point geometry, then both loops are short-circuited and all we do
-	  // is gradually rename the input until it's called 'geometry'.
-	  //
-	  // This also aims to allocate as few resources as possible: just a
-	  // few numbers and booleans, rather than any temporary arrays as would
-	  // be required with the normalization approach.
-	    for (i = 0; i < stop; i++) {
-
-	        geometryMaybeCollection = (isFeatureCollection ? layer.features[i].geometry :
-	        (isFeature ? layer.geometry : layer));
-	        isGeometryCollection = geometryMaybeCollection.type === 'GeometryCollection';
-	        stopG = isGeometryCollection ? geometryMaybeCollection.geometries.length : 1;
-
-	        for (g = 0; g < stopG; g++) {
-	            geometry = isGeometryCollection ?
-	            geometryMaybeCollection.geometries[g] : geometryMaybeCollection;
-
-	            if (geometry.type === 'Point' ||
-	                geometry.type === 'LineString' ||
-	                geometry.type === 'MultiPoint' ||
-	                geometry.type === 'Polygon' ||
-	                geometry.type === 'MultiLineString' ||
-	                geometry.type === 'MultiPolygon') {
-	                callback(geometry, currentIndex);
-	                currentIndex++;
-	            } else if (geometry.type === 'GeometryCollection') {
-	                for (j = 0; j < geometry.geometries.length; j++) {
-	                    callback(geometry.geometries[j], currentIndex);
-	                    currentIndex++;
-	                }
-	            } else {
-	                throw new Error('Unknown Geometry Type');
-	            }
-	        }
-	    }
-	}
-	module.exports.geomEach = geomEach;
-
-	/**
-	 * Callback for geomReduce
-	 *
-	 * The first time the callback function is called, the values provided as arguments depend
-	 * on whether the reduce method has an initialValue argument.
-	 *
-	 * If an initialValue is provided to the reduce method:
-	 *  - The previousValue argument is initialValue.
-	 *  - The currentValue argument is the value of the first element present in the array.
-	 *
-	 * If an initialValue is not provided:
-	 *  - The previousValue argument is the value of the first element present in the array.
-	 *  - The currentValue argument is the value of the second element present in the array.
-	 *
-	 * @private
-	 * @callback geomReduceCallback
-	 * @param {*} previousValue The accumulated value previously returned in the last invocation
-	 * of the callback, or initialValue, if supplied.
-	 * @param {*} currentGeometry The current Feature being processed.
-	 * @param {number} currentIndex The index of the current element being processed in the
-	 * array.Starts at index 0, if an initialValue is provided, and at index 1 otherwise.
-	 */
-
-	/**
-	 * Reduce geometry in any GeoJSON object, similar to Array.reduce().
-	 *
-	 * @name geomReduce
-	 * @param {Object} layer any GeoJSON object
-	 * @param {Function} callback a method that takes (previousValue, currentGeometry, currentIndex)
-	 * @param {*} [initialValue] Value to use as the first argument to the first call of the callback.
-	 * @returns {*} The value that results from the reduction.
-	 * @example
-	 * var features = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"foo": "bar"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [26, 37]
-	 *       }
-	 *     },
-	 *     {
-	 *       "type": "Feature",
-	 *       "properties": {"hello": "world"},
-	 *       "geometry": {
-	 *         "type": "Point",
-	 *         "coordinates": [36, 53]
-	 *       }
-	 *     }
-	 *   ]
-	 * };
-	 * turf.geomReduce(features, function (previousValue, currentGeometry, currentIndex) {
-	 *   //=previousValue
-	 *   //=currentGeometry
-	 *   //=currentIndex
-	 *   return currentGeometry
-	 * });
-	 */
-	function geomReduce(layer, callback, initialValue) {
-	    var previousValue = initialValue;
-	    geomEach(layer, function (currentGeometry, currentIndex) {
-	        if (currentIndex === 0 && initialValue === undefined) {
-	            previousValue = currentGeometry;
-	        } else {
-	            previousValue = callback(previousValue, currentGeometry, currentIndex);
-	        }
-	    });
-	    return previousValue;
-	}
-	module.exports.geomReduce = geomReduce;
-
-
-/***/ }),
-/* 40 */
-/***/ (function(module, exports) {
-
-	/**
-	 * Wraps a GeoJSON {@link Geometry} in a GeoJSON {@link Feature}.
-	 *
-	 * @name feature
-	 * @param {Geometry} geometry input geometry
-	 * @param {Object} properties properties
-	 * @returns {FeatureCollection} a FeatureCollection of input features
-	 * @example
-	 * var geometry = {
-	 *      "type": "Point",
-	 *      "coordinates": [
-	 *        67.5,
-	 *        32.84267363195431
-	 *      ]
-	 *    }
-	 *
-	 * var feature = turf.feature(geometry);
-	 *
-	 * //=feature
-	 */
-	function feature(geometry, properties) {
-	    if (!geometry) throw new Error('No geometry passed');
-
-	    return {
-	        type: 'Feature',
-	        properties: properties || {},
-	        geometry: geometry
-	    };
-	}
-	module.exports.feature = feature;
-
-	/**
-	 * Takes coordinates and properties (optional) and returns a new {@link Point} feature.
-	 *
-	 * @name point
-	 * @param {Array<number>} coordinates longitude, latitude position (each in decimal degrees)
-	 * @param {Object=} properties an Object that is used as the {@link Feature}'s
-	 * properties
-	 * @returns {Feature<Point>} a Point feature
-	 * @example
-	 * var pt1 = turf.point([-75.343, 39.984]);
-	 *
-	 * //=pt1
-	 */
-	module.exports.point = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-	    if (coordinates.length === undefined) throw new Error('Coordinates must be an array');
-	    if (coordinates.length < 2) throw new Error('Coordinates must be at least 2 numbers long');
-	    if (typeof coordinates[0] !== 'number' || typeof coordinates[1] !== 'number') throw new Error('Coordinates must numbers');
-
-	    return feature({
-	        type: 'Point',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-	/**
-	 * Takes an array of LinearRings and optionally an {@link Object} with properties and returns a {@link Polygon} feature.
-	 *
-	 * @name polygon
-	 * @param {Array<Array<Array<number>>>} coordinates an array of LinearRings
-	 * @param {Object=} properties a properties object
-	 * @returns {Feature<Polygon>} a Polygon feature
-	 * @throws {Error} throw an error if a LinearRing of the polygon has too few positions
-	 * or if a LinearRing of the Polygon does not have matching Positions at the
-	 * beginning & end.
-	 * @example
-	 * var polygon = turf.polygon([[
-	 *  [-2.275543, 53.464547],
-	 *  [-2.275543, 53.489271],
-	 *  [-2.215118, 53.489271],
-	 *  [-2.215118, 53.464547],
-	 *  [-2.275543, 53.464547]
-	 * ]], { name: 'poly1', population: 400});
-	 *
-	 * //=polygon
-	 */
-	module.exports.polygon = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-
-	    for (var i = 0; i < coordinates.length; i++) {
-	        var ring = coordinates[i];
-	        if (ring.length < 4) {
-	            throw new Error('Each LinearRing of a Polygon must have 4 or more Positions.');
-	        }
-	        for (var j = 0; j < ring[ring.length - 1].length; j++) {
-	            if (ring[ring.length - 1][j] !== ring[0][j]) {
-	                throw new Error('First and last Position are not equivalent.');
-	            }
-	        }
-	    }
-
-	    return feature({
-	        type: 'Polygon',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-	/**
-	 * Creates a {@link LineString} based on a
-	 * coordinate array. Properties can be added optionally.
-	 *
-	 * @name lineString
-	 * @param {Array<Array<number>>} coordinates an array of Positions
-	 * @param {Object=} properties an Object of key-value pairs to add as properties
-	 * @returns {Feature<LineString>} a LineString feature
-	 * @throws {Error} if no coordinates are passed
-	 * @example
-	 * var linestring1 = turf.lineString([
-	 *   [-21.964416, 64.148203],
-	 *   [-21.956176, 64.141316],
-	 *   [-21.93901, 64.135924],
-	 *   [-21.927337, 64.136673]
-	 * ]);
-	 * var linestring2 = turf.lineString([
-	 *   [-21.929054, 64.127985],
-	 *   [-21.912918, 64.134726],
-	 *   [-21.916007, 64.141016],
-	 *   [-21.930084, 64.14446]
-	 * ], {name: 'line 1', distance: 145});
-	 *
-	 * //=linestring1
-	 *
-	 * //=linestring2
-	 */
-	module.exports.lineString = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-
-	    return feature({
-	        type: 'LineString',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-	/**
-	 * Takes one or more {@link Feature|Features} and creates a {@link FeatureCollection}.
-	 *
-	 * @name featureCollection
-	 * @param {Feature[]} features input features
-	 * @returns {FeatureCollection} a FeatureCollection of input features
-	 * @example
-	 * var features = [
-	 *  turf.point([-75.343, 39.984], {name: 'Location A'}),
-	 *  turf.point([-75.833, 39.284], {name: 'Location B'}),
-	 *  turf.point([-75.534, 39.123], {name: 'Location C'})
-	 * ];
-	 *
-	 * var fc = turf.featureCollection(features);
-	 *
-	 * //=fc
-	 */
-	module.exports.featureCollection = function (features) {
-	    if (!features) throw new Error('No features passed');
-
-	    return {
-	        type: 'FeatureCollection',
-	        features: features
-	    };
-	};
-
-	/**
-	 * Creates a {@link Feature<MultiLineString>} based on a
-	 * coordinate array. Properties can be added optionally.
-	 *
-	 * @name multiLineString
-	 * @param {Array<Array<Array<number>>>} coordinates an array of LineStrings
-	 * @param {Object=} properties an Object of key-value pairs to add as properties
-	 * @returns {Feature<MultiLineString>} a MultiLineString feature
-	 * @throws {Error} if no coordinates are passed
-	 * @example
-	 * var multiLine = turf.multiLineString([[[0,0],[10,10]]]);
-	 *
-	 * //=multiLine
-	 *
-	 */
-	module.exports.multiLineString = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-
-	    return feature({
-	        type: 'MultiLineString',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-	/**
-	 * Creates a {@link Feature<MultiPoint>} based on a
-	 * coordinate array. Properties can be added optionally.
-	 *
-	 * @name multiPoint
-	 * @param {Array<Array<number>>} coordinates an array of Positions
-	 * @param {Object=} properties an Object of key-value pairs to add as properties
-	 * @returns {Feature<MultiPoint>} a MultiPoint feature
-	 * @throws {Error} if no coordinates are passed
-	 * @example
-	 * var multiPt = turf.multiPoint([[0,0],[10,10]]);
-	 *
-	 * //=multiPt
-	 *
-	 */
-	module.exports.multiPoint = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-
-	    return feature({
-	        type: 'MultiPoint',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-
-	/**
-	 * Creates a {@link Feature<MultiPolygon>} based on a
-	 * coordinate array. Properties can be added optionally.
-	 *
-	 * @name multiPolygon
-	 * @param {Array<Array<Array<Array<number>>>>} coordinates an array of Polygons
-	 * @param {Object=} properties an Object of key-value pairs to add as properties
-	 * @returns {Feature<MultiPolygon>} a multipolygon feature
-	 * @throws {Error} if no coordinates are passed
-	 * @example
-	 * var multiPoly = turf.multiPolygon([[[[0,0],[0,10],[10,10],[10,0],[0,0]]]]);
-	 *
-	 * //=multiPoly
-	 *
-	 */
-	module.exports.multiPolygon = function (coordinates, properties) {
-	    if (!coordinates) throw new Error('No coordinates passed');
-
-	    return feature({
-	        type: 'MultiPolygon',
-	        coordinates: coordinates
-	    }, properties);
-	};
-
-	/**
-	 * Creates a {@link Feature<GeometryCollection>} based on a
-	 * coordinate array. Properties can be added optionally.
-	 *
-	 * @name geometryCollection
-	 * @param {Array<{Geometry}>} geometries an array of GeoJSON Geometries
-	 * @param {Object=} properties an Object of key-value pairs to add as properties
-	 * @returns {Feature<GeometryCollection>} a GeoJSON GeometryCollection Feature
-	 * @example
-	 * var pt = {
-	 *     "type": "Point",
-	 *       "coordinates": [100, 0]
-	 *     };
-	 * var line = {
-	 *     "type": "LineString",
-	 *     "coordinates": [ [101, 0], [102, 1] ]
-	 *   };
-	 * var collection = turf.geometryCollection([pt, line]);
-	 *
-	 * //=collection
-	 */
-	module.exports.geometryCollection = function (geometries, properties) {
-	    if (!geometries) throw new Error('No geometries passed');
-
-	    return feature({
-	        type: 'GeometryCollection',
-	        geometries: geometries
-	    }, properties);
-	};
-
-	var factors = {
-	    miles: 3960,
-	    nauticalmiles: 3441.145,
-	    degrees: 57.2957795,
-	    radians: 1,
-	    inches: 250905600,
-	    yards: 6969600,
-	    meters: 6373000,
-	    metres: 6373000,
-	    kilometers: 6373,
-	    kilometres: 6373,
-	    feet: 20908792.65
-	};
-
-	/*
-	 * Convert a distance measurement from radians to a more friendly unit.
-	 *
-	 * @name radiansToDistance
-	 * @param {number} distance in radians across the sphere
-	 * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
-	 * inches, yards, metres, meters, kilometres, kilometers.
-	 * @returns {number} distance
-	 */
-	module.exports.radiansToDistance = function (radians, units) {
-	    var factor = factors[units || 'kilometers'];
-	    if (factor === undefined) throw new Error('Invalid unit');
-
-	    return radians * factor;
-	};
-
-	/*
-	 * Convert a distance measurement from a real-world unit into radians
-	 *
-	 * @name distanceToRadians
-	 * @param {number} distance in real units
-	 * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
-	 * inches, yards, metres, meters, kilometres, kilometers.
-	 * @returns {number} radians
-	 */
-	module.exports.distanceToRadians = function (distance, units) {
-	    var factor = factors[units || 'kilometers'];
-	    if (factor === undefined) throw new Error('Invalid unit');
-
-	    return distance / factor;
-	};
-
-	/*
-	 * Convert a distance measurement from a real-world unit into degrees
-	 *
-	 * @name distanceToRadians
-	 * @param {number} distance in real units
-	 * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
-	 * inches, yards, metres, meters, kilometres, kilometers.
-	 * @returns {number} degrees
-	 */
-	module.exports.distanceToDegrees = function (distance, units) {
-	    var factor = factors[units || 'kilometers'];
-	    if (factor === undefined) throw new Error('Invalid unit');
-
-	    return (distance / factor) * 57.2958;
-	};
-
-
-/***/ }),
-/* 41 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var point = __webpack_require__(40).point;
-	var polygon = __webpack_require__(40).polygon;
-	var distance = __webpack_require__(42);
-	var featurecollection = __webpack_require__(40).featureCollection;
-
-	//Precompute cosines and sines of angles used in hexagon creation
-	// for performance gain
-	var cosines = [];
-	var sines = [];
-	for (var i = 0; i < 6; i++) {
-	    var angle = 2 * Math.PI / 6 * i;
-	    cosines.push(Math.cos(angle));
-	    sines.push(Math.sin(angle));
-	}
-
-	/**
-	 * Takes a bounding box and a cell size in degrees and returns a {@link FeatureCollection} of flat-topped
-	 * hexagons ({@link Polygon} features) aligned in an "odd-q" vertical grid as
-	 * described in [Hexagonal Grids](http://www.redblobgames.com/grids/hexagons/).
-	 *
-	 * @name hexGrid
-	 * @param {Array<number>} bbox extent in [minX, minY, maxX, maxY] order
-	 * @param {number} cellSize dimension of cell in specified units
-	 * @param {string} [units=kilometers] used in calculating cellSize, can be degrees, radians, miles, or kilometers
-	 * @param {boolean} [triangles=false] whether to return as triangles instead of hexagons
-	 * @returns {FeatureCollection<Polygon>} a hexagonal grid
-	 * @example
-	 * var bbox = [-96,31,-84,40];
-	 * var cellSize = 50;
-	 * var units = 'miles';
-	 *
-	 * var hexgrid = turf.hexGrid(bbox, cellSize, units);
-	 *
-	 * //=hexgrid
-	 */
-	module.exports = function hexGrid(bbox, cellSize, units, triangles) {
-	    var xFraction = cellSize / (distance(point([bbox[0], bbox[1]]), point([bbox[2], bbox[1]]), units));
-	    var cellWidth = xFraction * (bbox[2] - bbox[0]);
-	    var yFraction = cellSize / (distance(point([bbox[0], bbox[1]]), point([bbox[0], bbox[3]]), units));
-	    var cellHeight = yFraction * (bbox[3] - bbox[1]);
-	    var radius = cellWidth / 2;
-
-	    var hex_width = radius * 2;
-	    var hex_height = Math.sqrt(3) / 2 * cellHeight;
-
-	    var box_width = bbox[2] - bbox[0];
-	    var box_height = bbox[3] - bbox[1];
-
-	    var x_interval = 3 / 4 * hex_width;
-	    var y_interval = hex_height;
-
-	    var x_span = box_width / (hex_width - radius / 2);
-	    var x_count = Math.ceil(x_span);
-	    if (Math.round(x_span) === x_count) {
-	        x_count++;
-	    }
-
-	    var x_adjust = ((x_count * x_interval - radius / 2) - box_width) / 2 - radius / 2;
-
-	    var y_count = Math.ceil(box_height / hex_height);
-
-	    var y_adjust = (box_height - y_count * hex_height) / 2;
-
-	    var hasOffsetY = y_count * hex_height - box_height > hex_height / 2;
-	    if (hasOffsetY) {
-	        y_adjust -= hex_height / 4;
-	    }
-
-	    var fc = featurecollection([]);
-	    for (var x = 0; x < x_count; x++) {
-	        for (var y = 0; y <= y_count; y++) {
-
-	            var isOdd = x % 2 === 1;
-	            if (y === 0 && isOdd) {
-	                continue;
-	            }
-
-	            if (y === 0 && hasOffsetY) {
-	                continue;
-	            }
-
-	            var center_x = x * x_interval + bbox[0] - x_adjust;
-	            var center_y = y * y_interval + bbox[1] + y_adjust;
-
-	            if (isOdd) {
-	                center_y -= hex_height / 2;
-	            }
-	            if (triangles) {
-	                fc.features.push.apply(fc.features, hexTriangles([center_x, center_y], cellWidth / 2, cellHeight / 2));
-	            } else {
-	                fc.features.push(hexagon([center_x, center_y], cellWidth / 2, cellHeight / 2));
-	            }
-	        }
-	    }
-
-	    return fc;
-	};
-
-	//Center should be [x, y]
-	function hexagon(center, rx, ry) {
-	    var vertices = [];
-	    for (var i = 0; i < 6; i++) {
-	        var x = center[0] + rx * cosines[i];
-	        var y = center[1] + ry * sines[i];
-	        vertices.push([x, y]);
-	    }
-	    //first and last vertex must be the same
-	    vertices.push(vertices[0]);
-	    return polygon([vertices]);
-	}
-
-	//Center should be [x, y]
-	function hexTriangles(center, rx, ry) {
-	    var triangles = [];
-	    for (var i = 0; i < 6; i++) {
-	        var vertices = [];
-	        vertices.push(center);
-	        vertices.push([
-	            center[0] + rx * cosines[i],
-	            center[1] + ry * sines[i]
-	        ]);
-	        vertices.push([
-	            center[0] + rx * cosines[(i + 1) % 6],
-	            center[1] + ry * sines[(i + 1) % 6]
-	        ]);
-	        vertices.push(center);
-	        triangles.push(polygon([vertices]));
-	    }
-	    return triangles;
-	}
-
-
-/***/ }),
-/* 42 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	var getCoord = __webpack_require__(43).getCoord;
-	var radiansToDistance = __webpack_require__(40).radiansToDistance;
-	//http://en.wikipedia.org/wiki/Haversine_formula
-	//http://www.movable-type.co.uk/scripts/latlong.html
-
-	/**
-	 * Calculates the distance between two {@link Point|points} in degrees, radians,
-	 * miles, or kilometers. This uses the
-	 * [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula)
-	 * to account for global curvature.
-	 *
-	 * @name distance
-	 * @param {Feature<Point>} from origin point
-	 * @param {Feature<Point>} to destination point
-	 * @param {string} [units=kilometers] can be degrees, radians, miles, or kilometers
-	 * @returns {number} distance between the two points
-	 * @example
-	 * var from = {
-	 *   "type": "Feature",
-	 *   "properties": {},
-	 *   "geometry": {
-	 *     "type": "Point",
-	 *     "coordinates": [-75.343, 39.984]
-	 *   }
-	 * };
-	 * var to = {
-	 *   "type": "Feature",
-	 *   "properties": {},
-	 *   "geometry": {
-	 *     "type": "Point",
-	 *     "coordinates": [-75.534, 39.123]
-	 *   }
-	 * };
-	 * var units = "miles";
-	 *
-	 * var points = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [from, to]
-	 * };
-	 *
-	 * //=points
-	 *
-	 * var distance = turf.distance(from, to, units);
-	 *
-	 * //=distance
-	 */
-	module.exports = function (from, to, units) {
-	    var degrees2radians = Math.PI / 180;
-	    var coordinates1 = getCoord(from);
-	    var coordinates2 = getCoord(to);
-	    var dLat = degrees2radians * (coordinates2[1] - coordinates1[1]);
-	    var dLon = degrees2radians * (coordinates2[0] - coordinates1[0]);
-	    var lat1 = degrees2radians * coordinates1[1];
-	    var lat2 = degrees2radians * coordinates2[1];
-
-	    var a = Math.pow(Math.sin(dLat / 2), 2) +
-	          Math.pow(Math.sin(dLon / 2), 2) * Math.cos(lat1) * Math.cos(lat2);
-
-	    return radiansToDistance(2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)), units);
-	};
-
-
-/***/ }),
-/* 43 */
-/***/ (function(module, exports) {
-
-	/**
-	 * Unwrap a coordinate from a Point Feature, Geometry or a single coordinate.
-	 *
-	 * @param {Array<any>|Geometry|Feature<Point>} obj any value
-	 * @returns {Array<number>} coordinates
-	 */
-	function getCoord(obj) {
-	    if (!obj) throw new Error('No obj passed');
-
-	    var coordinates = getCoords(obj);
-
-	    // getCoord() must contain at least two numbers (Point)
-	    if (coordinates.length > 1 &&
-	        typeof coordinates[0] === 'number' &&
-	        typeof coordinates[1] === 'number') {
-	        return coordinates;
-	    } else {
-	        throw new Error('Coordinate is not a valid Point');
-	    }
-	}
-
-	/**
-	 * Unwrap coordinates from a Feature, Geometry Object or an Array of numbers
-	 *
-	 * @param {Array<any>|Geometry|Feature<any>} obj any value
-	 * @returns {Array<any>} coordinates
-	 */
-	function getCoords(obj) {
-	    if (!obj) throw new Error('No obj passed');
-	    var coordinates;
-
-	    // Array of numbers
-	    if (obj.length) {
-	        coordinates = obj;
-
-	    // Geometry Object
-	    } else if (obj.coordinates) {
-	        coordinates = obj.coordinates;
-
-	    // Feature
-	    } else if (obj.geometry && obj.geometry.coordinates) {
-	        coordinates = obj.geometry.coordinates;
-	    }
-	    // Checks if coordinates contains a number
-	    if (coordinates) {
-	        containsNumber(coordinates);
-	        return coordinates;
-	    }
-	    throw new Error('No valid coordinates');
-	}
-
-	/**
-	 * Checks if coordinates contains a number
-	 *
-	 * @private
-	 * @param {Array<any>} coordinates GeoJSON Coordinates
-	 * @returns {boolean} true if Array contains a number
-	 */
-	function containsNumber(coordinates) {
-	    if (coordinates.length > 1 &&
-	        typeof coordinates[0] === 'number' &&
-	        typeof coordinates[1] === 'number') {
-	        return true;
-	    }
-	    if (coordinates[0].length) {
-	        return containsNumber(coordinates[0]);
-	    }
-	    throw new Error('coordinates must only contain numbers');
-	}
-
-	/**
-	 * Enforce expectations about types of GeoJSON objects for Turf.
-	 *
-	 * @alias geojsonType
-	 * @param {GeoJSON} value any GeoJSON object
-	 * @param {string} type expected GeoJSON type
-	 * @param {string} name name of calling function
-	 * @throws {Error} if value is not the expected type.
-	 */
-	function geojsonType(value, type, name) {
-	    if (!type || !name) throw new Error('type and name required');
-
-	    if (!value || value.type !== type) {
-	        throw new Error('Invalid input to ' + name + ': must be a ' + type + ', given ' + value.type);
-	    }
-	}
-
-	/**
-	 * Enforce expectations about types of {@link Feature} inputs for Turf.
-	 * Internally this uses {@link geojsonType} to judge geometry types.
-	 *
-	 * @alias featureOf
-	 * @param {Feature} feature a feature with an expected geometry type
-	 * @param {string} type expected GeoJSON type
-	 * @param {string} name name of calling function
-	 * @throws {Error} error if value is not the expected type.
-	 */
-	function featureOf(feature, type, name) {
-	    if (!feature) throw new Error('No feature passed');
-	    if (!name) throw new Error('.featureOf() requires a name');
-	    if (!feature || feature.type !== 'Feature' || !feature.geometry) {
-	        throw new Error('Invalid input to ' + name + ', Feature with geometry required');
-	    }
-	    if (!feature.geometry || feature.geometry.type !== type) {
-	        throw new Error('Invalid input to ' + name + ': must be a ' + type + ', given ' + feature.geometry.type);
-	    }
-	}
-
-	/**
-	 * Enforce expectations about types of {@link FeatureCollection} inputs for Turf.
-	 * Internally this uses {@link geojsonType} to judge geometry types.
-	 *
-	 * @alias collectionOf
-	 * @param {FeatureCollection} featureCollection a FeatureCollection for which features will be judged
-	 * @param {string} type expected GeoJSON type
-	 * @param {string} name name of calling function
-	 * @throws {Error} if value is not the expected type.
-	 */
-	function collectionOf(featureCollection, type, name) {
-	    if (!featureCollection) throw new Error('No featureCollection passed');
-	    if (!name) throw new Error('.collectionOf() requires a name');
-	    if (!featureCollection || featureCollection.type !== 'FeatureCollection') {
-	        throw new Error('Invalid input to ' + name + ', FeatureCollection required');
-	    }
-	    for (var i = 0; i < featureCollection.features.length; i++) {
-	        var feature = featureCollection.features[i];
-	        if (!feature || feature.type !== 'Feature' || !feature.geometry) {
-	            throw new Error('Invalid input to ' + name + ', Feature with geometry required');
-	        }
-	        if (!feature.geometry || feature.geometry.type !== type) {
-	            throw new Error('Invalid input to ' + name + ': must be a ' + type + ', given ' + feature.geometry.type);
-	        }
-	    }
-	}
-
-	module.exports.geojsonType = geojsonType;
-	module.exports.collectionOf = collectionOf;
-	module.exports.featureOf = featureOf;
-	module.exports.getCoord = getCoord;
-	module.exports.getCoords = getCoords;
-
-
-/***/ }),
-/* 44 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	//http://en.wikipedia.org/wiki/Haversine_formula
-	//http://www.movable-type.co.uk/scripts/latlong.html
-	var getCoord = __webpack_require__(43).getCoord;
-	var helpers = __webpack_require__(40);
-	var point = helpers.point;
-	var distanceToRadians = helpers.distanceToRadians;
-
-	/**
-	 * Takes a {@link Point} and calculates the location of a destination point given a distance in degrees, radians, miles, or kilometers; and bearing in degrees. This uses the [Haversine formula](http://en.wikipedia.org/wiki/Haversine_formula) to account for global curvature.
-	 *
-	 * @name destination
-	 * @param {Feature<Point>} from starting point
-	 * @param {number} distance distance from the starting point
-	 * @param {number} bearing ranging from -180 to 180
-	 * @param {string} [units=kilometers] miles, kilometers, degrees, or radians
-	 * @returns {Feature<Point>} destination point
-	 * @example
-	 * var point = {
-	 *   "type": "Feature",
-	 *   "properties": {
-	 *     "marker-color": "#0f0"
-	 *   },
-	 *   "geometry": {
-	 *     "type": "Point",
-	 *     "coordinates": [-75.343, 39.984]
-	 *   }
-	 * };
-	 * var distance = 50;
-	 * var bearing = 90;
-	 * var units = 'miles';
-	 *
-	 * var destination = turf.destination(point, distance, bearing, units);
-	 * destination.properties['marker-color'] = '#f00';
-	 *
-	 * var result = {
-	 *   "type": "FeatureCollection",
-	 *   "features": [point, destination]
-	 * };
-	 *
-	 * //=result
-	 */
-	module.exports = function (from, distance, bearing, units) {
-	    var degrees2radians = Math.PI / 180;
-	    var radians2degrees = 180 / Math.PI;
-	    var coordinates1 = getCoord(from);
-	    var longitude1 = degrees2radians * coordinates1[0];
-	    var latitude1 = degrees2radians * coordinates1[1];
-	    var bearing_rad = degrees2radians * bearing;
-
-	    var radians = distanceToRadians(distance, units);
-
-	    var latitude2 = Math.asin(Math.sin(latitude1) * Math.cos(radians) +
-	        Math.cos(latitude1) * Math.sin(radians) * Math.cos(bearing_rad));
-	    var longitude2 = longitude1 + Math.atan2(Math.sin(bearing_rad) *
-	        Math.sin(radians) * Math.cos(latitude1),
-	        Math.cos(radians) - Math.sin(latitude1) * Math.sin(latitude2));
-
-	    return point([radians2degrees * longitude2, radians2degrees * latitude2]);
-	};
 
 
 /***/ })

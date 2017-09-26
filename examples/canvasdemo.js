@@ -45,7 +45,10 @@ map.on('load', function() {
 });
 
 function init() {
-    var objNum = 10, canvasLayer = new Alex.CanvasOverlayer({map:map});
+    var objNum = 10, canvasLayer = new Alex.CanvasOverlayer({
+        map: map,
+        shadow: true
+    });
     objs = Alex.Util.rdObjs(objNum, mapCenter);
     // myTween.loop = false;
     targets = Alex.Util.rdObjs(objNum, mapCenter);

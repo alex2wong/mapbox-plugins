@@ -89,10 +89,10 @@ export default class controllers {
         try {
             setInterval( function(){
                 ele.innerHTML = drone.name + "<br> coords: " +
-                     drone.point.coordinates[0].toFixed(1) + ", " +
-		             drone.point.coordinates[1].toFixed(1) + "<br>" +
+                     drone.lon.toFixed(1) + ", " +
+		             drone.lat.toFixed(1) + "<br>" +
                      'speed: ' + drone.speed + "<br>" +
-                     'direction: ' + ((drone.direction%(Math.PI*2))*180/Math.PI).toFixed(1)
+                     'direction: ' + (drone.direction%(360)).toFixed(1)
             }, 200);
 
         } catch(e) {

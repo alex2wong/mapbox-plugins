@@ -12,7 +12,7 @@ export default class Bullet {
             coordinates: [0, 0]
         };
         // DeepCopy the drone coords to bullet.
-        this.spoint.coordinates[0] = opts.point.coordinates[0];
-        this.spoint.coordinates[1] = opts.point.coordinates[1];
+        this.spoint.coordinates[0] = opts.lon;
+        this.spoint.coordinates[1] = opts.lat;
     }
 }

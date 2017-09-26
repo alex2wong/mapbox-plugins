@@ -1,34 +1,44 @@
 
+function BBOX(opts) {
+    let _opts = opts || {};
+    this.minX = _opts.minX;
+    this.minY = _opts.minY; 
+    this.maxX = _opts.maxX; 
+    this.maxY = _opts.maxY;
+}
+
 // Some Static Function bind with one Canvas context
 export default class Canvas {
     // Bound with a canvas element.
     static init(ele) {
-        Canvas.canv = ele;
-        Canvas.height = ele.height;
-        Canvas.width = ele.width;
-        // let the canvas's width/height cohere width DOM width/height. 
-        Canvas.canv.width = ele.width;
-        Canvas.canv.height = ele.height;
-        Canvas.ctx = ele.getContext("2d");
-        Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
-        Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
-        Canvas.ctx.strokeWidth = 2;
-        Canvas.animate = false;
-        Canvas.img = new Image();
+        if (ele instanceof HTMLCanvasElement) {
+            Canvas.canv = ele;
+            Canvas.height = ele.height;
+            Canvas.width = ele.width;
+            // let the canvas's width/height cohere width DOM width/height. 
+            Canvas.ctx = ele.getContext("2d");
+            Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
+            Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
+            Canvas.ctx.strokeWidth = 1;
+            Canvas.animate = false;
+            Canvas.img = new Image();
+        } else {
+            console.error("ele is not instanceof CANVAS");
+        }
     }
 
     /**
      * set ctx.strokeStyle with rgba() @string
      */
     static setStroke(colorStr) {
-        Canvas.ctx.strokeStyle = colorStr;
+        if (Canvas.ctx) Canvas.ctx.strokeStyle = colorStr;
     }
 
     /**
      * set ctx.fillStyle with rgba(). @string
      */
     static setFill(colorStr) {
-        Canvas.ctx.fillStyle = colorStr;
+        if (Canvas.ctx) Canvas.ctx.fillStyle = colorStr;
     }
 
     /**
@@ -126,6 +136,19 @@ export default class Canvas {
         }
     }
 
+    /**
+     * drawRect with given BBox{minX, minY, maxX, maxY}
+     */
+    static drawRect(bbox, fill=false) {
+        let _bbox = new BBOX(bbox),
+            rectWidth = _bbox.maxX - _bbox.minX,
+            rectHeight = _bbox.maxY - _bbox.minY;
+        if (fill) {
+            Canvas.ctx.fillRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+        } else {
+            Canvas.ctx.strokeRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+        }
+    }
 
     /**
      * drawLine with given Value..@Array
@@ -196,8 +219,8 @@ export default class Canvas {
 
     static clearCanv() {
         Canvas.ctx.clearRect(0,0,Canvas.width,Canvas.height);
-        Canvas.setFill("#000");
-        Canvas.ctx.fillRect(0,0,Canvas.width,Canvas.height);
+        // Canvas.setFill("#000");
+        // Canvas.ctx.fillRect(0,0,Canvas.width,Canvas.height);
     }
 
 }

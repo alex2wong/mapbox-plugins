@@ -1,0 +1,137 @@
+<!doctype html>
+<head>
+    <title>Glow Style Demo</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.css' rel='stylesheet' />    
+    <link href="https://alex2wong.github.io/mapbox-plugins/styles.css" rel="stylesheet" />
+    <link href="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.css" rel="stylesheet" />
+</head>
+
+<div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'></div>
+<!--<script src='../../dist/mapbox-gl.js'></script>-->
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>
+<script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
+<script src="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.debug.js"></script>
+<script>
+    // import * as Alex from '../src/index';
+
+    var data = null;
+    mapboxgl.accessToken = false;
+    // var mapCenter = [120.8066, 30.6135];
+    var mapCenter = [13.41, 52.52], osmb = null;
+    var map = new mapboxgl.Map({
+        style: {
+            "version": 8,
+            "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+            "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+            "sources": {
+                "custom-tms": {   
+                    'type': 'raster',
+                    'tiles': [
+                        // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+                        // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}",
+                        // "https://c.tiles.mapbox.com/v3/osmbuildings.kbpalbpk/{z}/{x}/{y}.png",
+                        "http://b.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    ],
+                    'tileSize': 256
+                },
+            },
+            "layers": [
+                // {
+                //     'id': 'custom-tms',
+                //     'type': 'raster',
+                //     'source': 'custom-tms',
+                //     'paint': {}
+                // },
+            ]
+        },
+        center: mapCenter,
+        zoom: 15,
+        pitch: 0,
+        bearing: 0,
+        light: {
+            'anchor':'viewport',
+            'color':'white',
+            'intensity':0.7
+        },
+        container: 'map'
+    });
+
+    map.on('load', function() {
+        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/countries.geojson")
+            .then((res) => {
+                console.log("got jsonData..");
+                data = res;
+                map.addSource("world", {
+                    "type": "geojson",
+                    "data": data
+                });
+                map.addLayer({
+                    "id": "world",
+                    "source": "world",
+                    "type": "fill",
+                    "paint": {
+                        "fill-color": "rgba(0,0,0,0.7)",
+                        "fill-outline-color": "#eee",
+                        // "fill-opacity": 0.4
+                    },
+                    // "filter": ["==", "$type", "Polygon"]
+                });
+            });
+        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/berlinRoad.geojson")
+            .then((res) => {
+                console.log("got line data..");
+                map.addSource("roads", {
+                    "type": "geojson",
+                    "data": res
+                });
+                map.addLayer({
+                    "id": "roads",
+                    "source": "roads",
+                    "type": "line",
+                    "paint": {
+                        "line-color": "#fffb91",
+                        "line-opacity": 0.8,
+                        "line-blur": 4,
+                        "line-width": 6,
+                        // {
+                        //     "type": "identity",
+                        //     "property":  "CLASS"
+                        // }
+                    },
+                });
+            });
+        
+        osmb = new OSMBuildings({
+            position: { latitude: mapCenter[1], longitude:mapCenter[0] },
+            zoom: (map.getZoom() + 1),
+            minZoom: 15
+        })
+        // osmb.appendTo('map');
+
+        // // osmb.addMapTiles(
+        // //     'https://{s}.tiles.mapbox.com/v3/osmbuildings.kbpalbpk/{z}/{x}/{y}.png',
+        // //     {
+        // //     attribution: '© Data <a href="http://openstreetmap.org/copyright/">OpenStreetMap</a> · © Map <a href="http://mapbox.com">Mapbox</a>'
+        // //     }
+        // // );
+
+        // osmb.addGeoJSONTiles('http://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
+        // var now = null;
+        // function changeDate() {
+        //     var Y = now.getFullYear(),
+        //         M = now.getMonth(),
+        //         D = now.getDate(),
+        //         h = now.getHours(),
+        //         h = 10;
+        //         m = 0;
+        //     osmb.setDate(new Date(Y, M, D, h, m));
+        // }
+        // now = new Date();
+        // changeDate();
+    });    
+
+</script>
