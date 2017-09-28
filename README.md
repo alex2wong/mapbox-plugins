@@ -1,4 +1,4 @@
-# mapbox-plugins
+# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master)
 Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
 
 https://alex2wong.github.io/mapbox-plugins/
