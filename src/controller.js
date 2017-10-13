@@ -1,6 +1,4 @@
 import Drone from './drone';
-import MiniRefreshTools from '../examples/listLayer/node_modules/minirefresh/dist/debug/minirefresh';
-// import '../examples/listLayer/node_modules/minirefresh/dist/debug/minirefresh.css'
 import { deprecate } from 'core-decorators';
 import { CanvasOverlayer} from './layers/canvasOverlay';
 

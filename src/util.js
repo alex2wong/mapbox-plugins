@@ -2,6 +2,10 @@ import Const from './const';
 
 export default class util {
 
+    static getAnimationFrame() {
+        
+    }
+
     /**
      * use promise to implement xmlHttpRequest process
      * promise.then receive 2 params.(resolve func, reject func)

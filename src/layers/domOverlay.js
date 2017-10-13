@@ -95,9 +95,6 @@ function _redraw(domOpts) {
             dot.style.width = dot.style.height = dotRadius * 2 + 'px';
             dot.style.position = "absolute";
 
-            dom.innerHTML = domOpt['content'];
-            Util.setIconDiv(dom, iconName);
-            dom.className = "dom-popup";
             dom.style.position = "absolute";
             dom.style.background = "#fff";
             dom.style.padding = '5px';
@@ -105,6 +102,9 @@ function _redraw(domOpts) {
             dom.style.left = pix[0] + "px";
             // calc the dom bottom, depend on its height and canvas height..
             dom.style.top = (pix[1] - lineHeight) + "px";
+            dom.innerHTML = domOpt['content'];
+            Util.setIconDiv(dom, iconName);
+            dom.className = "dom-popup";
 
             line.className = "dom-ele", dot.className = "dom-ele";
             line.style.left = pix[0] + "px";

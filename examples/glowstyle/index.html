@@ -9,9 +9,10 @@
     <link href="https://alex2wong.github.io/mapbox-plugins/styles.css" rel="stylesheet" />
     <link href="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.css" rel="stylesheet" />
 </head>
-
-<div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'></div>
-<!--<script src='../../dist/mapbox-gl.js'></script>-->
+<body>
+    <h3>Glow Animation Demo</h3>
+    <div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'></div>
+<!--<script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>-->
 <script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>
 <script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
 <script src="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.debug.js"></script>
@@ -49,19 +50,22 @@
             ]
         },
         center: mapCenter,
-        zoom: 15,
-        pitch: 0,
+        zoom: 13,
+        pitch: 31,
         bearing: 0,
         light: {
             'anchor':'viewport',
             'color':'white',
             'intensity':0.7
         },
-        container: 'map'
+        container: 'map',
+        showCollisionBoxes: true,
+        // interactive: false
     });
 
     map.on('load', function() {
-        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/countries.geojson")
+        // https://alex2wong.github.io/mapbox-plugins
+        Alex.Util.getJSON("../../assets/countries.geojson")
             .then((res) => {
                 console.log("got jsonData..");
                 data = res;
@@ -81,7 +85,7 @@
                     // "filter": ["==", "$type", "Polygon"]
                 });
             });
-        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/berlinRoad.geojson")
+        Alex.Util.getJSON("../../assets/berlinRoad.geojson")
             .then((res) => {
                 console.log("got line data..");
                 map.addSource("roads", {
@@ -94,8 +98,8 @@
                     "type": "line",
                     "paint": {
                         "line-color": "#fffb91",
-                        "line-opacity": 0.8,
-                        "line-blur": 4,
+                        "line-opacity": 0.7,
+                        "line-blur": 6,
                         "line-width": 6,
                         // {
                         //     "type": "identity",
@@ -103,6 +107,7 @@
                         // }
                     },
                 });
+                setInterval(update, 100);
             });
         
         osmb = new OSMBuildings({
@@ -110,6 +115,12 @@
             zoom: (map.getZoom() + 1),
             minZoom: 15
         })
+        var curBlurwid = 0, t = 0;
+        function update(){
+            t += 0.2;
+            curBlurwid = 4 + 3*Math.cos(t);
+            map.setPaintProperty('roads', 'line-width', curBlurwid);
+        }
         // osmb.appendTo('map');
 
         // // osmb.addMapTiles(
@@ -120,18 +131,7 @@
         // // );
 
         // osmb.addGeoJSONTiles('http://{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json');
-        // var now = null;
-        // function changeDate() {
-        //     var Y = now.getFullYear(),
-        //         M = now.getMonth(),
-        //         D = now.getDate(),
-        //         h = now.getHours(),
-        //         h = 10;
-        //         m = 0;
-        //     osmb.setDate(new Date(Y, M, D, h, m));
-        // }
-        // now = new Date();
-        // changeDate();
     });    
 
 </script>
+</body>

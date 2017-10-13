@@ -41,7 +41,8 @@
             'color':'white',
             'intensity':0.7
         },
-        container: 'map'
+        container: 'map',
+        showCollisionBoxes: true,
     });
 
     map.on('load', function() {
@@ -61,7 +62,7 @@
                     "paint": {
                         "fill-color": "rgba(0,0,0,0.7)",
                         "fill-outline-color": "#eee",
-                        // "fill-opacity": 0.4
+                        "fill-outline-width": 2,
                     },
                     // "filter": ["==", "$type", "Polygon"]
                 });
@@ -97,4 +98,11 @@
             requestAnimationFrame(update);
         }
         update();
+        var curBlurwid = 0, t = 0;
+        function glow(){
+            t += 0.2;
+            curBlurwid = 3 + 2*Math.cos(t);
+            map.setPaintProperty('world', 'fill-outline-width', curBlurwid);
+        }
+        setInterval(glow, 100);
     }
