@@ -27,7 +27,7 @@ var map = new mapboxgl.Map({
         ]
     },
     center: mapCenter,
-    zoom: 6,
+    zoom: 10,
     pitch: 45,
     bearing: 0,
     light: {
@@ -45,7 +45,7 @@ map.on('load', function() {
 });
 
 function init() {
-    var objNum = 10, canvasLayer = new Alex.CanvasOverlayer({
+    var objNum = 5000, canvasLayer = new Alex.CanvasOverlayer({
         map: map,
         shadow: true
     });

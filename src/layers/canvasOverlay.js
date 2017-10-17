@@ -116,7 +116,7 @@ function _redraw(objs) {
             if (pix == null) continue;
             ctx.fillStyle = objs[i]['color'];
             ctx.beginPath();
-            if (label.startsWith("Play")) radius = iconSize*0.75;
+            if (label !== undefined && label.startsWith("Play")) radius = iconSize*0.75;
             // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
             if (icon !== undefined) {
                 let min = icon.height > icon.width ? icon.width : icon.height;

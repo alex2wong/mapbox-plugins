@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.rbush = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
+	exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
 
 	var _drone = __webpack_require__(2);
 
@@ -94,14 +94,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _domOverlay = __webpack_require__(32);
 
+	var _windLayer = __webpack_require__(33);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// this is Root Module for Whole app, require lib we need.
-	var rbush = __webpack_require__(33);
+	var rbush = __webpack_require__(34);
 
 	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
 
 	// Static Props..
+	// this is Root Module for Whole app, require lib we need.
 	exports.Drone = _drone2.default;
 	exports.Canvas = _canvas2.default;
 	exports.Chart = _chartmodel2.default;
@@ -110,6 +112,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.myTween = _Tween.myTween;
 	exports.CanvasOverlayer = _canvasOverlay.CanvasOverlayer;
 	exports.DomOverlayer = _domOverlay.DomOverlayer;
+	exports.WindLayer = _windLayer.WindLayer;
 	exports.rbush = rbush;
 
 /***/ }),
@@ -2867,7 +2870,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (pix == null) continue;
 	            ctx.fillStyle = objs[i]['color'];
 	            ctx.beginPath();
-	            if (label.startsWith("Play")) radius = iconSize * 0.75;
+	            if (label !== undefined && label.startsWith("Play")) radius = iconSize * 0.75;
 	            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
 	            if (icon !== undefined) {
 	                var min = icon.height > icon.width ? icon.width : icon.height;
@@ -3332,11 +3335,148 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.WindLayer = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _canvasOverlay = __webpack_require__(29);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * initWindlayer based on mapboxgl-canvas
+	 */
+	var WindLayer = exports.WindLayer = function (_CanvasOverlayer) {
+	    _inherits(WindLayer, _CanvasOverlayer);
+
+	    function WindLayer(opts) {
+	        _classCallCheck(this, WindLayer);
+
+	        var _opts = opts || {};
+
+	        var _this = _possibleConstructorReturn(this, (WindLayer.__proto__ || Object.getPrototypeOf(WindLayer)).call(this, _opts));
+
+	        _this.windImage = opts.image || new Image();
+	        // this.redraw = _redraw.bind(this);
+	        return _this;
+	    }
+
+	    /**
+	     * render particles based on image
+	     * @param {*grid wind image} image 
+	     */
+
+
+	    _createClass(WindLayer, [{
+	        key: "updateWind",
+	        value: function updateWind(image, geojson) {
+	            var canvas = this.canvas,
+	                pix2render = [],
+	                ctx = this.canvas.getContext("2d");
+	            if (this.particles == undefined) {
+	                console.log("generating particles...");
+	                this.particles = genParticles(image, geojson);
+	            }
+	            // ctx.globalAlpha = 0.95;
+	            if (!geojson) {
+	                console.log("generating particles complete! num: " + this.particles.length);
+	                this.redraw(this.particles);
+	            } else {
+	                // wind data should be rendered as mapboxgl vector.
+	                console.log("generating particles complete! Wind data should be rendered as mapboxgl vector.");
+	            }
+	        }
+	    }]);
+
+	    return WindLayer;
+	}(_canvasOverlay.CanvasOverlayer);
+
+	function _redraw() {}
+	// this.particles
+
+
+	/**
+	 * generate particles based on got Grid wind image.
+	 * (actually image -> particles)
+	 * called after wind image loaded event..
+	 * return particles: Array, particles with wind strength and angle.
+	 */
+	function genParticles(image, geojson) {
+	    var windImage = image || this.windImage,
+	        tmpCanvas = document.createElement("canvas"),
+	        tmpCtx = tmpCanvas.getContext("2d"),
+	        particles = [],
+	        features = [];
+	    if (geojson) {
+	        particles = {
+	            "type": "FeatureCollection",
+	            "name": "particles",
+	            "features": features
+	        };
+	    }
+
+	    tmpCanvas.width = windImage.width;
+	    tmpCanvas.height = windImage.height;
+	    tmpCtx.drawImage(windImage, 0, 0);
+	    // imageData.data.length: width*height*4
+	    var imageData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height),
+	        dataLength = imageData.data.byteLength;
+	    for (var i = 0; i < tmpCanvas.height; i++) {
+	        // i:0~180, j:0~360
+	        for (var j = 0; j < tmpCanvas.width; j++) {
+	            var particle = {
+	                'lon': -180 + j,
+	                'lat': -90 + i
+	            };
+	            var uIndex = (i * 360 + j) * 4,
+	                vIndex = uIndex + 1;
+	            var uVal = imageData.data[uIndex],
+	                vVal = imageData.data[vIndex],
+	                windPow = Math.pow(uVal, 2) + Math.pow(vVal, 2),
+	                angle = Number(Math.atan(vVal / uVal).toFixed(2)),
+	                color = 'rgba(' + (windPow / 255).toFixed(0) + ', 255, 100, 0.7)';
+	            // return geojson dataSource for mapboxgl.vector layer.
+	            if (geojson) {
+	                particle = { "type": "Feature",
+	                    "properties": {
+	                        "angle": angle,
+	                        "color": color
+	                    },
+	                    "geometry": {
+	                        "type": "Point",
+	                        "coordinates": [-180 + j, -90 + i]
+	                    }
+	                };
+	                features.push(particle);
+	            } else {
+	                particle.color = color;
+	                particle.angle = angle;
+	                particle.radius = 4;
+	                particles.push(particle);
+	            }
+	        }
+	    }
+	    return particles;
+	}
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	'use strict';
 
 	module.exports = rbush;
 
-	var quickselect = __webpack_require__(34);
+	var quickselect = __webpack_require__(35);
 
 	function rbush(maxEntries, format) {
 	    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
@@ -3896,7 +4036,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 34 */
+/* 35 */
 /***/ (function(module, exports) {
 
 	'use strict';
