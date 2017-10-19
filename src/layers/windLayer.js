@@ -7,7 +7,8 @@ export class WindLayer extends CanvasOverlayer {
     constructor(opts) {
         let _opts = opts || {};
         super(_opts);
-        this.windImage = opts.image || new Image();
+        this.windImage = _opts.image || new Image();
+        this.radius = _opts.radius || 2; 
         // this.redraw = _redraw.bind(this);
     }
     
@@ -15,12 +16,12 @@ export class WindLayer extends CanvasOverlayer {
      * render particles based on image
      * @param {*grid wind image} image 
      */
-    updateWind(image, geojson) {
+    updateWind(image, geojson, compressRatio) {
         let canvas = this.canvas, pix2render = [],
             ctx = this.canvas.getContext("2d");
         if (this.particles == undefined) {
             console.log("generating particles...");
-            this.particles = genParticles(image, geojson);
+            this.particles = genParticles(image, geojson, compressRatio, this.radius);
         }
         // ctx.globalAlpha = 0.95;
         if (!geojson) {
@@ -28,7 +29,7 @@ export class WindLayer extends CanvasOverlayer {
             this.redraw(this.particles);
         } else {
             // wind data should be rendered as mapboxgl vector.
-            console.log("generating particles complete! Wind data should be rendered as mapboxgl vector.");
+            console.log("generating particles complete! num: " + this.particles.features.length + " in geojson.");
         }
     }
 }
@@ -43,7 +44,7 @@ function _redraw() {
  * called after wind image loaded event..
  * return particles: Array, particles with wind strength and angle.
  */
-function genParticles(image, geojson) {
+function genParticles(image, geojson, compressRatio, radius) {
     let windImage = image || this.windImage,
         tmpCanvas = document.createElement("canvas"),
         tmpCtx = tmpCanvas.getContext("2d"),
@@ -62,9 +63,14 @@ function genParticles(image, geojson) {
     // imageData.data.length: width*height*4
     let imageData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height),
         dataLength = imageData.data.byteLength;
-    for (let i=0;i<tmpCanvas.height;i++) {
+    if (compressRatio == undefined || (compressRatio !== undefined && compressRatio < 1)) {
+        console.warn("Input compressRatio invalid, use default 1.");
+        compressRatio = 1;
+    }
+    compressRatio = parseInt(Number(compressRatio));
+    for (let i=1;i<tmpCanvas.height-1;i+=compressRatio) {
         // i:0~180, j:0~360
-        for (let j=0;j<tmpCanvas.width;j++) {
+        for (let j=0;j<tmpCanvas.width;j+=compressRatio) {
             let particle = {
                 'lon': -180 + j,
                 'lat': -90 + i,
@@ -90,7 +96,7 @@ function genParticles(image, geojson) {
             } else {
                 particle.color = color;
                 particle.angle = angle;
-                particle.radius = 4;
+                particle.radius = radius;
                 particles.push(particle);
             }
         }

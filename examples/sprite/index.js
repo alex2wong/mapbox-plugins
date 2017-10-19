@@ -62,7 +62,7 @@
                     "paint": {
                         "fill-color": "rgba(0,0,0,0.7)",
                         "fill-outline-color": "#eee",
-                        "fill-outline-width": 2,
+                        "fill-outline-width": 2
                     },
                     // "filter": ["==", "$type", "Polygon"]
                 });
@@ -76,7 +76,8 @@
         var objNum = 4, canvasLayer = new Alex.CanvasOverlayer({
             map: map,
             shadow: false,
-            keepTrack: true
+            keepTrack: true,
+            blurWidth: 4
         });
         objs = Alex.Util.rdObjs(objNum, mapCenter);
         // myTween.loop = false;
@@ -98,11 +99,4 @@
             requestAnimationFrame(update);
         }
         update();
-        var curBlurwid = 0, t = 0;
-        function glow(){
-            t += 0.2;
-            curBlurwid = 3 + 2*Math.cos(t);
-            map.setPaintProperty('world', 'fill-outline-width', curBlurwid);
-        }
-        setInterval(glow, 100);
     }

@@ -2744,6 +2744,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.canvas = _this._init();
 	        _this.redraw = _redraw.bind(_this);
 	        _this.shadow = _opts.shadow != undefined ? _opts.shadow : false;
+	        _this.blurWidth = _opts.blurWidth != undefined ? _opts.blurWidth : 4;
 	        _this.keepTrack = _opts.keepTrack != undefined ? _opts.keepTrack : false;
 	        if (_this.keepTrack) {
 	            // create trackLayer to render history track lines..
@@ -2789,7 +2790,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.trackLayer) {
 	                this.trackCtx = this.trackLayer.getContext("2d");
 	                this.movedTo = false;
-	                initCtx(this.trackCtx, "rgba(255,255,255,.4");
+	                initCtx(this.trackCtx, this.blurWidth, "rgba(255,255,255,.4");
 	                this.trackCtx.lineWidth = 2;
 	                this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
 	                this.trackCtx.beginPath();
@@ -2857,7 +2858,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // ctx.fillStyle = "rgba(240,200,20,.7)";
 	        // ctx.fillRect(0,0,canv.width, canv.height);
 
-	        initCtx(ctx, "rgba(255,255,255,.4");
+	        initCtx(ctx, this.blurWidth, "rgba(255,255,255,.4");
 	        for (var i = 0; i < objs.length; i++) {
 	            var x = objs[i]['lon'],
 	                y = objs[i]['lat'],
@@ -2914,9 +2915,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
-	function initCtx(ctx, shadowColor) {
+	function initCtx(ctx, blurWidth, shadowColor) {
 	    if (ctx === undefined) return;
-	    ctx.shadowBlur = 7;
+	    ctx.shadowBlur = blurWidth;
 	    ctx.shadowColor = "rgba(255,255,255,.8)";
 	    ctx.strokeStyle = "rgba(255,255,255,.9)";
 	}
@@ -3365,7 +3366,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        var _this = _possibleConstructorReturn(this, (WindLayer.__proto__ || Object.getPrototypeOf(WindLayer)).call(this, _opts));
 
-	        _this.windImage = opts.image || new Image();
+	        _this.windImage = _opts.image || new Image();
+	        _this.radius = _opts.radius || 2;
 	        // this.redraw = _redraw.bind(this);
 	        return _this;
 	    }
@@ -3378,13 +3380,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    _createClass(WindLayer, [{
 	        key: "updateWind",
-	        value: function updateWind(image, geojson) {
+	        value: function updateWind(image, geojson, compressRatio) {
 	            var canvas = this.canvas,
 	                pix2render = [],
 	                ctx = this.canvas.getContext("2d");
 	            if (this.particles == undefined) {
 	                console.log("generating particles...");
-	                this.particles = genParticles(image, geojson);
+	                this.particles = genParticles(image, geojson, compressRatio, this.radius);
 	            }
 	            // ctx.globalAlpha = 0.95;
 	            if (!geojson) {
@@ -3392,7 +3394,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                this.redraw(this.particles);
 	            } else {
 	                // wind data should be rendered as mapboxgl vector.
-	                console.log("generating particles complete! Wind data should be rendered as mapboxgl vector.");
+	                console.log("generating particles complete! num: " + this.particles.features.length + " in geojson.");
 	            }
 	        }
 	    }]);
@@ -3410,7 +3412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * called after wind image loaded event..
 	 * return particles: Array, particles with wind strength and angle.
 	 */
-	function genParticles(image, geojson) {
+	function genParticles(image, geojson, compressRatio, radius) {
 	    var windImage = image || this.windImage,
 	        tmpCanvas = document.createElement("canvas"),
 	        tmpCtx = tmpCanvas.getContext("2d"),
@@ -3430,9 +3432,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    // imageData.data.length: width*height*4
 	    var imageData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height),
 	        dataLength = imageData.data.byteLength;
-	    for (var i = 0; i < tmpCanvas.height; i++) {
+	    if (compressRatio == undefined || compressRatio !== undefined && compressRatio < 1) {
+	        console.warn("Input compressRatio invalid, use default 1.");
+	        compressRatio = 1;
+	    }
+	    compressRatio = parseInt(Number(compressRatio));
+	    for (var i = 1; i < tmpCanvas.height - 1; i += compressRatio) {
 	        // i:0~180, j:0~360
-	        for (var j = 0; j < tmpCanvas.width; j++) {
+	        for (var j = 0; j < tmpCanvas.width; j += compressRatio) {
 	            var particle = {
 	                'lon': -180 + j,
 	                'lat': -90 + i
@@ -3460,7 +3467,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            } else {
 	                particle.color = color;
 	                particle.angle = angle;
-	                particle.radius = 4;
+	                particle.radius = radius;
 	                particles.push(particle);
 	            }
 	        }
