@@ -55,4 +55,4 @@ function update(){
 update();
 
 ```
-Any bugfix, enhancement and PR receive warn welcome :)
+### Any **bugfix, enhancement and PR** receive warm welcome :)
