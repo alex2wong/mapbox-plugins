@@ -41,7 +41,8 @@
             'color':'white',
             'intensity':0.7
         },
-        container: 'map'
+        container: 'map',
+        showCollisionBoxes: true,
     });
 
     map.on('load', function() {
@@ -61,7 +62,7 @@
                     "paint": {
                         "fill-color": "rgba(0,0,0,0.7)",
                         "fill-outline-color": "#eee",
-                        // "fill-opacity": 0.4
+                        "fill-outline-width": 2
                     },
                     // "filter": ["==", "$type", "Polygon"]
                 });
@@ -75,7 +76,8 @@
         var objNum = 4, canvasLayer = new Alex.CanvasOverlayer({
             map: map,
             shadow: false,
-            keepTrack: true
+            keepTrack: true,
+            blurWidth: 4
         });
         objs = Alex.Util.rdObjs(objNum, mapCenter);
         // myTween.loop = false;

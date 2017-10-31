@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
+	exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
 
 	var _drone = __webpack_require__(2);
 
@@ -88,13 +88,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _controller2 = _interopRequireDefault(_controller);
 
-	var _Tween = __webpack_require__(29);
+	var _Tween = __webpack_require__(31);
 
-	var _canvasOverlay = __webpack_require__(30);
+	var _canvasOverlay = __webpack_require__(29);
 
 	var _domOverlay = __webpack_require__(32);
 
+	var _windLayer = __webpack_require__(33);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	var rbush = __webpack_require__(34);
 
 	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
 
@@ -108,6 +112,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.myTween = _Tween.myTween;
 	exports.CanvasOverlayer = _canvasOverlay.CanvasOverlayer;
 	exports.DomOverlayer = _domOverlay.DomOverlayer;
+	exports.WindLayer = _windLayer.WindLayer;
+	exports.rbush = rbush;
 
 /***/ }),
 /* 2 */
@@ -175,7 +181,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            // make sure Sprite in world..
 	            var alY = Math.cos(this.direction * Math.PI / 180) * this.speed * 0.001,
 	                lat = this.lat + alY;
-	            if (lat > 88 || lat < -88) {
+	            if (lat > 84 || lat < -84) {
 	                alY = -alY;
 	                this.direction += 180;
 	                console.warn("latitude out of bbox, turn back..");
@@ -320,8 +326,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(util, null, [{
-	        key: "getJSON",
-
+	        key: "getAnimationFrame",
+	        value: function getAnimationFrame() {}
 
 	        /**
 	         * use promise to implement xmlHttpRequest process
@@ -349,6 +355,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        /**
 	         * return promise obj.
 	         */
+
+	    }, {
+	        key: "getJSON",
 	        value: function getJSON(url, resolve, reject) {
 	            var promise = new Promise(function (resolve, reject) {
 	                var xhr = new XMLHttpRequest();
@@ -606,7 +615,16 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	function BBOX(opts) {
+	    var _opts = opts || {};
+	    this.minX = _opts.minX;
+	    this.minY = _opts.minY;
+	    this.maxX = _opts.maxX;
+	    this.maxY = _opts.maxY;
+	}
+
 	// Some Static Function bind with one Canvas context
+
 	var Canvas = function () {
 	    function Canvas() {
 	        _classCallCheck(this, Canvas);
@@ -617,18 +635,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        // Bound with a canvas element.
 	        value: function init(ele) {
-	            Canvas.canv = ele;
-	            Canvas.height = ele.height;
-	            Canvas.width = ele.width;
-	            // let the canvas's width/height cohere width DOM width/height. 
-	            Canvas.canv.width = ele.width;
-	            Canvas.canv.height = ele.height;
-	            Canvas.ctx = ele.getContext("2d");
-	            Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
-	            Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
-	            Canvas.ctx.strokeWidth = 2;
-	            Canvas.animate = false;
-	            Canvas.img = new Image();
+	            if (ele instanceof HTMLCanvasElement) {
+	                Canvas.canv = ele;
+	                Canvas.height = ele.height;
+	                Canvas.width = ele.width;
+	                // let the canvas's width/height cohere width DOM width/height. 
+	                Canvas.ctx = ele.getContext("2d");
+	                Canvas.ctx.strokeStyle = "rgba(0,0,0,0.9)";
+	                Canvas.ctx.fillStyle = "rgba(10,200,240,0.4)";
+	                Canvas.ctx.strokeWidth = 1;
+	                Canvas.animate = false;
+	                Canvas.img = new Image();
+	            } else {
+	                console.error("ele is not instanceof CANVAS");
+	            }
 	        }
 
 	        /**
@@ -638,7 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "setStroke",
 	        value: function setStroke(colorStr) {
-	            Canvas.ctx.strokeStyle = colorStr;
+	            if (Canvas.ctx) Canvas.ctx.strokeStyle = colorStr;
 	        }
 
 	        /**
@@ -648,7 +668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, {
 	        key: "setFill",
 	        value: function setFill(colorStr) {
-	            Canvas.ctx.fillStyle = colorStr;
+	            if (Canvas.ctx) Canvas.ctx.fillStyle = colorStr;
 	        }
 
 	        /**
@@ -759,6 +779,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
+	         * drawRect with given BBox{minX, minY, maxX, maxY}
+	         */
+
+	    }, {
+	        key: "drawRect",
+	        value: function drawRect(bbox) {
+	            var fill = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	            var _bbox = new BBOX(bbox),
+	                rectWidth = _bbox.maxX - _bbox.minX,
+	                rectHeight = _bbox.maxY - _bbox.minY;
+	            if (fill) {
+	                Canvas.ctx.fillRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+	            } else {
+	                Canvas.ctx.strokeRect(_bbox.minX, _bbox.minY, rectWidth, rectHeight);
+	            }
+	        }
+
+	        /**
 	         * drawLine with given Value..@Array
 	         * lwidth : lineWidth @number
 	         * dash: default false @bool
@@ -834,8 +873,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "clearCanv",
 	        value: function clearCanv() {
 	            Canvas.ctx.clearRect(0, 0, Canvas.width, Canvas.height);
-	            Canvas.setFill("#000");
-	            Canvas.ctx.fillRect(0, 0, Canvas.width, Canvas.height);
+	            // Canvas.setFill("#000");
+	            // Canvas.ctx.fillRect(0,0,Canvas.width,Canvas.height);
 	        }
 	    }]);
 
@@ -998,6 +1037,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _coreDecorators = __webpack_require__(10);
 
+	var _canvasOverlay = __webpack_require__(29);
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -1039,6 +1080,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	            });
 	            console.log("gameControl register success.");
+	        }
+
+	        /**
+	         * pickupObj control, need to bind with canvasOverlay, to fetch the objs drawn
+	         * each moveEnd, rebuild the pixList depend on objs in viewport!
+	         * pixList's index is vital for pickUp performance.
+	         */
+
+	    }, {
+	        key: 'pickupControl',
+	        value: function pickupControl(canvasOverlay) {
+	            if (canvasOverlay instanceof _canvasOverlay.CanvasOverlayer) {
+	                // establish pixList storing objs' location. canvasOverlay.source.lon, lat
+	                var pix = canvasOverlay.lnglat2pix(canvasOverlay.source[0].lon, canvasOverlay.source[1].lat);
+	            }
 	        }
 
 	        /**
@@ -1091,6 +1147,33 @@ return /******/ (function(modules) { // webpackBootstrap
 	                console.error(e);
 	            }
 	            console.log("dashBoard register success.");
+	        }
+
+	        /** create refreshable features list.  */
+
+	    }, {
+	        key: 'featureList',
+	        value: function featureList(containerId) {
+	            if (containerId == undefined || typeof containerId !== "string") {
+	                console.warn("invalid containerId..");
+	                return null;
+	            }
+	            // var miniRefresh = new MiniRefresh({
+	            //     container: '#' + containerId,
+	            //     down: {
+	            //         callback: function() {
+	            //             // 下拉事件
+	            //             console.log("list dragged ..");
+	            //         }
+	            //     },
+	            //     up: {
+
+	            //         callback: function() {
+	            //             // 上拉事件
+	            //         }
+	            //     }
+	            // });
+	            // return miniRefresh;
 	        }
 	    }]);
 
@@ -2622,6 +2705,316 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.CanvasOverlayer = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _overlay = __webpack_require__(30);
+
+	var _overlay2 = _interopRequireDefault(_overlay);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * initCanvasOverlayer based on mapboxgl-canvas
+	 */
+	var CanvasOverlayer = exports.CanvasOverlayer = function (_Overlayer) {
+	    _inherits(CanvasOverlayer, _Overlayer);
+
+	    function CanvasOverlayer(opts) {
+	        _classCallCheck(this, CanvasOverlayer);
+
+	        var _opts = opts || {};
+
+	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this, _opts));
+
+	        _this.canvas = _this._init();
+	        _this.redraw = _redraw.bind(_this);
+	        _this.shadow = _opts.shadow != undefined ? _opts.shadow : false;
+	        _this.blurWidth = _opts.blurWidth != undefined ? _opts.blurWidth : 4;
+	        _this.keepTrack = _opts.keepTrack != undefined ? _opts.keepTrack : false;
+	        if (_this.keepTrack) {
+	            // create trackLayer to render history track lines..
+	            _this.trackLayer = _this._init();
+	            _this._initTrackCtx();
+	        }
+	        _this.tracks = [];
+	        _this.initTrackCtx = _this._initTrackCtx.bind(_this);
+	        if (_opts && _opts.map) {
+	            _this.setMap(_opts.map);
+	            // 绑定每次move 都重绘doms..
+	            _opts.map.on("move", function () {
+	                _this.redrawTrack();
+	            });
+	        }
+	        return _this;
+	    }
+
+	    _createClass(CanvasOverlayer, [{
+	        key: "_init",
+	        value: function _init() {
+	            var shadow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	            var keepTrack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	            var canvasContainer = this.map._canvasContainer,
+	                mapboxCanvas = this.map._canvas,
+	                canvasOverlay = document.createElement("canvas");
+	            canvasOverlay.style.position = "absolute";
+	            canvasOverlay.className = "overlay-canvas";
+	            canvasOverlay.width = parseInt(mapboxCanvas.style.width);
+	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
+	            canvasContainer.appendChild(canvasOverlay);
+	            return canvasOverlay;
+	        }
+
+	        /**
+	         * init track ctx for each track segment rendering..
+	         */
+
+	    }, {
+	        key: "_initTrackCtx",
+	        value: function _initTrackCtx() {
+	            if (this.trackLayer) {
+	                this.trackCtx = this.trackLayer.getContext("2d");
+	                this.movedTo = false;
+	                initCtx(this.trackCtx, this.blurWidth, "rgba(255,255,255,.4");
+	                this.trackCtx.lineWidth = 2;
+	                this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
+	                this.trackCtx.beginPath();
+	            }
+	        }
+
+	        /**
+	         * render cached tracks to line when map moved..
+	         */
+
+	    }, {
+	        key: "redrawTrack",
+	        value: function redrawTrack() {
+	            if (this.trackCtx && this.tracks && this.tracks.length > 0) {
+	                var pix = [0, 0];
+	                this.trackCtx.clearRect(0, 0, this.trackLayer.width, this.trackLayer.height);
+	                this.trackCtx.beginPath();
+	                pix = this.lnglat2pix(this.tracks[0][0], this.tracks[0][1]);
+	                this.trackCtx.moveTo(pix[0], pix[1]);
+	                for (var i = 1; i < this.tracks.length; i++) {
+	                    pix = this.lnglat2pix(this.tracks[i][0], this.tracks[i][1]);
+	                    this.trackCtx.lineTo(pix[0], pix[1]);
+	                }
+	                this.trackCtx.stroke();
+	            }
+	        }
+	    }]);
+
+	    return CanvasOverlayer;
+	}(_overlay2.default);
+
+	function _preSetCtx(context) {
+	    //默认值为source-over
+	    var prev = context.globalCompositeOperation;
+	    //只显示canvas上原图像的重叠部分 source-in, source, destination-in
+	    context.globalCompositeOperation = 'destination-in';
+	    //设置主canvas的绘制透明度
+	    context.globalAlpha = 0.95;
+	    //这一步目的是将canvas上的图像变的透明
+	    // context.fillStyle = "rgba(0,0,0,.95)";
+	    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+	    //在原图像上重叠新图像
+	    context.globalCompositeOperation = prev;
+	}
+
+	var iconSize = 32;
+	/**
+	 * expoid this method, can be overwritten
+	 * for special render requirements..
+	 * Important ! redraw may use this.map as projector!
+	 * @param: keepLog, keep render Sprites location log.. 
+	 */
+	function _redraw(objs) {
+	    var _this2 = this;
+
+	    if (this.canvas) {
+	        var ctx = this.canvas.getContext("2d");
+	        // ctx.clearRect(0,0,canv.width, canv.height);
+	        if (this.shadow) {
+	            _preSetCtx(ctx);
+	            ctx.save();
+	        } else {
+	            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	        }
+	        // ctx.fillStyle = "rgba(240,200,20,.7)";
+	        // ctx.fillRect(0,0,canv.width, canv.height);
+
+	        initCtx(ctx, this.blurWidth, "rgba(255,255,255,.4");
+	        for (var i = 0; i < objs.length; i++) {
+	            var x = objs[i]['lon'],
+	                y = objs[i]['lat'],
+	                radius = objs[i]['radius'] || 2,
+	                icon = objs[i]['icon'],
+	                label = objs[i]['name'],
+	                rotate = objs[i]['direction'];
+	            radius = Math.abs(radius);
+	            var pix = this.lnglat2pix(x, y);
+	            if (pix == null) continue;
+	            ctx.fillStyle = objs[i]['color'];
+	            ctx.beginPath();
+	            if (label !== undefined && label.startsWith("Play")) radius = iconSize * 0.75;
+	            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
+	            if (icon !== undefined) {
+	                var min = icon.height > icon.width ? icon.width : icon.height;
+	                ctx.save();
+	                ctx.translate(pix[0], pix[1]);
+	                ctx.rotate(rotate * Math.PI / 180);
+	                try {
+	                    ctx.drawImage(icon, 0, 0, min, min, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
+	                } catch (e) {
+	                    console.warn("ctx.drawImage.. error.");
+	                }
+	                if (this.trackCtx && !this.movedTo) {
+	                    this.trackCtx.moveTo(pix[0], pix[1]);
+	                    this.movedTo = true;
+	                } else if (this.trackCtx) {
+	                    this.trackCtx.lineTo(pix[0], pix[1]);
+	                    this.tracks.push([x, y]);
+	                    setTimeout(function () {
+	                        //// closePath would auto-complete the path to polygon..
+	                        // this.trackCtx.closePath();
+	                        _this2.trackCtx.stroke();
+	                        _this2.initTrackCtx();
+	                    }, 0);
+	                }
+	                ctx.restore();
+	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
+	                ctx.stroke();
+	                // or drawSome Triangle things to present the Sprites..
+	            } else {
+	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
+	                ctx.fill();
+	            }
+	            // if (label !== undefined) {
+	            //     ctx.strokeText(label, pix[0], pix[1]);
+	            // }
+	            ctx.closePath();
+	        }
+	        if (this.shadow) {
+	            ctx.restore();
+	        }
+	    }
+	}
+
+	function initCtx(ctx, blurWidth, shadowColor) {
+	    if (ctx === undefined) return;
+	    ctx.shadowBlur = blurWidth;
+	    ctx.shadowColor = "rgba(255,255,255,.8)";
+	    ctx.strokeStyle = "rgba(255,255,255,.9)";
+	}
+
+	/**
+	 * draw tri on canvas by center and rotation..
+	 * @param rotate: degree number,
+	 * @param radius: number, tri radius..
+	 *      /\  default beta angle is 30 degree.
+	 *     /  \
+	 *    /____\ 
+	 * draw triangle 
+	 */
+	function drawTri(ctx, coord, rotate) {
+	    var radius = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : iconSize / 2;
+	    var beta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 30;
+
+	    // calc the head point of triangle.
+	    var headPoint = [undefined, undefined],
+	        tailPoint = [undefined, undefined],
+	        rad = rotate * Math.PI / 180;
+	    headPoint[0] = coord[0] + Math.cos(rad) * radius;
+	    headPoint[1] = coord[1] + Math.sin(rad) * radius;
+	    tailPoint[0] = coord[0] - Math.cos(rad) * radius;
+	    tailPoint[1] = coord[1] - Math.sin(rad) * radius;
+	    var rot = rotate - beta / 2,
+	        rPoint = [undefined, undefined];
+	    rPoint[0] = Math.cos(rot * Math.PI / 180);
+
+	    ctx.lineTo(headPoint);
+	}
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	/**
+	 * Base class of Overlayer
+	 */
+	var Overlayer = function () {
+	    function Overlayer(opts) {
+	        _classCallCheck(this, Overlayer);
+
+	        if (opts && opts.map) this.map = opts.map || undefined;
+	    }
+
+	    /**
+	     * to be overwrite in subClass
+	     */
+
+
+	    _createClass(Overlayer, [{
+	        key: "_init",
+	        value: function _init() {}
+
+	        // @setter
+
+	    }, {
+	        key: "setMap",
+	        value: function setMap(map) {
+	            this.map = map;
+	            return this;
+	        }
+	        /**
+	         * use Global map or this.map instance to project
+	         */
+
+	    }, {
+	        key: "lnglat2pix",
+	        value: function lnglat2pix(lng, lat) {
+	            if (this.map != undefined && this.map.project instanceof Function) {
+	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
+	                var x = lnglat.x,
+	                    y = lnglat.y;
+	                return [x, y];
+	            }
+	            return [lng, lat];
+	        }
+	    }]);
+
+	    return Overlayer;
+	}();
+
+	exports.default = Overlayer;
+
+/***/ }),
+/* 31 */
 /***/ (function(module, exports) {
 
 	'use strict';
@@ -2768,315 +3161,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 /***/ }),
-/* 30 */
-/***/ (function(module, exports, __webpack_require__) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-	exports.CanvasOverlayer = undefined;
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	var _overlay = __webpack_require__(31);
-
-	var _overlay2 = _interopRequireDefault(_overlay);
-
-	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-	/**
-	 * initCanvasOverlayer based on mapboxgl-canvas
-	 */
-	var CanvasOverlayer = exports.CanvasOverlayer = function (_Overlayer) {
-	    _inherits(CanvasOverlayer, _Overlayer);
-
-	    function CanvasOverlayer(opts) {
-	        _classCallCheck(this, CanvasOverlayer);
-
-	        var _opts = opts || {};
-
-	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this, _opts));
-
-	        _this.canvas = _this._init();
-	        _this.redraw = _redraw.bind(_this);
-	        _this.shadow = _opts.shadow != undefined ? _opts.shadow : false;
-	        _this.keepTrack = _opts.keepTrack != undefined ? _opts.keepTrack : false;
-	        if (_this.keepTrack) {
-	            // create trackLayer to render history track lines..
-	            _this.trackLayer = _this._init();
-	            _this._initTrackCtx();
-	        }
-	        _this.tracks = [];
-	        _this.initTrackCtx = _this._initTrackCtx.bind(_this);
-	        if (_opts && _opts.map) {
-	            _this.setMap(_opts.map);
-	            // 绑定每次move 都重绘doms..
-	            _opts.map.on("move", function () {
-	                _this.redrawTrack();
-	            });
-	        }
-	        return _this;
-	    }
-
-	    _createClass(CanvasOverlayer, [{
-	        key: "_init",
-	        value: function _init() {
-	            var shadow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
-	            var keepTrack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
-
-	            var canvasContainer = this.map._canvasContainer,
-	                mapboxCanvas = this.map._canvas,
-	                canvasOverlay = document.createElement("canvas");
-	            canvasOverlay.style.position = "absolute";
-	            canvasOverlay.className = "overlay-canvas";
-	            canvasOverlay.width = parseInt(mapboxCanvas.style.width);
-	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
-	            canvasContainer.appendChild(canvasOverlay);
-	            return canvasOverlay;
-	        }
-
-	        /**
-	         * init track ctx for each track segment rendering..
-	         */
-
-	    }, {
-	        key: "_initTrackCtx",
-	        value: function _initTrackCtx() {
-	            if (this.trackLayer) {
-	                this.trackCtx = this.trackLayer.getContext("2d");
-	                this.movedTo = false;
-	                initCtx(this.trackCtx, "rgba(255,255,255,.4");
-	                this.trackCtx.lineWidth = 2;
-	                this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
-	                this.trackCtx.beginPath();
-	            }
-	        }
-
-	        /**
-	         * render cached tracks to line when map moved..
-	         */
-
-	    }, {
-	        key: "redrawTrack",
-	        value: function redrawTrack() {
-	            if (this.trackCtx && this.tracks && this.tracks.length > 0) {
-	                var pix = [0, 0];
-	                this.trackCtx.clearRect(0, 0, this.trackLayer.width, this.trackLayer.height);
-	                this.trackCtx.beginPath();
-	                pix = this.lnglat2pix(this.tracks[0][0], this.tracks[0][1]);
-	                this.trackCtx.moveTo(pix[0], pix[1]);
-	                for (var i = 1; i < this.tracks.length; i++) {
-	                    pix = this.lnglat2pix(this.tracks[i][0], this.tracks[i][1]);
-	                    this.trackCtx.lineTo(pix[0], pix[1]);
-	                }
-	                this.trackCtx.stroke();
-	            }
-	        }
-	    }]);
-
-	    return CanvasOverlayer;
-	}(_overlay2.default);
-
-	function _preSetCtx(context) {
-	    //默认值为source-over
-	    var prev = context.globalCompositeOperation;
-	    //只显示canvas上原图像的重叠部分 source-in, source, destination-in
-	    context.globalCompositeOperation = 'destination-in';
-	    //设置主canvas的绘制透明度
-	    context.globalAlpha = 0.95;
-	    //这一步目的是将canvas上的图像变的透明
-	    // context.fillStyle = "rgba(0,0,0,.95)";
-	    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
-	    //在原图像上重叠新图像
-	    context.globalCompositeOperation = prev;
-	}
-
-	var iconSize = 32;
-	/**
-	 * expoid this method, can be overwritten
-	 * for special render requirements..
-	 * Important ! redraw may use this.map as projector!
-	 * @param: keepLog, keep render Sprites location log.. 
-	 */
-	function _redraw(objs) {
-	    var _this2 = this;
-
-	    if (this.canvas) {
-	        var ctx = this.canvas.getContext("2d");
-	        // ctx.clearRect(0,0,canv.width, canv.height);
-	        if (this.shadow) {
-	            _preSetCtx(ctx);
-	            ctx.save();
-	        } else {
-	            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	        }
-	        // ctx.fillStyle = "rgba(240,200,20,.7)";
-	        // ctx.fillRect(0,0,canv.width, canv.height);
-
-	        initCtx(ctx, "rgba(255,255,255,.4");
-	        for (var i = 0; i < objs.length; i++) {
-	            var x = objs[i]['lon'],
-	                y = objs[i]['lat'],
-	                radius = objs[i]['radius'] || 2,
-	                icon = objs[i]['icon'],
-	                label = objs[i]['name'],
-	                rotate = objs[i]['direction'];
-	            radius = Math.abs(radius);
-	            var pix = this.lnglat2pix(x, y);
-	            if (pix == null) continue;
-	            ctx.fillStyle = objs[i]['color'];
-	            ctx.beginPath();
-	            if (label.startsWith("Play")) radius = iconSize * 0.75;
-	            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
-	            if (icon !== undefined) {
-	                var min = icon.height > icon.width ? icon.width : icon.height;
-	                ctx.save();
-	                ctx.translate(pix[0], pix[1]);
-	                ctx.rotate(rotate * Math.PI / 180);
-	                try {
-	                    ctx.drawImage(icon, 0, 0, min, min, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
-	                } catch (e) {
-	                    console.warn("ctx.drawImage.. error.");
-	                }
-	                if (this.trackCtx && !this.movedTo) {
-	                    this.trackCtx.moveTo(pix[0], pix[1]);
-	                    this.movedTo = true;
-	                } else if (this.trackCtx) {
-	                    this.trackCtx.lineTo(pix[0], pix[1]);
-	                    this.tracks.push([x, y]);
-	                    setTimeout(function () {
-	                        //// closePath would auto-complete the path to polygon..
-	                        // this.trackCtx.closePath();
-	                        _this2.trackCtx.stroke();
-	                        _this2.initTrackCtx();
-	                    }, 0);
-	                }
-	                ctx.restore();
-	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
-	                ctx.stroke();
-	                // or drawSome Triangle things to present the Sprites..
-	            } else {
-	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
-	                ctx.fill();
-	            }
-	            // if (label !== undefined) {
-	            //     ctx.strokeText(label, pix[0], pix[1]);
-	            // }
-	            ctx.closePath();
-	        }
-	        if (this.shadow) {
-	            ctx.restore();
-	        }
-	    }
-	}
-
-	function initCtx(ctx, shadowColor) {
-	    if (ctx === undefined) return;
-	    ctx.shadowBlur = 7;
-	    ctx.shadowColor = "rgba(255,255,255,.8)";
-	    ctx.strokeStyle = "rgba(255,255,255,.9)";
-	}
-
-	/**
-	 * draw tri on canvas by center and rotation..
-	 * @param rotate: degree number,
-	 * @param radius: number, tri radius..
-	 *      /\  default beta angle is 30 degree.
-	 *     /  \
-	 *    /____\ 
-	 * draw triangle 
-	 */
-	function drawTri(ctx, coord, rotate) {
-	    var radius = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : iconSize / 2;
-	    var beta = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 30;
-
-	    // calc the head point of triangle.
-	    var headPoint = [undefined, undefined],
-	        tailPoint = [undefined, undefined],
-	        rad = rotate * Math.PI / 180;
-	    headPoint[0] = coord[0] + Math.cos(rad) * radius;
-	    headPoint[1] = coord[1] + Math.sin(rad) * radius;
-	    tailPoint[0] = coord[0] - Math.cos(rad) * radius;
-	    tailPoint[1] = coord[1] - Math.sin(rad) * radius;
-	    var rot = rotate - beta / 2,
-	        rPoint = [undefined, undefined];
-	    rPoint[0] = Math.cos(rot * Math.PI / 180);
-
-	    ctx.lineTo(headPoint);
-	}
-
-/***/ }),
-/* 31 */
-/***/ (function(module, exports) {
-
-	"use strict";
-
-	Object.defineProperty(exports, "__esModule", {
-	    value: true
-	});
-
-	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-	/**
-	 * Base class of Overlayer
-	 */
-	var Overlayer = function () {
-	    function Overlayer(opts) {
-	        _classCallCheck(this, Overlayer);
-
-	        if (opts && opts.map) this.map = opts.map || undefined;
-	    }
-
-	    /**
-	     * to be overwrite in subClass
-	     */
-
-
-	    _createClass(Overlayer, [{
-	        key: "_init",
-	        value: function _init() {}
-
-	        // @setter
-
-	    }, {
-	        key: "setMap",
-	        value: function setMap(map) {
-	            this.map = map;
-	            return this;
-	        }
-	        /**
-	         * use Global map or this.map instance to project
-	         */
-
-	    }, {
-	        key: "lnglat2pix",
-	        value: function lnglat2pix(lng, lat) {
-	            if (this.map != undefined && this.map.project instanceof Function) {
-	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
-	                var x = lnglat.x,
-	                    y = lnglat.y;
-	                return [x, y];
-	            }
-	            return [lng, lat];
-	        }
-	    }]);
-
-	    return Overlayer;
-	}();
-
-	exports.default = Overlayer;
-
-/***/ }),
 /* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3089,7 +3173,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-	var _overlay = __webpack_require__(31);
+	var _overlay = __webpack_require__(30);
 
 	var _overlay2 = _interopRequireDefault(_overlay);
 
@@ -3105,9 +3189,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
 
+	var duration = 1200;
+
 	/**
 	 * initDomOverlayer
 	 */
+
 	var DomOverlayer = exports.DomOverlayer = function (_Overlayer) {
 	    _inherits(DomOverlayer, _Overlayer);
 
@@ -3214,15 +3301,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	            dot.style.width = dot.style.height = dotRadius * 2 + 'px';
 	            dot.style.position = "absolute";
 
-	            dom.innerHTML = domOpt['content'];
-	            _util2.default.setIconDiv(dom, iconName);
-	            dom.className = "dom-popup";
 	            dom.style.position = "absolute";
 	            dom.style.background = "#fff";
 	            dom.style.padding = '5px';
+	            // set domOverlay position. dom box animation needed.
 	            dom.style.left = pix[0] + "px";
 	            // calc the dom bottom, depend on its height and canvas height..
 	            dom.style.top = pix[1] - lineHeight + "px";
+	            dom.innerHTML = domOpt['content'];
+	            _util2.default.setIconDiv(dom, iconName);
+	            dom.className = "dom-popup";
 
 	            line.className = "dom-ele", dot.className = "dom-ele";
 	            line.style.left = pix[0] + "px";
@@ -3238,7 +3326,787 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
+	function animLine(line) {
+	    line.className = "dom-line";
+	}
+
 	var htmlTemplate = {};
+
+/***/ }),
+/* 33 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.WindLayer = undefined;
+
+	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+	var _canvasOverlay = __webpack_require__(29);
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+	function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+	function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+	/**
+	 * initWindlayer based on mapboxgl-canvas
+	 */
+	var WindLayer = exports.WindLayer = function (_CanvasOverlayer) {
+	    _inherits(WindLayer, _CanvasOverlayer);
+
+	    function WindLayer(opts) {
+	        _classCallCheck(this, WindLayer);
+
+	        var _opts = opts || {};
+
+	        var _this = _possibleConstructorReturn(this, (WindLayer.__proto__ || Object.getPrototypeOf(WindLayer)).call(this, _opts));
+
+	        _this.windImage = _opts.image || new Image();
+	        _this.radius = _opts.radius || 2;
+	        // this.redraw = _redraw.bind(this);
+	        return _this;
+	    }
+
+	    /**
+	     * render particles based on image
+	     * @param {*grid wind image} image 
+	     */
+
+
+	    _createClass(WindLayer, [{
+	        key: "updateWind",
+	        value: function updateWind(image, geojson, compressRatio) {
+	            var canvas = this.canvas,
+	                pix2render = [],
+	                ctx = this.canvas.getContext("2d");
+	            if (this.particles == undefined) {
+	                console.log("generating particles...");
+	                this.particles = genParticles(image, geojson, compressRatio, this.radius);
+	            }
+	            // ctx.globalAlpha = 0.95;
+	            if (!geojson) {
+	                console.log("generating particles complete! num: " + this.particles.length);
+	                this.redraw(this.particles);
+	            } else {
+	                // wind data should be rendered as mapboxgl vector.
+	                console.log("generating particles complete! num: " + this.particles.features.length + " in geojson.");
+	            }
+	        }
+	    }]);
+
+	    return WindLayer;
+	}(_canvasOverlay.CanvasOverlayer);
+
+	function _redraw() {}
+	// this.particles
+
+
+	/**
+	 * generate particles based on got Grid wind image.
+	 * (actually image -> particles)
+	 * called after wind image loaded event..
+	 * return particles: Array, particles with wind strength and angle.
+	 */
+	function genParticles(image, geojson, compressRatio, radius) {
+	    var windImage = image || this.windImage,
+	        tmpCanvas = document.createElement("canvas"),
+	        tmpCtx = tmpCanvas.getContext("2d"),
+	        particles = [],
+	        features = [];
+	    if (geojson) {
+	        particles = {
+	            "type": "FeatureCollection",
+	            "name": "particles",
+	            "features": features
+	        };
+	    }
+
+	    tmpCanvas.width = windImage.width;
+	    tmpCanvas.height = windImage.height;
+	    tmpCtx.drawImage(windImage, 0, 0);
+	    // imageData.data.length: width*height*4
+	    var imageData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height),
+	        dataLength = imageData.data.byteLength;
+	    if (compressRatio == undefined || compressRatio !== undefined && compressRatio < 1) {
+	        console.warn("Input compressRatio invalid, use default 1.");
+	        compressRatio = 1;
+	    }
+	    compressRatio = parseInt(Number(compressRatio));
+	    for (var i = 1; i < tmpCanvas.height - 1; i += compressRatio) {
+	        // i:0~180, j:0~360
+	        for (var j = 0; j < tmpCanvas.width; j += compressRatio) {
+	            var particle = {
+	                'lon': -180 + j,
+	                'lat': -90 + i
+	            };
+	            var uIndex = (i * 360 + j) * 4,
+	                vIndex = uIndex + 1;
+	            var uVal = imageData.data[uIndex],
+	                vVal = imageData.data[vIndex],
+	                windPow = Math.pow(uVal, 2) + Math.pow(vVal, 2),
+	                angle = Number(Math.atan(vVal / uVal).toFixed(2)),
+	                color = 'rgba(' + (windPow / 255).toFixed(0) + ', 255, 100, 0.7)';
+	            // return geojson dataSource for mapboxgl.vector layer.
+	            if (geojson) {
+	                particle = { "type": "Feature",
+	                    "properties": {
+	                        "angle": angle,
+	                        "color": color
+	                    },
+	                    "geometry": {
+	                        "type": "Point",
+	                        "coordinates": [-180 + j, -90 + i]
+	                    }
+	                };
+	                features.push(particle);
+	            } else {
+	                particle.color = color;
+	                particle.angle = angle;
+	                particle.radius = radius;
+	                particles.push(particle);
+	            }
+	        }
+	    }
+	    return particles;
+	}
+
+/***/ }),
+/* 34 */
+/***/ (function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	module.exports = rbush;
+
+	var quickselect = __webpack_require__(35);
+
+	function rbush(maxEntries, format) {
+	    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
+
+	    // max entries in a node is 9 by default; min node fill is 40% for best performance
+	    this._maxEntries = Math.max(4, maxEntries || 9);
+	    this._minEntries = Math.max(2, Math.ceil(this._maxEntries * 0.4));
+
+	    if (format) {
+	        this._initFormat(format);
+	    }
+
+	    this.clear();
+	}
+
+	rbush.prototype = {
+
+	    all: function () {
+	        return this._all(this.data, []);
+	    },
+
+	    search: function (bbox) {
+
+	        var node = this.data,
+	            result = [],
+	            toBBox = this.toBBox;
+
+	        if (!intersects(bbox, node)) return result;
+
+	        var nodesToSearch = [],
+	            i, len, child, childBBox;
+
+	        while (node) {
+	            for (i = 0, len = node.children.length; i < len; i++) {
+
+	                child = node.children[i];
+	                childBBox = node.leaf ? toBBox(child) : child;
+
+	                if (intersects(bbox, childBBox)) {
+	                    if (node.leaf) result.push(child);
+	                    else if (contains(bbox, childBBox)) this._all(child, result);
+	                    else nodesToSearch.push(child);
+	                }
+	            }
+	            node = nodesToSearch.pop();
+	        }
+
+	        return result;
+	    },
+
+	    collides: function (bbox) {
+
+	        var node = this.data,
+	            toBBox = this.toBBox;
+
+	        if (!intersects(bbox, node)) return false;
+
+	        var nodesToSearch = [],
+	            i, len, child, childBBox;
+
+	        while (node) {
+	            for (i = 0, len = node.children.length; i < len; i++) {
+
+	                child = node.children[i];
+	                childBBox = node.leaf ? toBBox(child) : child;
+
+	                if (intersects(bbox, childBBox)) {
+	                    if (node.leaf || contains(bbox, childBBox)) return true;
+	                    nodesToSearch.push(child);
+	                }
+	            }
+	            node = nodesToSearch.pop();
+	        }
+
+	        return false;
+	    },
+
+	    load: function (data) {
+	        if (!(data && data.length)) return this;
+
+	        if (data.length < this._minEntries) {
+	            for (var i = 0, len = data.length; i < len; i++) {
+	                this.insert(data[i]);
+	            }
+	            return this;
+	        }
+
+	        // recursively build the tree with the given data from stratch using OMT algorithm
+	        var node = this._build(data.slice(), 0, data.length - 1, 0);
+
+	        if (!this.data.children.length) {
+	            // save as is if tree is empty
+	            this.data = node;
+
+	        } else if (this.data.height === node.height) {
+	            // split root if trees have the same height
+	            this._splitRoot(this.data, node);
+
+	        } else {
+	            if (this.data.height < node.height) {
+	                // swap trees if inserted one is bigger
+	                var tmpNode = this.data;
+	                this.data = node;
+	                node = tmpNode;
+	            }
+
+	            // insert the small tree into the large tree at appropriate level
+	            this._insert(node, this.data.height - node.height - 1, true);
+	        }
+
+	        return this;
+	    },
+
+	    insert: function (item) {
+	        if (item) this._insert(item, this.data.height - 1);
+	        return this;
+	    },
+
+	    clear: function () {
+	        this.data = createNode([]);
+	        return this;
+	    },
+
+	    remove: function (item, equalsFn) {
+	        if (!item) return this;
+
+	        var node = this.data,
+	            bbox = this.toBBox(item),
+	            path = [],
+	            indexes = [],
+	            i, parent, index, goingUp;
+
+	        // depth-first iterative tree traversal
+	        while (node || path.length) {
+
+	            if (!node) { // go up
+	                node = path.pop();
+	                parent = path[path.length - 1];
+	                i = indexes.pop();
+	                goingUp = true;
+	            }
+
+	            if (node.leaf) { // check current node
+	                index = findItem(item, node.children, equalsFn);
+
+	                if (index !== -1) {
+	                    // item found, remove the item and condense tree upwards
+	                    node.children.splice(index, 1);
+	                    path.push(node);
+	                    this._condense(path);
+	                    return this;
+	                }
+	            }
+
+	            if (!goingUp && !node.leaf && contains(node, bbox)) { // go down
+	                path.push(node);
+	                indexes.push(i);
+	                i = 0;
+	                parent = node;
+	                node = node.children[0];
+
+	            } else if (parent) { // go right
+	                i++;
+	                node = parent.children[i];
+	                goingUp = false;
+
+	            } else node = null; // nothing found
+	        }
+
+	        return this;
+	    },
+
+	    toBBox: function (item) { return item; },
+
+	    compareMinX: compareNodeMinX,
+	    compareMinY: compareNodeMinY,
+
+	    toJSON: function () { return this.data; },
+
+	    fromJSON: function (data) {
+	        this.data = data;
+	        return this;
+	    },
+
+	    _all: function (node, result) {
+	        var nodesToSearch = [];
+	        while (node) {
+	            if (node.leaf) result.push.apply(result, node.children);
+	            else nodesToSearch.push.apply(nodesToSearch, node.children);
+
+	            node = nodesToSearch.pop();
+	        }
+	        return result;
+	    },
+
+	    _build: function (items, left, right, height) {
+
+	        var N = right - left + 1,
+	            M = this._maxEntries,
+	            node;
+
+	        if (N <= M) {
+	            // reached leaf level; return leaf
+	            node = createNode(items.slice(left, right + 1));
+	            calcBBox(node, this.toBBox);
+	            return node;
+	        }
+
+	        if (!height) {
+	            // target height of the bulk-loaded tree
+	            height = Math.ceil(Math.log(N) / Math.log(M));
+
+	            // target number of root entries to maximize storage utilization
+	            M = Math.ceil(N / Math.pow(M, height - 1));
+	        }
+
+	        node = createNode([]);
+	        node.leaf = false;
+	        node.height = height;
+
+	        // split the items into M mostly square tiles
+
+	        var N2 = Math.ceil(N / M),
+	            N1 = N2 * Math.ceil(Math.sqrt(M)),
+	            i, j, right2, right3;
+
+	        multiSelect(items, left, right, N1, this.compareMinX);
+
+	        for (i = left; i <= right; i += N1) {
+
+	            right2 = Math.min(i + N1 - 1, right);
+
+	            multiSelect(items, i, right2, N2, this.compareMinY);
+
+	            for (j = i; j <= right2; j += N2) {
+
+	                right3 = Math.min(j + N2 - 1, right2);
+
+	                // pack each entry recursively
+	                node.children.push(this._build(items, j, right3, height - 1));
+	            }
+	        }
+
+	        calcBBox(node, this.toBBox);
+
+	        return node;
+	    },
+
+	    _chooseSubtree: function (bbox, node, level, path) {
+
+	        var i, len, child, targetNode, area, enlargement, minArea, minEnlargement;
+
+	        while (true) {
+	            path.push(node);
+
+	            if (node.leaf || path.length - 1 === level) break;
+
+	            minArea = minEnlargement = Infinity;
+
+	            for (i = 0, len = node.children.length; i < len; i++) {
+	                child = node.children[i];
+	                area = bboxArea(child);
+	                enlargement = enlargedArea(bbox, child) - area;
+
+	                // choose entry with the least area enlargement
+	                if (enlargement < minEnlargement) {
+	                    minEnlargement = enlargement;
+	                    minArea = area < minArea ? area : minArea;
+	                    targetNode = child;
+
+	                } else if (enlargement === minEnlargement) {
+	                    // otherwise choose one with the smallest area
+	                    if (area < minArea) {
+	                        minArea = area;
+	                        targetNode = child;
+	                    }
+	                }
+	            }
+
+	            node = targetNode || node.children[0];
+	        }
+
+	        return node;
+	    },
+
+	    _insert: function (item, level, isNode) {
+
+	        var toBBox = this.toBBox,
+	            bbox = isNode ? item : toBBox(item),
+	            insertPath = [];
+
+	        // find the best node for accommodating the item, saving all nodes along the path too
+	        var node = this._chooseSubtree(bbox, this.data, level, insertPath);
+
+	        // put the item into the node
+	        node.children.push(item);
+	        extend(node, bbox);
+
+	        // split on node overflow; propagate upwards if necessary
+	        while (level >= 0) {
+	            if (insertPath[level].children.length > this._maxEntries) {
+	                this._split(insertPath, level);
+	                level--;
+	            } else break;
+	        }
+
+	        // adjust bboxes along the insertion path
+	        this._adjustParentBBoxes(bbox, insertPath, level);
+	    },
+
+	    // split overflowed node into two
+	    _split: function (insertPath, level) {
+
+	        var node = insertPath[level],
+	            M = node.children.length,
+	            m = this._minEntries;
+
+	        this._chooseSplitAxis(node, m, M);
+
+	        var splitIndex = this._chooseSplitIndex(node, m, M);
+
+	        var newNode = createNode(node.children.splice(splitIndex, node.children.length - splitIndex));
+	        newNode.height = node.height;
+	        newNode.leaf = node.leaf;
+
+	        calcBBox(node, this.toBBox);
+	        calcBBox(newNode, this.toBBox);
+
+	        if (level) insertPath[level - 1].children.push(newNode);
+	        else this._splitRoot(node, newNode);
+	    },
+
+	    _splitRoot: function (node, newNode) {
+	        // split root node
+	        this.data = createNode([node, newNode]);
+	        this.data.height = node.height + 1;
+	        this.data.leaf = false;
+	        calcBBox(this.data, this.toBBox);
+	    },
+
+	    _chooseSplitIndex: function (node, m, M) {
+
+	        var i, bbox1, bbox2, overlap, area, minOverlap, minArea, index;
+
+	        minOverlap = minArea = Infinity;
+
+	        for (i = m; i <= M - m; i++) {
+	            bbox1 = distBBox(node, 0, i, this.toBBox);
+	            bbox2 = distBBox(node, i, M, this.toBBox);
+
+	            overlap = intersectionArea(bbox1, bbox2);
+	            area = bboxArea(bbox1) + bboxArea(bbox2);
+
+	            // choose distribution with minimum overlap
+	            if (overlap < minOverlap) {
+	                minOverlap = overlap;
+	                index = i;
+
+	                minArea = area < minArea ? area : minArea;
+
+	            } else if (overlap === minOverlap) {
+	                // otherwise choose distribution with minimum area
+	                if (area < minArea) {
+	                    minArea = area;
+	                    index = i;
+	                }
+	            }
+	        }
+
+	        return index;
+	    },
+
+	    // sorts node children by the best axis for split
+	    _chooseSplitAxis: function (node, m, M) {
+
+	        var compareMinX = node.leaf ? this.compareMinX : compareNodeMinX,
+	            compareMinY = node.leaf ? this.compareMinY : compareNodeMinY,
+	            xMargin = this._allDistMargin(node, m, M, compareMinX),
+	            yMargin = this._allDistMargin(node, m, M, compareMinY);
+
+	        // if total distributions margin value is minimal for x, sort by minX,
+	        // otherwise it's already sorted by minY
+	        if (xMargin < yMargin) node.children.sort(compareMinX);
+	    },
+
+	    // total margin of all possible split distributions where each node is at least m full
+	    _allDistMargin: function (node, m, M, compare) {
+
+	        node.children.sort(compare);
+
+	        var toBBox = this.toBBox,
+	            leftBBox = distBBox(node, 0, m, toBBox),
+	            rightBBox = distBBox(node, M - m, M, toBBox),
+	            margin = bboxMargin(leftBBox) + bboxMargin(rightBBox),
+	            i, child;
+
+	        for (i = m; i < M - m; i++) {
+	            child = node.children[i];
+	            extend(leftBBox, node.leaf ? toBBox(child) : child);
+	            margin += bboxMargin(leftBBox);
+	        }
+
+	        for (i = M - m - 1; i >= m; i--) {
+	            child = node.children[i];
+	            extend(rightBBox, node.leaf ? toBBox(child) : child);
+	            margin += bboxMargin(rightBBox);
+	        }
+
+	        return margin;
+	    },
+
+	    _adjustParentBBoxes: function (bbox, path, level) {
+	        // adjust bboxes along the given tree path
+	        for (var i = level; i >= 0; i--) {
+	            extend(path[i], bbox);
+	        }
+	    },
+
+	    _condense: function (path) {
+	        // go through the path, removing empty nodes and updating bboxes
+	        for (var i = path.length - 1, siblings; i >= 0; i--) {
+	            if (path[i].children.length === 0) {
+	                if (i > 0) {
+	                    siblings = path[i - 1].children;
+	                    siblings.splice(siblings.indexOf(path[i]), 1);
+
+	                } else this.clear();
+
+	            } else calcBBox(path[i], this.toBBox);
+	        }
+	    },
+
+	    _initFormat: function (format) {
+	        // data format (minX, minY, maxX, maxY accessors)
+
+	        // uses eval-type function compilation instead of just accepting a toBBox function
+	        // because the algorithms are very sensitive to sorting functions performance,
+	        // so they should be dead simple and without inner calls
+
+	        var compareArr = ['return a', ' - b', ';'];
+
+	        this.compareMinX = new Function('a', 'b', compareArr.join(format[0]));
+	        this.compareMinY = new Function('a', 'b', compareArr.join(format[1]));
+
+	        this.toBBox = new Function('a',
+	            'return {minX: a' + format[0] +
+	            ', minY: a' + format[1] +
+	            ', maxX: a' + format[2] +
+	            ', maxY: a' + format[3] + '};');
+	    }
+	};
+
+	function findItem(item, items, equalsFn) {
+	    if (!equalsFn) return items.indexOf(item);
+
+	    for (var i = 0; i < items.length; i++) {
+	        if (equalsFn(item, items[i])) return i;
+	    }
+	    return -1;
+	}
+
+	// calculate node's bbox from bboxes of its children
+	function calcBBox(node, toBBox) {
+	    distBBox(node, 0, node.children.length, toBBox, node);
+	}
+
+	// min bounding rectangle of node children from k to p-1
+	function distBBox(node, k, p, toBBox, destNode) {
+	    if (!destNode) destNode = createNode(null);
+	    destNode.minX = Infinity;
+	    destNode.minY = Infinity;
+	    destNode.maxX = -Infinity;
+	    destNode.maxY = -Infinity;
+
+	    for (var i = k, child; i < p; i++) {
+	        child = node.children[i];
+	        extend(destNode, node.leaf ? toBBox(child) : child);
+	    }
+
+	    return destNode;
+	}
+
+	function extend(a, b) {
+	    a.minX = Math.min(a.minX, b.minX);
+	    a.minY = Math.min(a.minY, b.minY);
+	    a.maxX = Math.max(a.maxX, b.maxX);
+	    a.maxY = Math.max(a.maxY, b.maxY);
+	    return a;
+	}
+
+	function compareNodeMinX(a, b) { return a.minX - b.minX; }
+	function compareNodeMinY(a, b) { return a.minY - b.minY; }
+
+	function bboxArea(a)   { return (a.maxX - a.minX) * (a.maxY - a.minY); }
+	function bboxMargin(a) { return (a.maxX - a.minX) + (a.maxY - a.minY); }
+
+	function enlargedArea(a, b) {
+	    return (Math.max(b.maxX, a.maxX) - Math.min(b.minX, a.minX)) *
+	           (Math.max(b.maxY, a.maxY) - Math.min(b.minY, a.minY));
+	}
+
+	function intersectionArea(a, b) {
+	    var minX = Math.max(a.minX, b.minX),
+	        minY = Math.max(a.minY, b.minY),
+	        maxX = Math.min(a.maxX, b.maxX),
+	        maxY = Math.min(a.maxY, b.maxY);
+
+	    return Math.max(0, maxX - minX) *
+	           Math.max(0, maxY - minY);
+	}
+
+	function contains(a, b) {
+	    return a.minX <= b.minX &&
+	           a.minY <= b.minY &&
+	           b.maxX <= a.maxX &&
+	           b.maxY <= a.maxY;
+	}
+
+	function intersects(a, b) {
+	    return b.minX <= a.maxX &&
+	           b.minY <= a.maxY &&
+	           b.maxX >= a.minX &&
+	           b.maxY >= a.minY;
+	}
+
+	function createNode(children) {
+	    return {
+	        children: children,
+	        height: 1,
+	        leaf: true,
+	        minX: Infinity,
+	        minY: Infinity,
+	        maxX: -Infinity,
+	        maxY: -Infinity
+	    };
+	}
+
+	// sort an array so that items come in groups of n unsorted items, with groups sorted between each other;
+	// combines selection algorithm with binary divide & conquer approach
+
+	function multiSelect(arr, left, right, n, compare) {
+	    var stack = [left, right],
+	        mid;
+
+	    while (stack.length) {
+	        right = stack.pop();
+	        left = stack.pop();
+
+	        if (right - left <= n) continue;
+
+	        mid = left + Math.ceil((right - left) / n / 2) * n;
+	        quickselect(arr, mid, left, right, compare);
+
+	        stack.push(left, mid, mid, right);
+	    }
+	}
+
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports) {
+
+	'use strict';
+
+	module.exports = partialSort;
+
+	// Floyd-Rivest selection algorithm:
+	// Rearrange items so that all items in the [left, k] range are smaller than all items in (k, right];
+	// The k-th element will have the (k - left + 1)th smallest value in [left, right]
+
+	function partialSort(arr, k, left, right, compare) {
+	    left = left || 0;
+	    right = right || (arr.length - 1);
+	    compare = compare || defaultCompare;
+
+	    while (right > left) {
+	        if (right - left > 600) {
+	            var n = right - left + 1;
+	            var m = k - left + 1;
+	            var z = Math.log(n);
+	            var s = 0.5 * Math.exp(2 * z / 3);
+	            var sd = 0.5 * Math.sqrt(z * s * (n - s) / n) * (m - n / 2 < 0 ? -1 : 1);
+	            var newLeft = Math.max(left, Math.floor(k - m * s / n + sd));
+	            var newRight = Math.min(right, Math.floor(k + (n - m) * s / n + sd));
+	            partialSort(arr, k, newLeft, newRight, compare);
+	        }
+
+	        var t = arr[k];
+	        var i = left;
+	        var j = right;
+
+	        swap(arr, left, k);
+	        if (compare(arr[right], t) > 0) swap(arr, left, right);
+
+	        while (i < j) {
+	            swap(arr, i, j);
+	            i++;
+	            j--;
+	            while (compare(arr[i], t) < 0) i++;
+	            while (compare(arr[j], t) > 0) j--;
+	        }
+
+	        if (compare(arr[left], t) === 0) swap(arr, left, j);
+	        else {
+	            j++;
+	            swap(arr, j, right);
+	        }
+
+	        if (j <= k) left = j + 1;
+	        if (k <= j) right = j - 1;
+	    }
+	}
+
+	function swap(arr, i, j) {
+	    var tmp = arr[i];
+	    arr[i] = arr[j];
+	    arr[j] = tmp;
+	}
+
+	function defaultCompare(a, b) {
+	    return a < b ? -1 : a > b ? 1 : 0;
+	}
+
 
 /***/ })
 /******/ ])

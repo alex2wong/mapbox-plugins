@@ -8,11 +8,13 @@ import Controllers from "./controller";
 import { myTween, sleep} from "./tween/Tween";
 import { CanvasOverlayer } from './layers/canvasOverlay';
 import { DomOverlayer } from './layers/domOverlay';
+import { WindLayer } from './layers/windLayer';
+var rbush = require('rbush');
 
 // var HexgridHeatmap = require('./layers/hexgridHeatLayer');
 
 // Static Props..
 export {
     Drone, Canvas, Chart, Util, Controllers, myTween, 
-    CanvasOverlayer, DomOverlayer
+    CanvasOverlayer, DomOverlayer, WindLayer, rbush
 }

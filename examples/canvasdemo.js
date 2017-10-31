@@ -27,7 +27,7 @@ var map = new mapboxgl.Map({
         ]
     },
     center: mapCenter,
-    zoom: 6,
+    zoom: 7,
     pitch: 45,
     bearing: 0,
     light: {
@@ -45,9 +45,10 @@ map.on('load', function() {
 });
 
 function init() {
-    var objNum = 10, canvasLayer = new Alex.CanvasOverlayer({
+    var objNum = 100, canvasLayer = new Alex.CanvasOverlayer({
         map: map,
-        shadow: true
+        shadow: true,
+        blurWidth: 4
     });
     objs = Alex.Util.rdObjs(objNum, mapCenter);
     // myTween.loop = false;

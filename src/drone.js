@@ -28,7 +28,7 @@ export default class Drone extends Sprite {
         // make sure Sprite in world..
         let alY = Math.cos(this.direction*Math.PI/180) * this.speed * 0.001,
             lat = this.lat + alY;
-        if (lat > 88 || lat < -88) {
+        if (lat > 84 || lat < -84) {
             alY = -alY;
             this.direction += 180;
             console.warn("latitude out of bbox, turn back..");

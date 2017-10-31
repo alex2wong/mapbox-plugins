@@ -1,5 +1,6 @@
 import Drone from './drone';
 import { deprecate } from 'core-decorators';
+import { CanvasOverlayer} from './layers/canvasOverlay';
 
 export default class controllers {
     /**
@@ -29,6 +30,19 @@ export default class controllers {
             }
         });
         console.log("gameControl register success.");
+    }
+
+    /**
+     * pickupObj control, need to bind with canvasOverlay, to fetch the objs drawn
+     * each moveEnd, rebuild the pixList depend on objs in viewport!
+     * pixList's index is vital for pickUp performance.
+     */
+    static pickupControl(canvasOverlay) {
+        if (canvasOverlay instanceof CanvasOverlayer) {
+            // establish pixList storing objs' location. canvasOverlay.source.lon, lat
+            let pix = canvasOverlay.lnglat2pix(canvasOverlay.source[0].lon,
+                canvasOverlay.source[1].lat);
+        }
     }
 
     /**
@@ -83,5 +97,29 @@ export default class controllers {
             console.error(e);
         }        
         console.log("dashBoard register success.");
+    }
+
+    /** create refreshable features list.  */
+    static featureList(containerId) {
+        if (containerId == undefined || typeof containerId !== "string") {
+            console.warn("invalid containerId..");
+            return null;
+        }
+        // var miniRefresh = new MiniRefresh({
+        //     container: '#' + containerId,
+        //     down: {
+        //         callback: function() {
+        //             // 下拉事件
+        //             console.log("list dragged ..");
+        //         }
+        //     },
+        //     up: {
+
+        //         callback: function() {
+        //             // 上拉事件
+        //         }
+        //     }
+        // });
+        // return miniRefresh;
     }
 }

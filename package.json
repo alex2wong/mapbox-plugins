@@ -25,14 +25,20 @@
     "babel-loader": "^6.2.8",
     "babel-plugin-transform-decorators": "^6.13.0",
     "babel-preset-latest": "^6.16.0",
+    "eslint": "^4.7.2",
+    "eslint-config-airbnb": "^9.0.1",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^3.0.1",
     "gulp": "^3.9.1",
     "webpack": "^1.13.3"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "http-server",
-    "build": "babel src -d lib",
-    "start": "webpack && npm run server"
+    "babel": "babel src -d lib",
+    "build": "webpack",
+    "start": "webpack && npm run server",
+    "lint": "eslint --cache --ignore-path .gitignore src"
   },
   "repository": {
     "type": "git",

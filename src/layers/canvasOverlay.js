@@ -10,6 +10,7 @@ export class CanvasOverlayer extends Overlayer {
         this.canvas = this._init();
         this.redraw = _redraw.bind(this);
         this.shadow = _opts.shadow != undefined? _opts.shadow : false;
+        this.blurWidth = _opts.blurWidth != undefined? _opts.blurWidth: 4;
         this.keepTrack = _opts.keepTrack != undefined? _opts.keepTrack : false;
         if (this.keepTrack) {
             // create trackLayer to render history track lines..
@@ -46,7 +47,7 @@ export class CanvasOverlayer extends Overlayer {
         if(this.trackLayer) {
             this.trackCtx = this.trackLayer.getContext("2d");
             this.movedTo = false;
-            initCtx(this.trackCtx,"rgba(255,255,255,.4");
+            initCtx(this.trackCtx, this.blurWidth,"rgba(255,255,255,.4");
             this.trackCtx.lineWidth = 2;
             this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
             this.trackCtx.beginPath();
@@ -106,7 +107,7 @@ function _redraw(objs) {
         // ctx.fillStyle = "rgba(240,200,20,.7)";
         // ctx.fillRect(0,0,canv.width, canv.height);
         
-        initCtx(ctx,"rgba(255,255,255,.4");        
+        initCtx(ctx,this.blurWidth,"rgba(255,255,255,.4");        
         for(let i=0;i<objs.length;i++) {
             let x = objs[i]['lon'], y = objs[i]['lat'], 
                 radius = objs[i]['radius'] || 2, icon = objs[i]['icon'],
@@ -116,7 +117,7 @@ function _redraw(objs) {
             if (pix == null) continue;
             ctx.fillStyle = objs[i]['color'];
             ctx.beginPath();
-            if (label.startsWith("Play")) radius = iconSize*0.75;
+            if (label !== undefined && label.startsWith("Play")) radius = iconSize*0.75;
             // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
             if (icon !== undefined) {
                 let min = icon.height > icon.width ? icon.width : icon.height;
@@ -161,9 +162,9 @@ function _redraw(objs) {
     }
 }
 
-function initCtx(ctx, shadowColor) {
+function initCtx(ctx, blurWidth, shadowColor) {
     if (ctx === undefined) return;
-    ctx.shadowBlur = 7;
+    ctx.shadowBlur = blurWidth;
     ctx.shadowColor = "rgba(255,255,255,.8)";
     ctx.strokeStyle = "rgba(255,255,255,.9)";
 }
