@@ -77,6 +77,37 @@ export default class util {
         }
     }
 
+    /**
+     * add img, video element to domContainer.
+     * @param {*domEle} dom, dom container..
+     * @param {*Array} res, urls of img/video loaded to dom. 
+     */
+    static setResource(dom, res) {
+        if (!(res instanceof Array)) return;
+        for (let i = 0; i < res.length; i ++) {
+            let filetype = this.getFiletype(res[i]);
+            if (filetype !== "") {
+                let ele = document.createElement(filetype);
+                ele.style.height = '250px';
+                ele.style.width = 'auto';
+                ele.src = res[i];
+                ele.setAttribute('autoplay', true);
+                dom.appendChild(ele);
+            }
+        }
+    }
+
+    static getFiletype(uri) {
+        let isIMG = uri.match(/\.(jpg)|(png)|(gif)/g) ? true: false;
+        let isMP4 = uri.match(/\.mp4\?+/g) ? true: false;
+        if (isIMG) return 'img';
+        else if (isMP4) return 'video';
+        else {
+            console.log(`filetype of ${uri} is not supported`);
+            return '';
+        }
+    }
+
     // random point objs with given number
     static rdObjs(num, mapCenter) {
         var objs = [], index = 0;

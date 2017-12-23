@@ -13,7 +13,7 @@ export class DomOverlayer extends Overlayer {
         this.redraw = _redraw.bind(this);
         if (opts && opts.map) {
             this.setMap(opts.map);
-            // 绑定每次move 都重绘doms..
+            // bind render doms to each move..performance to be promoted.
             opts.map.on("move", () => {
                 this.redraw(opts);
             });
@@ -77,17 +77,16 @@ const lineHeight = 100, dotRadius = 4;
 function _redraw(domOpts) {
     if (domOpts && domOpts.doms) {
         let doms = domOpts.doms;
-        this.clearDoms();
         // append each of domPopups to domContainer.
-        for(let i=0;i<doms.length;i++) {
+        for (let i=0;i<doms.length;i++) {
             let domOpt = doms[i];
             let x = domOpt['lon'], y = domOpt['lat'], 
                 pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
-            let iconName = domOpt['icon'];
-            let dom = document.createElement("div"),
-                line = document.createElement("div"),
-                dot = document.createElement("div");
+            let iconName = domOpt['icon'], resources = domOpt['resources'];
+            let dom = this.doms[i*3] || document.createElement("div"),
+                line = this.doms[i*3+1] ||document.createElement("div"),
+                dot =this.doms[i*3+2] || document.createElement("div");
             line.style.height = lineHeight - 10 + 'px';
             line.style.width = '1px';
             line.style.position = "absolute";
@@ -102,8 +101,13 @@ function _redraw(domOpts) {
             dom.style.left = pix[0] + "px";
             // calc the dom bottom, depend on its height and canvas height..
             dom.style.top = (pix[1] - lineHeight) + "px";
-            dom.innerHTML = domOpt['content'];
-            Util.setIconDiv(dom, iconName);
+            dom.innerHTML = `<p> ${domOpt['content']} </p>`;
+            // only set resource to dom at initial stage.
+            if (resources != undefined) {
+                Util.setResource(dom, resources);
+            } else if (iconName != undefined) {
+                Util.setIconDiv(dom, iconName);
+            }
             dom.className = "dom-popup";
 
             line.className = "dom-ele", dot.className = "dom-ele";
@@ -112,10 +116,13 @@ function _redraw(domOpts) {
             dot.style.left = pix[0] - dotRadius + "px";
             dot.style.top = pix[1] - dotRadius + "px";
 
-            this.domContainer.appendChild(dom);
-            this.domContainer.appendChild(line);
-            this.domContainer.appendChild(dot);
-            this.doms.push(...[dom, line, dot]);
+            // add dom to container at init process.
+            if (this.doms[i*3] == undefined) {
+                this.domContainer.appendChild(dom);
+                this.domContainer.appendChild(line);
+                this.domContainer.appendChild(dot);
+                this.doms.push(...[dom, line, dot]);
+            }
         }
     }
 }

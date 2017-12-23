@@ -235,7 +235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ (function(module, exports) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -261,6 +261,13 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	Const.Images = {
 	    Plane: '../assets/plane'
+	};
+
+	Const.FileType = {
+	    'png': 'IMG',
+	    'jpg': 'IMG',
+	    'gif': 'IMG',
+	    'mp4': 'VIDEO'
 	};
 
 	Const.SpritesUrl = "https://alex2wong.github.io/mapbox-plugins/assets/sprite";
@@ -403,6 +410,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	                iconImg.style.marginTop = "-" + iconStyle.y + "px";
 	                iconDiv.appendChild(iconImg);
 	                dom.appendChild(iconDiv);
+	            }
+	        }
+
+	        /**
+	         * add img, video element to domContainer.
+	         * @param {*domEle} dom, dom container..
+	         * @param {*Array} res, urls of img/video loaded to dom. 
+	         */
+
+	    }, {
+	        key: "setResource",
+	        value: function setResource(dom, res) {
+	            if (!(res instanceof Array)) return;
+	            for (var i = 0; i < res.length; i++) {
+	                var filetype = this.getFiletype(res[i]);
+	                if (filetype !== "") {
+	                    var ele = document.createElement(filetype);
+	                    ele.style.height = '250px';
+	                    ele.style.width = 'auto';
+	                    ele.src = res[i];
+	                    ele.setAttribute('autoplay', true);
+	                    dom.appendChild(ele);
+	                }
+	            }
+	        }
+	    }, {
+	        key: "getFiletype",
+	        value: function getFiletype(uri) {
+	            var isIMG = uri.match(/\.(jpg)|(png)|(gif)/g) ? true : false;
+	            var isMP4 = uri.match(/\.mp4\?+/g) ? true : false;
+	            if (isIMG) return 'img';else if (isMP4) return 'video';else {
+	                console.log("filetype of " + uri + " is not supported");
+	                return '';
 	            }
 	        }
 
@@ -3207,7 +3247,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.redraw = _redraw.bind(_this);
 	        if (opts && opts.map) {
 	            _this.setMap(opts.map);
-	            // 绑定每次move 都重绘doms..
+	            // bind render doms to each move..performance to be promoted.
 	            opts.map.on("move", function () {
 	                _this.redraw(opts);
 	            });
@@ -3280,20 +3320,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	function _redraw(domOpts) {
 	    if (domOpts && domOpts.doms) {
 	        var doms = domOpts.doms;
-	        this.clearDoms();
 	        // append each of domPopups to domContainer.
 	        for (var i = 0; i < doms.length; i++) {
-	            var _doms;
-
 	            var domOpt = doms[i];
 	            var x = domOpt['lon'],
 	                y = domOpt['lat'],
 	                pix = this.lnglat2pix(x, y);
 	            if (pix == null) continue;
-	            var iconName = domOpt['icon'];
-	            var dom = document.createElement("div"),
-	                line = document.createElement("div"),
-	                dot = document.createElement("div");
+	            var iconName = domOpt['icon'],
+	                resources = domOpt['resources'];
+	            var dom = this.doms[i * 3] || document.createElement("div"),
+	                line = this.doms[i * 3 + 1] || document.createElement("div"),
+	                dot = this.doms[i * 3 + 2] || document.createElement("div");
 	            line.style.height = lineHeight - 10 + 'px';
 	            line.style.width = '1px';
 	            line.style.position = "absolute";
@@ -3308,8 +3346,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	            dom.style.left = pix[0] + "px";
 	            // calc the dom bottom, depend on its height and canvas height..
 	            dom.style.top = pix[1] - lineHeight + "px";
-	            dom.innerHTML = domOpt['content'];
-	            _util2.default.setIconDiv(dom, iconName);
+	            dom.innerHTML = '<p> ' + domOpt['content'] + ' </p>';
+	            // only set resource to dom at initial stage.
+	            if (resources != undefined) {
+	                _util2.default.setResource(dom, resources);
+	            } else if (iconName != undefined) {
+	                _util2.default.setIconDiv(dom, iconName);
+	            }
 	            dom.className = "dom-popup";
 
 	            line.className = "dom-ele", dot.className = "dom-ele";
@@ -3318,10 +3361,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            dot.style.left = pix[0] - dotRadius + "px";
 	            dot.style.top = pix[1] - dotRadius + "px";
 
-	            this.domContainer.appendChild(dom);
-	            this.domContainer.appendChild(line);
-	            this.domContainer.appendChild(dot);
-	            (_doms = this.doms).push.apply(_doms, [dom, line, dot]);
+	            // add dom to container at init process.
+	            if (this.doms[i * 3] == undefined) {
+	                var _doms;
+
+	                this.domContainer.appendChild(dom);
+	                this.domContainer.appendChild(line);
+	                this.domContainer.appendChild(dot);
+	                (_doms = this.doms).push.apply(_doms, [dom, line, dot]);
+	            }
 	        }
 	    }
 	}
@@ -3482,6 +3530,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	module.exports = rbush;
+	module.exports.default = rbush;
 
 	var quickselect = __webpack_require__(35);
 
@@ -3571,7 +3620,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 
-	        // recursively build the tree with the given data from stratch using OMT algorithm
+	        // recursively build the tree with the given data from scratch using OMT algorithm
 	        var node = this._build(data.slice(), 0, data.length - 1, 0);
 
 	        if (!this.data.children.length) {
