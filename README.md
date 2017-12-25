@@ -1,4 +1,5 @@
 # mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master)
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_shield)
 Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
 
 https://alex2wong.github.io/mapbox-plugins/
@@ -56,3 +57,7 @@ update();
 
 ```
 ### Any **bugfix, enhancement and PR** receive warm welcome :)
+
+
+## License
+[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_large)
