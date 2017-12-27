@@ -84,7 +84,7 @@ body, html {
 }
 
 .portfolio-logo {
-  background: url(assets/logo.png) 50% no-repeat;
+  /*background: url(assets/logo.png) 50% no-repeat;*/
   background-size: cover;
   height: 150px;
   width: 150px;

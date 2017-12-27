@@ -29,8 +29,8 @@ var map = new mapboxgl.Map({
         ]
     },
     center: mapCenter,
-    zoom: 6,
-    pitch: 15,
+    zoom: 3,
+    pitch: 45,
     bearing: 0,
     light: {
         'anchor':'viewport',
@@ -66,26 +66,45 @@ map.on('load', function() {
         map: map,
         doms: [
             {
-                icon: 'rocket-11',
-                content: "This is domOverlay",
+                type: 'pie',
                 class: 'bounceIn',
-                lon: mapCenter[0],
-                lat: mapCenter[1]
+                data: {
+                    datasets: [{
+                        data: [50 ,40, 15],
+                        backgroundColor: ['#ff6384', '#ffcd56', '#36a2eb']
+                    }],
+                    labels: ['teenager', 'adult', 'oldman']
+                },
+                lon: 104.11,
+                lat: 28.12
             },
             {
-                resources: [`https://f.us.sinaimg.cn/000Jvtr4lx07gEkbnofK0
-                10402002R2V0k01.mp4?label=mp4_hd&template=28&Expires=1514018239&ssig=arQTKitfcr&KID=unistore,video`],
-                content: "load video",
-                lon: mapCenter[0] + 1.5,
-                lat: mapCenter[1] + 1.5,
+                type: 'pie',
+                class: 'bounceIn',
+                data: {
+                    datasets: [{
+                        data: [100, 50 ,40],
+                        backgroundColor: ['#ff6384', '#ffcd56', '#36a2eb']
+                    }],
+                    labels: ['teenager', 'adult', 'oldman']
+                },
+                // content: "load chart",
+                lon: 122.22,
+                lat: 45.22,
             },
             {
-                resources: ['https://wx1.sinaimg.cn/mw690/4507b64aly1fmju1qfe03j21kw11t7wj.jpg'],
-                content: "ready to load picture",
-                class: 'bounceInUp',
-                lon: mapCenter[0]-1.5,
-                lat: mapCenter[1]-1.5
-            }
+                type: 'pie',
+                class: 'bounceIn',
+                data: {
+                    datasets: [{
+                        data: [50, 12, 19],
+                        backgroundColor: ['#ff6384', '#ffcd56', '#36a2eb']
+                    }],
+                    labels: ['teenager', 'adult', 'oldman']
+                },
+                lon: 116.33,
+                lat: 23.21
+            },
         ]
     });
 });

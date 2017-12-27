@@ -1,5 +1,5 @@
-# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master)
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_shield)
+# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_shield)
+
 Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
 
 https://alex2wong.github.io/mapbox-plugins/
@@ -18,16 +18,20 @@ Note: pls visit all demo with **HTTPS**..
 
 [Global Wind Layer. render 1w point animation with Canvas](https://alex2wong.github.io/mapbox-plugins/examples/windLayer)
 
+[Integrate with Chart.js](https://alex2wong.github.io/mapbox-plugins/examples/chartlayer) 
+
+[Chart.js](http://www.chartjs.org/) is a great chart lib on canvas.
+
 # run locally
 
 > npm install
 
-> npm run start
+> npm start
 
 visit from localhost:8080/examples/
 
 
-# Use and Develope
+# how to use
 plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:
 
 ```
@@ -56,8 +60,10 @@ function update(){
 update();
 
 ```
-### Any **bugfix, enhancement and PR** receive warm welcome :)
 
+
+### Any **☆Star, Enhancement and PR** are welcome :)
 
 ## License
 [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_large)
+

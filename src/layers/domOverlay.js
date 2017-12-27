@@ -19,6 +19,7 @@ export class DomOverlayer extends Overlayer {
             });
         }
         this.doms = [];
+        this.lastData = [];
         this.redraw(opts);
         console.log("Dom overlayer add to Map...");
     }
@@ -30,8 +31,8 @@ export class DomOverlayer extends Overlayer {
         domContainer.style.position = "absolute";
         domContainer.className = "overlay-dom";
         domContainer.style.width = mapboxCanvas.style.width;
-        domContainer.style.height = mapboxCanvas.style.height;
-        canvasContainer.appendChild(domContainer);
+        domContainer.style.height = '0';
+        canvasContainer.parentElement.appendChild(domContainer);
         return domContainer;
     }
 
@@ -69,7 +70,7 @@ export class DomOverlayer extends Overlayer {
 }
 
 
-const lineHeight = 100, dotRadius = 4;
+const lineHeight = 100, dotRadius = 4, chartHeight = 60;
 /**
  * domOverlay register&render above default canvas..
  * keep in absolute geolocation..
@@ -80,35 +81,33 @@ function _redraw(domOpts) {
         // append each of domPopups to domContainer.
         for (let i=0;i<doms.length;i++) {
             let domOpt = doms[i];
+            // let sanity = Util.checkSanity(this.lastDoms[i], domOpt);
             let x = domOpt['lon'], y = domOpt['lat'], 
                 pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
-            let iconName = domOpt['icon'], resources = domOpt['resources'];
+            let iconName = domOpt['icon'], resources = domOpt['resources'], 
+                moveClass = domOpt['class']? domOpt['class'] + ' animated': '',
+                chartData = domOpt['data'], chartType = domOpt['type'];
+            // data sanity should be checked, domOpts not changed then just update position!
             let dom = this.doms[i*3] || document.createElement("div"),
                 line = this.doms[i*3+1] ||document.createElement("div"),
                 dot =this.doms[i*3+2] || document.createElement("div");
-            line.style.height = lineHeight - 10 + 'px';
-            line.style.width = '1px';
-            line.style.position = "absolute";
-            dot.style.borderRadius = '50%';
-            dot.style.width = dot.style.height = dotRadius * 2 + 'px';
-            dot.style.position = "absolute";
+            preStyleEles(line, dot, dom, pix, chartType);
 
-            dom.style.position = "absolute";
-            dom.style.background = "#fff";
-            dom.style.padding = '5px';
-            // set domOverlay position. dom box animation needed.
-            dom.style.left = pix[0] + "px";
-            // calc the dom bottom, depend on its height and canvas height..
-            dom.style.top = (pix[1] - lineHeight) + "px";
-            dom.innerHTML = `<p> ${domOpt['content']} </p>`;
-            // only set resource to dom at initial stage.
+            let dataClone = Util.deepClone(chartData);
             if (resources != undefined) {
+                dom.innerHTML = (domOpt['content'] || ``) + '</br>';
                 Util.setResource(dom, resources);
             } else if (iconName != undefined) {
+                dom.innerHTML = (domOpt['content'] || ``) + '</br>';
                 Util.setIconDiv(dom, iconName);
+            } else if (chartData != undefined && chartType != undefined 
+                        && Util.isChanged(this.lastData[i], chartData)) {
+                // setChart would contaminate input Data.
+                Util.setChart(dom, dataClone, chartType, chartHeight*2);
+                this.lastData[i] = chartData;
             }
-            dom.className = "dom-popup";
+            if (chartType != undefined) styleChartContainer(dom)
 
             line.className = "dom-ele", dot.className = "dom-ele";
             line.style.left = pix[0] + "px";
@@ -118,6 +117,8 @@ function _redraw(domOpts) {
 
             // add dom to container at init process.
             if (this.doms[i*3] == undefined) {
+                dom.className = `dom-popup ${moveClass}`;
+                console.warn(`add ${moveClass} css to dom.`)
                 this.domContainer.appendChild(dom);
                 this.domContainer.appendChild(line);
                 this.domContainer.appendChild(dot);
@@ -125,6 +126,28 @@ function _redraw(domOpts) {
             }
         }
     }
+}
+
+function preStyleEles(line, dot, dom, pix, chartType) {
+    line.style.height = lineHeight - 10 + 'px';
+    line.style.width = '1px';
+    line.style.position = "absolute";
+    dot.style.borderRadius = '50%';
+    dot.style.width = dot.style.height = dotRadius * 2 + 'px';
+    dot.style.position = "absolute";
+
+    dom.style.position = "absolute";
+    dom.style.background = "#fff";
+    dom.style.padding = '5px';
+    // set domOverlay position. dom box animation needed.
+    dom.style.left = (pix[0] - (chartType ? chartHeight : 0)) + "px";
+    dom.style.top = (pix[1] - lineHeight - (chartType ? chartHeight : 0)) + "px";
+}
+
+function styleChartContainer(dom) {
+    dom.style.borderWidth = '0';
+    dom.style.zIndex = 9999;
+    dom.style.backgroundColor = 'rgba(0,0,0,0.0)';
 }
 
 function animLine (line){

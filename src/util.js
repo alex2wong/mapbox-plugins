@@ -57,6 +57,35 @@ export default class util {
         return promise;
     }
 
+    static deepClone(obj) {
+        let cloned = {};
+        if (typeof obj !== 'object') return null;
+        for(let k in obj){
+            if (obj.hasOwnProperty(k) && typeof obj[k] !== 'object') {
+                cloned[k] = obj[k];
+            } else if (obj[k].constructor.toString().indexOf("Object") > 0) {
+                cloned[k] = this.deepClone(obj[k]);
+            } else if (Array.isArray(obj[k])) {
+                cloned[k] = obj[k].map((ele) => {
+                    // let ret = null;
+                    if (typeof ele !== 'object') return ele;
+                    else return this.deepClone(ele);
+                });
+                // cloned[k] = [].concat(obj[k]);
+            }
+        }
+        return cloned;
+    }
+
+    static isChanged(lastData, data) {
+        if (JSON.stringify(lastData) == JSON.stringify(data))
+            return false;
+        else {
+            console.warn('chartData changed..')
+            return true;
+        }
+    }
+
     /**
      * return iconposition style by iconName
      */
@@ -106,6 +135,27 @@ export default class util {
             console.log(`filetype of ${uri} is not supported`);
             return '';
         }
+    }
+
+    static setChart(dom, data, type, height) {
+        if (Chart == undefined) {
+            console.warn(`Chart module ${Chart.toString()} not defined or data invalid: ${data.toString()}`);
+            return;
+        }
+        let canv = document.createElement('canvas'),
+            ctx = canv.getContext('2d');
+        let piechart = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: {
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        canv.height = height; canv.style.height = canv.height + 'px';
+        canv.width = height; canv.style.width = canv.width + 'px';
+        dom.appendChild(canv);
     }
 
     // random point objs with given number

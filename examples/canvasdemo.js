@@ -11,8 +11,9 @@ var map = new mapboxgl.Map({
             "custom-tms": {   
                 'type': 'raster',
                 'tiles': [
-                    "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
-                    // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
+                    // `https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/
+                    // ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}`,
+                    "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
                 ],
                 'tileSize': 256
             },

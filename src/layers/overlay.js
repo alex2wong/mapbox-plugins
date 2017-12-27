@@ -26,7 +26,7 @@ export default class Overlayer {
         if (this.map != undefined && this.map.project instanceof Function) {
             let lnglat = this.map.project(new mapboxgl.LngLat(
                 lng, lat));
-            let x = lnglat.x, y = lnglat.y;
+            let x = (lnglat.x).toFixed(0), y = (lnglat.y).toFixed(0);
             return [x, y];
         }
         return [lng, lat];

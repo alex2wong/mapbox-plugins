@@ -317,6 +317,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: true
 	});
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _const = __webpack_require__(3);
@@ -389,6 +391,36 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	            return promise;
 	        }
+	    }, {
+	        key: "deepClone",
+	        value: function deepClone(obj) {
+	            var _this = this;
+
+	            var cloned = {};
+	            if ((typeof obj === "undefined" ? "undefined" : _typeof(obj)) !== 'object') return null;
+	            for (var k in obj) {
+	                if (obj.hasOwnProperty(k) && _typeof(obj[k]) !== 'object') {
+	                    cloned[k] = obj[k];
+	                } else if (obj[k].constructor.toString().indexOf("Object") > 0) {
+	                    cloned[k] = this.deepClone(obj[k]);
+	                } else if (Array.isArray(obj[k])) {
+	                    cloned[k] = obj[k].map(function (ele) {
+	                        // let ret = null;
+	                        if ((typeof ele === "undefined" ? "undefined" : _typeof(ele)) !== 'object') return ele;else return _this.deepClone(ele);
+	                    });
+	                    // cloned[k] = [].concat(obj[k]);
+	                }
+	            }
+	            return cloned;
+	        }
+	    }, {
+	        key: "isChanged",
+	        value: function isChanged(lastData, data) {
+	            if (JSON.stringify(lastData) == JSON.stringify(data)) return false;else {
+	                console.warn('chartData changed..');
+	                return true;
+	            }
+	        }
 
 	        /**
 	         * return iconposition style by iconName
@@ -444,6 +476,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	                console.log("filetype of " + uri + " is not supported");
 	                return '';
 	            }
+	        }
+	    }, {
+	        key: "setChart",
+	        value: function setChart(dom, data, type, height) {
+	            if (Chart == undefined) {
+	                console.warn("Chart module " + Chart.toString() + " not defined or data invalid: " + data.toString());
+	                return;
+	            }
+	            var canv = document.createElement('canvas'),
+	                ctx = canv.getContext('2d');
+	            var piechart = new Chart(ctx, {
+	                type: type,
+	                data: data,
+	                options: {
+	                    legend: {
+	                        display: false
+	                    }
+	                }
+	            });
+	            canv.height = height;canv.style.height = canv.height + 'px';
+	            canv.width = height;canv.style.width = canv.width + 'px';
+	            dom.appendChild(canv);
 	        }
 
 	        // random point objs with given number
@@ -3040,8 +3094,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function lnglat2pix(lng, lat) {
 	            if (this.map != undefined && this.map.project instanceof Function) {
 	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
-	                var x = lnglat.x,
-	                    y = lnglat.y;
+	                var x = lnglat.x.toFixed(0),
+	                    y = lnglat.y.toFixed(0);
 	                return [x, y];
 	            }
 	            return [lng, lat];
@@ -3253,6 +3307,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            });
 	        }
 	        _this.doms = [];
+	        _this.lastData = [];
 	        _this.redraw(opts);
 	        console.log("Dom overlayer add to Map...");
 	        return _this;
@@ -3267,8 +3322,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            domContainer.style.position = "absolute";
 	            domContainer.className = "overlay-dom";
 	            domContainer.style.width = mapboxCanvas.style.width;
-	            domContainer.style.height = mapboxCanvas.style.height;
-	            canvasContainer.appendChild(domContainer);
+	            domContainer.style.height = '0';
+	            canvasContainer.parentElement.appendChild(domContainer);
 	            return domContainer;
 	        }
 
@@ -3312,7 +3367,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	}(_overlay2.default);
 
 	var lineHeight = 100,
-	    dotRadius = 4;
+	    dotRadius = 4,
+	    chartHeight = 60;
 	/**
 	 * domOverlay register&render above default canvas..
 	 * keep in absolute geolocation..
@@ -3323,37 +3379,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // append each of domPopups to domContainer.
 	        for (var i = 0; i < doms.length; i++) {
 	            var domOpt = doms[i];
+	            // let sanity = Util.checkSanity(this.lastDoms[i], domOpt);
 	            var x = domOpt['lon'],
 	                y = domOpt['lat'],
 	                pix = this.lnglat2pix(x, y);
 	            if (pix == null) continue;
 	            var iconName = domOpt['icon'],
-	                resources = domOpt['resources'];
+	                resources = domOpt['resources'],
+	                moveClass = domOpt['class'] ? domOpt['class'] + ' animated' : '',
+	                chartData = domOpt['data'],
+	                chartType = domOpt['type'];
+	            // data sanity should be checked, domOpts not changed then just update position!
 	            var dom = this.doms[i * 3] || document.createElement("div"),
 	                line = this.doms[i * 3 + 1] || document.createElement("div"),
 	                dot = this.doms[i * 3 + 2] || document.createElement("div");
-	            line.style.height = lineHeight - 10 + 'px';
-	            line.style.width = '1px';
-	            line.style.position = "absolute";
-	            dot.style.borderRadius = '50%';
-	            dot.style.width = dot.style.height = dotRadius * 2 + 'px';
-	            dot.style.position = "absolute";
+	            preStyleEles(line, dot, dom, pix, chartType);
 
-	            dom.style.position = "absolute";
-	            dom.style.background = "#fff";
-	            dom.style.padding = '5px';
-	            // set domOverlay position. dom box animation needed.
-	            dom.style.left = pix[0] + "px";
-	            // calc the dom bottom, depend on its height and canvas height..
-	            dom.style.top = pix[1] - lineHeight + "px";
-	            dom.innerHTML = '<p> ' + domOpt['content'] + ' </p>';
-	            // only set resource to dom at initial stage.
+	            var dataClone = _util2.default.deepClone(chartData);
 	            if (resources != undefined) {
+	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	                _util2.default.setResource(dom, resources);
 	            } else if (iconName != undefined) {
+	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	                _util2.default.setIconDiv(dom, iconName);
+	            } else if (chartData != undefined && chartType != undefined && _util2.default.isChanged(this.lastData[i], chartData)) {
+	                // setChart would contaminate input Data.
+	                _util2.default.setChart(dom, dataClone, chartType, chartHeight * 2);
+	                this.lastData[i] = chartData;
 	            }
-	            dom.className = "dom-popup";
+	            if (chartType != undefined) styleChartContainer(dom);
 
 	            line.className = "dom-ele", dot.className = "dom-ele";
 	            line.style.left = pix[0] + "px";
@@ -3365,6 +3419,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.doms[i * 3] == undefined) {
 	                var _doms;
 
+	                dom.className = 'dom-popup ' + moveClass;
+	                console.warn('add ' + moveClass + ' css to dom.');
 	                this.domContainer.appendChild(dom);
 	                this.domContainer.appendChild(line);
 	                this.domContainer.appendChild(dot);
@@ -3372,6 +3428,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }
 	        }
 	    }
+	}
+
+	function preStyleEles(line, dot, dom, pix, chartType) {
+	    line.style.height = lineHeight - 10 + 'px';
+	    line.style.width = '1px';
+	    line.style.position = "absolute";
+	    dot.style.borderRadius = '50%';
+	    dot.style.width = dot.style.height = dotRadius * 2 + 'px';
+	    dot.style.position = "absolute";
+
+	    dom.style.position = "absolute";
+	    dom.style.background = "#fff";
+	    dom.style.padding = '5px';
+	    // set domOverlay position. dom box animation needed.
+	    dom.style.left = pix[0] - (chartType ? chartHeight : 0) + "px";
+	    dom.style.top = pix[1] - lineHeight - (chartType ? chartHeight : 0) + "px";
+	}
+
+	function styleChartContainer(dom) {
+	    dom.style.borderWidth = '0';
+	    dom.style.zIndex = 9999;
+	    dom.style.backgroundColor = 'rgba(0,0,0,0.0)';
 	}
 
 	function animLine(line) {
