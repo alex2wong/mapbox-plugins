@@ -61,8 +61,7 @@
                     "type": "fill",
                     "paint": {
                         "fill-color": "rgba(0,0,0,0.7)",
-                        "fill-outline-color": "#eee",
-                        "fill-outline-width": 2
+                        "fill-outline-color": "#eee"
                     },
                     // "filter": ["==", "$type", "Polygon"]
                 });

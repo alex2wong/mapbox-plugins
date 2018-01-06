@@ -2,6 +2,7 @@ import Drone from './drone';
 import { deprecate } from 'core-decorators';
 import { CanvasOverlayer} from './layers/canvasOverlay';
 
+const interval = 25;
 export default class controllers {
     /**
      * GameController bind with a drone instance.. 
@@ -12,23 +13,53 @@ export default class controllers {
             console.error("gameControl must bind with a drone instance.");
             return;
         }
-        document.body.addEventListener('keydown', function(e) {
-            if (e.which === 37||e.which === 65) {
-                drone.turnLeft();
-            }
-            if (e.which === 39||e.which === 68) {
-                drone.turnRight();
-            }
-            if (e.which === 38 ||e.which === 87) { // faster
-                drone.accelerate();
-            }
-            if (e.which === 40||e.which === 83) { // slower
-                drone.brake();
-            }
-            if (e.which === 32) {
-                drone.fire();
-            }
-        });
+        // bind key event with drone..
+        drone.u=drone.r=drone.d=drone.l=0;onkeydown=(e)=>t(e,1);onkeyup=(e)=>t(e);
+        let t=(e,v,l,i)=>{
+            for(i in l={u:[38,90,87],r:[39,68],d:[40,83],l:[37,65,81]})
+            if(l[i].includes(e.keyCode))
+            drone[i]=v
+        }
+        setInterval(()=>{
+            if (drone.u) drone.accelerate();
+            if (drone.d) drone.brake();
+            if (drone.r) drone.turnRight();
+            if (drone.l) drone.turnLeft();
+        }, interval);
+        // document.body.addEventListener('keydown', function(e) {
+        //     if (e.which === 37||e.which === 65) {
+        //         if (drone.lastAction) {
+        //             drone.lastAction
+        //         }
+        //         drone.turnLeft();
+        //     }
+        //     if (e.which === 39||e.which === 68) {
+        //         let handleturnR = setInterval(drone.turnRight, interval);
+        //     }
+        //     if (e.which === 38 ||e.which === 87) { // faster
+        //         let handleAcc = setInterval(drone.accelerate, interval);
+        //     }
+        //     if (e.which === 40||e.which === 83) { // slower
+        //         let handleBrak = setInterval(drone.brake, interval);
+        //     }
+        //     if (e.which === 32) {
+        //         drone.fire();
+        //     }
+        //     document.body.addEventListener("keyup", function(evt) {
+        //         if (evt.which === 37||evt.which === 65) {
+        //             clearInterval(handleturnL);
+        //         }
+        //         if (e.which === 39||e.which === 68) {
+        //             clearInterval(handleturnR);
+        //         }
+        //         if (e.which === 38 ||e.which === 87) { // faster
+        //             clearInterval(handleAcc);
+        //         }
+        //         if (e.which === 40||e.which === 83) { // slower
+        //             clearInterval(handleBrak);
+        //         }
+        //     });
+        // });
         console.log("gameControl register success.");
     }
 
