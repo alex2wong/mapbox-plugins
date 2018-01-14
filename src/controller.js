@@ -26,40 +26,6 @@ export default class controllers {
             if (drone.r) drone.turnRight();
             if (drone.l) drone.turnLeft();
         }, interval);
-        // document.body.addEventListener('keydown', function(e) {
-        //     if (e.which === 37||e.which === 65) {
-        //         if (drone.lastAction) {
-        //             drone.lastAction
-        //         }
-        //         drone.turnLeft();
-        //     }
-        //     if (e.which === 39||e.which === 68) {
-        //         let handleturnR = setInterval(drone.turnRight, interval);
-        //     }
-        //     if (e.which === 38 ||e.which === 87) { // faster
-        //         let handleAcc = setInterval(drone.accelerate, interval);
-        //     }
-        //     if (e.which === 40||e.which === 83) { // slower
-        //         let handleBrak = setInterval(drone.brake, interval);
-        //     }
-        //     if (e.which === 32) {
-        //         drone.fire();
-        //     }
-        //     document.body.addEventListener("keyup", function(evt) {
-        //         if (evt.which === 37||evt.which === 65) {
-        //             clearInterval(handleturnL);
-        //         }
-        //         if (e.which === 39||e.which === 68) {
-        //             clearInterval(handleturnR);
-        //         }
-        //         if (e.which === 38 ||e.which === 87) { // faster
-        //             clearInterval(handleAcc);
-        //         }
-        //         if (e.which === 40||e.which === 83) { // slower
-        //             clearInterval(handleBrak);
-        //         }
-        //     });
-        // });
         console.log("gameControl register success.");
     }
 

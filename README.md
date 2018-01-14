@@ -22,6 +22,8 @@ Note: pls visit all demo with **HTTPS**..
 
 [Chart.js](http://www.chartjs.org/) is a great chart lib on canvas.
 
+[(NEW) Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation)
+
 # run locally
 
 > npm install

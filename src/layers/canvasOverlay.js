@@ -9,7 +9,12 @@ export class CanvasOverlayer extends Overlayer {
         super(_opts);
         this.canvas = this._init();
         this.redraw = _redraw.bind(this);
+        // how to deconstruct opts to this if we need defaultValue.
+        this.labelOn = _opts.labelOn || false;
+        this.xfield = _opts.xfield || 'lon';
+        this.yfield = _opts.yfield || 'lat';
         this.shadow = _opts.shadow != undefined? _opts.shadow : false;
+        this.lineColor = _opts.lineColor;
         this.blurWidth = _opts.blurWidth != undefined? _opts.blurWidth: 4;
         this.keepTrack = _opts.keepTrack != undefined? _opts.keepTrack : false;
         if (this.keepTrack) {
@@ -48,10 +53,25 @@ export class CanvasOverlayer extends Overlayer {
             this.trackCtx = this.trackLayer.getContext("2d");
             this.movedTo = false;
             initCtx(this.trackCtx, this.blurWidth,"rgba(255,255,255,.4");
-            this.trackCtx.lineWidth = 2;
-            this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
+            this.trackCtx.lineWidth = this.lineWidth || 3;
+            this.trackCtx.strokeStyle = this.lineColor || "rgba(255,255,20,.6)";
             this.trackCtx.beginPath();
         }
+    }
+
+    /**
+     * set tracks coordinates of overlayer.
+     * @param {*array of track points.} tracks 
+     */
+    setTracks(tracks) {
+        if (Array.isArray(tracks)) {
+            this.tracks = tracks;
+            return this;
+        }
+    }
+
+    getTracks() {
+        return this.tracks;
     }
 
     /**
@@ -104,57 +124,53 @@ function _redraw(objs) {
         } else {
             ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
         }
-        // ctx.fillStyle = "rgba(240,200,20,.7)";
-        // ctx.fillRect(0,0,canv.width, canv.height);
-        
         initCtx(ctx,this.blurWidth,"rgba(255,255,255,.4");        
         for(let i=0;i<objs.length;i++) {
-            let x = objs[i]['lon'], y = objs[i]['lat'], 
-                radius = objs[i]['radius'] || 2, icon = objs[i]['icon'],
-                label = objs[i]['name'], rotate = objs[i]['direction'];
+            let x = objs[i][this.xfield], y = objs[i][this.yfield], 
+                radius = objs[i]['radius'] || 3, icon = objs[i]['icon'],
+                label = objs[i]['name'], rotate = objs[i]['direction'] || 0;
             radius = Math.abs(radius);
             let pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
-            ctx.fillStyle = objs[i]['color'];
+            ctx.fillStyle = objs[i]['color'] || 'rgba(255,240,4,.9)';
             ctx.beginPath();
             if (label !== undefined && label.startsWith("Play")) radius = iconSize*0.75;
             // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
             if (icon !== undefined) {
-                let min = icon.height > icon.width ? icon.width : icon.height;
                 ctx.save();
                 ctx.translate(pix[0], pix[1]);
                 ctx.rotate(rotate*Math.PI/180);
+                let min = icon.height > icon.width ? icon.width : icon.height;
                 try {
                     ctx.drawImage(icon,0,0,min,min, -iconSize/2, -iconSize/2, iconSize, iconSize);
                 } 
                 catch (e) {
                     console.warn("ctx.drawImage.. error.");
                 }
-                if (this.trackCtx && !this.movedTo) {
-                    this.trackCtx.moveTo(pix[0],pix[1]);
-                    this.movedTo = true;
-                } else if (this.trackCtx) {
-                    this.trackCtx.lineTo(pix[0],pix[1]);
-                    this.tracks.push([x, y]);
-                    setTimeout(()=>{
-                        //// closePath would auto-complete the path to polygon..
-                        // this.trackCtx.closePath();
-                        this.trackCtx.stroke();
-                        this.initTrackCtx();
-                    }, 0);
-                }
                 ctx.restore();
-                ctx.arc(pix[0], pix[1], radius, 0, Math.PI*2);
-                ctx.stroke();
-                // or drawSome Triangle things to present the Sprites..
             } else {
                 ctx.arc(pix[0], pix[1], radius, 0, Math.PI*2);
                 ctx.fill();
             }
-            // if (label !== undefined) {
-            //     ctx.strokeText(label, pix[0], pix[1]);
-            // }
-            ctx.closePath();
+            if (this.keepTrack && this.tracks.length == 0) {
+                this.initTrackCtx();
+                this.trackCtx.moveTo(pix[0],pix[1]);
+                this.tracks.push([x, y]);
+                // this.movedTo = true;
+            } else if (this.trackCtx) {
+                this.trackCtx.lineTo(pix[0],pix[1]);
+                this.tracks.push([x, y]);
+                setTimeout(()=>{
+                    //// closePath would auto-complete the path to polygon..
+                    this.trackCtx.stroke();
+                    this.trackCtx.beginPath();
+                    this.trackCtx.moveTo(pix[0],pix[1]);
+                }, 0);
+            }
+            if (label !== undefined && this.labelOn) {
+                ctx.strokeText(label, pix[0], pix[1]);
+            }
+            // ctx.closePath();
         }
         if(this.shadow) {
             ctx.restore();
@@ -162,11 +178,13 @@ function _redraw(objs) {
     }
 }
 
-function initCtx(ctx, blurWidth, shadowColor) {
+function initCtx(ctx, blurWidth, shadowColor="rgba(255,255,255,.8)") {
     if (ctx === undefined) return;
+    ctx.linecap = 'round';
     ctx.shadowBlur = blurWidth;
-    ctx.shadowColor = "rgba(255,255,255,.8)";
+    ctx.shadowColor = shadowColor;
     ctx.strokeStyle = "rgba(255,255,255,.9)";
+    ctx.fillStyle = "rgba(255,240,91,.8)";
 }
 
 /**

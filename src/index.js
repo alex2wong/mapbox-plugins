@@ -9,12 +9,13 @@ import { myTween, sleep} from "./tween/Tween";
 import { CanvasOverlayer } from './layers/canvasOverlay';
 import { DomOverlayer } from './layers/domOverlay';
 import { WindLayer } from './layers/windLayer';
+import * as Config from './config';
 var rbush = require('rbush');
 
 // var HexgridHeatmap = require('./layers/hexgridHeatLayer');
-
+mapboxgl.accessToken = Config.default.tk;
 // Static Props..
 export {
     Drone, Canvas, Chart, Util, Controllers, myTween, 
-    CanvasOverlayer, DomOverlayer, WindLayer, rbush
+    CanvasOverlayer, DomOverlayer, WindLayer, rbush, Config
 }

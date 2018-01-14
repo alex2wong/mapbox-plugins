@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
+	exports.Config = exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
 
 	var _drone = __webpack_require__(2);
 
@@ -96,14 +96,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _windLayer = __webpack_require__(33);
 
+	var _config = __webpack_require__(34);
+
+	var Config = _interopRequireWildcard(_config);
+
+	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
+
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	var rbush = __webpack_require__(34);
+	// this is Root Module for Whole app, require lib we need.
+	var rbush = __webpack_require__(35);
 
 	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
-
+	mapboxgl.accessToken = Config.default.tk;
 	// Static Props..
-	// this is Root Module for Whole app, require lib we need.
 	exports.Drone = _drone2.default;
 	exports.Canvas = _canvas2.default;
 	exports.Chart = _chartmodel2.default;
@@ -114,6 +120,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DomOverlayer = _domOverlay.DomOverlayer;
 	exports.WindLayer = _windLayer.WindLayer;
 	exports.rbush = rbush;
+	exports.Config = Config;
 
 /***/ }),
 /* 2 */
@@ -273,6 +280,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	Const.SpritesUrl = "https://alex2wong.github.io/mapbox-plugins/assets/sprite";
 
 	Const.Sprites = { "airfield-15": { "width": 21, "height": 21, "x": 0, "y": 0, "pixelRatio": 1 }, "airport-15": { "width": 21, "height": 21, "x": 21, "y": 0, "pixelRatio": 1 }, "alcohol-shop-15": { "width": 21, "height": 21, "x": 0, "y": 21, "pixelRatio": 1 }, "amusement-park-15": { "width": 21, "height": 21, "x": 21, "y": 21, "pixelRatio": 1 }, "aquarium-15": { "width": 21, "height": 21, "x": 42, "y": 0, "pixelRatio": 1 }, "art-gallery-15": { "width": 21, "height": 21, "x": 63, "y": 0, "pixelRatio": 1 }, "attraction-15": { "width": 21, "height": 21, "x": 42, "y": 21, "pixelRatio": 1 }, "bakery-15": { "width": 21, "height": 21, "x": 63, "y": 21, "pixelRatio": 1 }, "bank-15": { "width": 21, "height": 21, "x": 0, "y": 42, "pixelRatio": 1 }, "bar-15": { "width": 21, "height": 21, "x": 21, "y": 42, "pixelRatio": 1 }, "beer-15": { "width": 21, "height": 21, "x": 42, "y": 42, "pixelRatio": 1 }, "bicycle-15": { "width": 21, "height": 21, "x": 63, "y": 42, "pixelRatio": 1 }, "bicycle-share-15": { "width": 21, "height": 21, "x": 0, "y": 63, "pixelRatio": 1 }, "bus-15": { "width": 21, "height": 21, "x": 21, "y": 63, "pixelRatio": 1 }, "cafe-15": { "width": 21, "height": 21, "x": 42, "y": 63, "pixelRatio": 1 }, "campsite-15": { "width": 21, "height": 21, "x": 63, "y": 63, "pixelRatio": 1 }, "car-15": { "width": 21, "height": 21, "x": 84, "y": 0, "pixelRatio": 1 }, "castle-15": { "width": 21, "height": 21, "x": 105, "y": 0, "pixelRatio": 1 }, "cemetery-15": { "width": 21, "height": 21, "x": 126, "y": 0, "pixelRatio": 1 }, "cinema-15": { "width": 21, "height": 21, "x": 147, "y": 0, "pixelRatio": 1 }, "circle-15": { "width": 21, "height": 21, "x": 84, "y": 21, "pixelRatio": 1 }, "circle-stroked-15": { "width": 21, "height": 21, "x": 105, "y": 21, "pixelRatio": 1 }, "clothing-store-15": { "width": 21, "height": 21, "x": 126, "y": 21, "pixelRatio": 1 }, "college-15": { "width": 21, "height": 21, "x": 147, "y": 21, "pixelRatio": 1 }, "dentist-15": { "width": 21, "height": 21, "x": 84, "y": 42, "pixelRatio": 1 }, "doctor-15": { "width": 21, "height": 21, "x": 105, "y": 42, "pixelRatio": 1 }, "dog-park-15": { "width": 21, "height": 21, "x": 126, "y": 42, "pixelRatio": 1 }, "drinking-water-15": { "width": 21, "height": 21, "x": 147, "y": 42, "pixelRatio": 1 }, "embassy-15": { "width": 21, "height": 21, "x": 84, "y": 63, "pixelRatio": 1 }, "entrance-15": { "width": 21, "height": 21, "x": 105, "y": 63, "pixelRatio": 1 }, "fast-food-15": { "width": 21, "height": 21, "x": 126, "y": 63, "pixelRatio": 1 }, "ferry-15": { "width": 21, "height": 21, "x": 147, "y": 63, "pixelRatio": 1 }, "fire-station-15": { "width": 21, "height": 21, "x": 0, "y": 84, "pixelRatio": 1 }, "fuel-15": { "width": 21, "height": 21, "x": 21, "y": 84, "pixelRatio": 1 }, "garden-15": { "width": 21, "height": 21, "x": 42, "y": 84, "pixelRatio": 1 }, "golf-15": { "width": 21, "height": 21, "x": 63, "y": 84, "pixelRatio": 1 }, "grocery-15": { "width": 21, "height": 21, "x": 84, "y": 84, "pixelRatio": 1 }, "harbor-15": { "width": 21, "height": 21, "x": 105, "y": 84, "pixelRatio": 1 }, "heliport-15": { "width": 21, "height": 21, "x": 126, "y": 84, "pixelRatio": 1 }, "hospital-15": { "width": 21, "height": 21, "x": 147, "y": 84, "pixelRatio": 1 }, "ice-cream-15": { "width": 21, "height": 21, "x": 0, "y": 105, "pixelRatio": 1 }, "information-15": { "width": 21, "height": 21, "x": 21, "y": 105, "pixelRatio": 1 }, "laundry-15": { "width": 21, "height": 21, "x": 42, "y": 105, "pixelRatio": 1 }, "library-15": { "width": 21, "height": 21, "x": 63, "y": 105, "pixelRatio": 1 }, "lodging-15": { "width": 21, "height": 21, "x": 84, "y": 105, "pixelRatio": 1 }, "marker-15": { "width": 21, "height": 21, "x": 105, "y": 105, "pixelRatio": 1 }, "monument-15": { "width": 21, "height": 21, "x": 126, "y": 105, "pixelRatio": 1 }, "mountain-15": { "width": 21, "height": 21, "x": 147, "y": 105, "pixelRatio": 1 }, "museum-15": { "width": 21, "height": 21, "x": 0, "y": 126, "pixelRatio": 1 }, "music-15": { "width": 21, "height": 21, "x": 21, "y": 126, "pixelRatio": 1 }, "park-15": { "width": 21, "height": 21, "x": 42, "y": 126, "pixelRatio": 1 }, "pharmacy-15": { "width": 21, "height": 21, "x": 63, "y": 126, "pixelRatio": 1 }, "picnic-site-15": { "width": 21, "height": 21, "x": 84, "y": 126, "pixelRatio": 1 }, "place-of-worship-15": { "width": 21, "height": 21, "x": 105, "y": 126, "pixelRatio": 1 }, "playground-15": { "width": 21, "height": 21, "x": 126, "y": 126, "pixelRatio": 1 }, "police-15": { "width": 21, "height": 21, "x": 147, "y": 126, "pixelRatio": 1 }, "post-15": { "width": 21, "height": 21, "x": 0, "y": 147, "pixelRatio": 1 }, "prison-15": { "width": 21, "height": 21, "x": 21, "y": 147, "pixelRatio": 1 }, "rail-15": { "width": 21, "height": 21, "x": 42, "y": 147, "pixelRatio": 1 }, "rail-light-15": { "width": 21, "height": 21, "x": 63, "y": 147, "pixelRatio": 1 }, "rail-metro-15": { "width": 21, "height": 21, "x": 84, "y": 147, "pixelRatio": 1 }, "religious-christian-15": { "width": 21, "height": 21, "x": 105, "y": 147, "pixelRatio": 1 }, "religious-jewish-15": { "width": 21, "height": 21, "x": 126, "y": 147, "pixelRatio": 1 }, "religious-muslim-15": { "width": 21, "height": 21, "x": 147, "y": 147, "pixelRatio": 1 }, "restaurant-15": { "width": 21, "height": 21, "x": 168, "y": 0, "pixelRatio": 1 }, "rocket-15": { "width": 21, "height": 21, "x": 189, "y": 0, "pixelRatio": 1 }, "school-15": { "width": 21, "height": 21, "x": 210, "y": 0, "pixelRatio": 1 }, "shop-15": { "width": 21, "height": 21, "x": 231, "y": 0, "pixelRatio": 1 }, "stadium-15": { "width": 21, "height": 21, "x": 252, "y": 0, "pixelRatio": 1 }, "star-15": { "width": 21, "height": 21, "x": 273, "y": 0, "pixelRatio": 1 }, "suitcase-15": { "width": 21, "height": 21, "x": 294, "y": 0, "pixelRatio": 1 }, "swimming-15": { "width": 21, "height": 21, "x": 315, "y": 0, "pixelRatio": 1 }, "theatre-15": { "width": 21, "height": 21, "x": 168, "y": 21, "pixelRatio": 1 }, "toilet-15": { "width": 21, "height": 21, "x": 189, "y": 21, "pixelRatio": 1 }, "town-hall-15": { "width": 21, "height": 21, "x": 210, "y": 21, "pixelRatio": 1 }, "triangle-15": { "width": 21, "height": 21, "x": 231, "y": 21, "pixelRatio": 1 }, "triangle-stroked-15": { "width": 21, "height": 21, "x": 252, "y": 21, "pixelRatio": 1 }, "veterinary-15": { "width": 21, "height": 21, "x": 273, "y": 21, "pixelRatio": 1 }, "volcano-15": { "width": 21, "height": 21, "x": 294, "y": 21, "pixelRatio": 1 }, "zoo-15": { "width": 21, "height": 21, "x": 315, "y": 21, "pixelRatio": 1 }, "airfield-11": { "width": 17, "height": 17, "x": 168, "y": 42, "pixelRatio": 1 }, "airport-11": { "width": 17, "height": 17, "x": 185, "y": 42, "pixelRatio": 1 }, "alcohol-shop-11": { "width": 17, "height": 17, "x": 202, "y": 42, "pixelRatio": 1 }, "amusement-park-11": { "width": 17, "height": 17, "x": 219, "y": 42, "pixelRatio": 1 }, "aquarium-11": { "width": 17, "height": 17, "x": 236, "y": 42, "pixelRatio": 1 }, "art-gallery-11": { "width": 17, "height": 17, "x": 253, "y": 42, "pixelRatio": 1 }, "attraction-11": { "width": 17, "height": 17, "x": 270, "y": 42, "pixelRatio": 1 }, "bakery-11": { "width": 17, "height": 17, "x": 287, "y": 42, "pixelRatio": 1 }, "bank-11": { "width": 17, "height": 17, "x": 304, "y": 42, "pixelRatio": 1 }, "bar-11": { "width": 17, "height": 17, "x": 168, "y": 63, "pixelRatio": 1 }, "beer-11": { "width": 17, "height": 17, "x": 185, "y": 63, "pixelRatio": 1 }, "bicycle-11": { "width": 17, "height": 17, "x": 202, "y": 63, "pixelRatio": 1 }, "bicycle-share-11": { "width": 17, "height": 17, "x": 219, "y": 63, "pixelRatio": 1 }, "bus-11": { "width": 17, "height": 17, "x": 236, "y": 63, "pixelRatio": 1 }, "cafe-11": { "width": 17, "height": 17, "x": 253, "y": 63, "pixelRatio": 1 }, "campsite-11": { "width": 17, "height": 17, "x": 270, "y": 63, "pixelRatio": 1 }, "car-11": { "width": 17, "height": 17, "x": 287, "y": 63, "pixelRatio": 1 }, "castle-11": { "width": 17, "height": 17, "x": 304, "y": 63, "pixelRatio": 1 }, "cemetery-11": { "width": 17, "height": 17, "x": 168, "y": 84, "pixelRatio": 1 }, "cinema-11": { "width": 17, "height": 17, "x": 185, "y": 84, "pixelRatio": 1 }, "circle-11": { "width": 17, "height": 17, "x": 202, "y": 84, "pixelRatio": 1 }, "circle-stroked-11": { "width": 17, "height": 17, "x": 219, "y": 84, "pixelRatio": 1 }, "clothing-store-11": { "width": 17, "height": 17, "x": 236, "y": 84, "pixelRatio": 1 }, "college-11": { "width": 17, "height": 17, "x": 253, "y": 84, "pixelRatio": 1 }, "dentist-11": { "width": 17, "height": 17, "x": 270, "y": 84, "pixelRatio": 1 }, "doctor-11": { "width": 17, "height": 17, "x": 287, "y": 84, "pixelRatio": 1 }, "dog-park-11": { "width": 17, "height": 17, "x": 304, "y": 84, "pixelRatio": 1 }, "drinking-water-11": { "width": 17, "height": 17, "x": 168, "y": 105, "pixelRatio": 1 }, "embassy-11": { "width": 17, "height": 17, "x": 185, "y": 105, "pixelRatio": 1 }, "entrance-11": { "width": 17, "height": 17, "x": 202, "y": 105, "pixelRatio": 1 }, "fast-food-11": { "width": 17, "height": 17, "x": 219, "y": 105, "pixelRatio": 1 }, "ferry-11": { "width": 17, "height": 17, "x": 236, "y": 105, "pixelRatio": 1 }, "fire-station-11": { "width": 17, "height": 17, "x": 253, "y": 105, "pixelRatio": 1 }, "fuel-11": { "width": 17, "height": 17, "x": 270, "y": 105, "pixelRatio": 1 }, "garden-11": { "width": 17, "height": 17, "x": 287, "y": 105, "pixelRatio": 1 }, "golf-11": { "width": 17, "height": 17, "x": 304, "y": 105, "pixelRatio": 1 }, "grocery-11": { "width": 17, "height": 17, "x": 168, "y": 126, "pixelRatio": 1 }, "harbor-11": { "width": 17, "height": 17, "x": 185, "y": 126, "pixelRatio": 1 }, "heliport-11": { "width": 17, "height": 17, "x": 202, "y": 126, "pixelRatio": 1 }, "hospital-11": { "width": 17, "height": 17, "x": 219, "y": 126, "pixelRatio": 1 }, "ice-cream-11": { "width": 17, "height": 17, "x": 236, "y": 126, "pixelRatio": 1 }, "information-11": { "width": 17, "height": 17, "x": 253, "y": 126, "pixelRatio": 1 }, "laundry-11": { "width": 17, "height": 17, "x": 270, "y": 126, "pixelRatio": 1 }, "library-11": { "width": 17, "height": 17, "x": 287, "y": 126, "pixelRatio": 1 }, "lodging-11": { "width": 17, "height": 17, "x": 304, "y": 126, "pixelRatio": 1 }, "marker-11": { "width": 17, "height": 17, "x": 168, "y": 147, "pixelRatio": 1 }, "monument-11": { "width": 17, "height": 17, "x": 185, "y": 147, "pixelRatio": 1 }, "mountain-11": { "width": 17, "height": 17, "x": 202, "y": 147, "pixelRatio": 1 }, "museum-11": { "width": 17, "height": 17, "x": 219, "y": 147, "pixelRatio": 1 }, "music-11": { "width": 17, "height": 17, "x": 236, "y": 147, "pixelRatio": 1 }, "park-11": { "width": 17, "height": 17, "x": 253, "y": 147, "pixelRatio": 1 }, "pharmacy-11": { "width": 17, "height": 17, "x": 270, "y": 147, "pixelRatio": 1 }, "picnic-site-11": { "width": 17, "height": 17, "x": 287, "y": 147, "pixelRatio": 1 }, "place-of-worship-11": { "width": 17, "height": 17, "x": 304, "y": 147, "pixelRatio": 1 }, "playground-11": { "width": 17, "height": 17, "x": 0, "y": 168, "pixelRatio": 1 }, "police-11": { "width": 17, "height": 17, "x": 17, "y": 168, "pixelRatio": 1 }, "post-11": { "width": 17, "height": 17, "x": 34, "y": 168, "pixelRatio": 1 }, "prison-11": { "width": 17, "height": 17, "x": 51, "y": 168, "pixelRatio": 1 }, "rail-11": { "width": 17, "height": 17, "x": 68, "y": 168, "pixelRatio": 1 }, "rail-light-11": { "width": 17, "height": 17, "x": 85, "y": 168, "pixelRatio": 1 }, "rail-metro-11": { "width": 17, "height": 17, "x": 102, "y": 168, "pixelRatio": 1 }, "religious-christian-11": { "width": 17, "height": 17, "x": 119, "y": 168, "pixelRatio": 1 }, "religious-jewish-11": { "width": 17, "height": 17, "x": 136, "y": 168, "pixelRatio": 1 }, "religious-muslim-11": { "width": 17, "height": 17, "x": 153, "y": 168, "pixelRatio": 1 }, "restaurant-11": { "width": 17, "height": 17, "x": 170, "y": 168, "pixelRatio": 1 }, "rocket-11": { "width": 17, "height": 17, "x": 187, "y": 168, "pixelRatio": 1 }, "school-11": { "width": 17, "height": 17, "x": 204, "y": 168, "pixelRatio": 1 }, "shop-11": { "width": 17, "height": 17, "x": 221, "y": 168, "pixelRatio": 1 }, "stadium-11": { "width": 17, "height": 17, "x": 238, "y": 168, "pixelRatio": 1 }, "star-11": { "width": 17, "height": 17, "x": 255, "y": 168, "pixelRatio": 1 }, "suitcase-11": { "width": 17, "height": 17, "x": 272, "y": 168, "pixelRatio": 1 }, "swimming-11": { "width": 17, "height": 17, "x": 289, "y": 168, "pixelRatio": 1 }, "theatre-11": { "width": 17, "height": 17, "x": 306, "y": 168, "pixelRatio": 1 }, "toilet-11": { "width": 17, "height": 17, "x": 0, "y": 185, "pixelRatio": 1 }, "town-hall-11": { "width": 17, "height": 17, "x": 17, "y": 185, "pixelRatio": 1 }, "triangle-11": { "width": 17, "height": 17, "x": 34, "y": 185, "pixelRatio": 1 }, "triangle-stroked-11": { "width": 17, "height": 17, "x": 51, "y": 185, "pixelRatio": 1 }, "veterinary-11": { "width": 17, "height": 17, "x": 68, "y": 185, "pixelRatio": 1 }, "volcano-11": { "width": 17, "height": 17, "x": 85, "y": 185, "pixelRatio": 1 }, "zoo-11": { "width": 17, "height": 17, "x": 102, "y": 185, "pixelRatio": 1 }, "dot-11": { "width": 11, "height": 11, "x": 323, "y": 168, "pixelRatio": 1 }, "dot-10": { "width": 10, "height": 10, "x": 119, "y": 185, "pixelRatio": 1 } };
+
+	Const.PK = "pk.eyJ1IjoiaHVhbmd5aXhpdSIsImEiOiI2WjVWR1hFIn0.1P90Q-tkbHS38BvnrhTI6w";
 
 /***/ }),
 /* 4 */
@@ -1137,6 +1146,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
+	var interval = 25;
+
 	var controllers = function () {
 	    function controllers() {
 	        _classCallCheck(this, controllers);
@@ -1154,25 +1165,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	                console.error("gameControl must bind with a drone instance.");
 	                return;
 	            }
-	            document.body.addEventListener('keydown', function (e) {
-	                if (e.which === 37 || e.which === 65) {
-	                    drone.turnLeft();
+	            // bind key event with drone..
+	            drone.u = drone.r = drone.d = drone.l = 0;onkeydown = function onkeydown(e) {
+	                return t(e, 1);
+	            };onkeyup = function onkeyup(e) {
+	                return t(e);
+	            };
+	            var t = function t(e, v, l, i) {
+	                for (i in l = { u: [38, 90, 87], r: [39, 68], d: [40, 83], l: [37, 65, 81] }) {
+	                    if (l[i].includes(e.keyCode)) drone[i] = v;
 	                }
-	                if (e.which === 39 || e.which === 68) {
-	                    drone.turnRight();
-	                }
-	                if (e.which === 38 || e.which === 87) {
-	                    // faster
-	                    drone.accelerate();
-	                }
-	                if (e.which === 40 || e.which === 83) {
-	                    // slower
-	                    drone.brake();
-	                }
-	                if (e.which === 32) {
-	                    drone.fire();
-	                }
-	            });
+	            };
+	            setInterval(function () {
+	                if (drone.u) drone.accelerate();
+	                if (drone.d) drone.brake();
+	                if (drone.r) drone.turnRight();
+	                if (drone.l) drone.turnLeft();
+	            }, interval);
 	            console.log("gameControl register success.");
 	        }
 
@@ -2801,7 +2810,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
-	"use strict";
+	'use strict';
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
@@ -2837,7 +2846,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _this.canvas = _this._init();
 	        _this.redraw = _redraw.bind(_this);
+	        // how to deconstruct opts to this if we need defaultValue.
+	        _this.labelOn = _opts.labelOn || false;
+	        _this.xfield = _opts.xfield || 'lon';
+	        _this.yfield = _opts.yfield || 'lat';
 	        _this.shadow = _opts.shadow != undefined ? _opts.shadow : false;
+	        _this.lineColor = _opts.lineColor;
 	        _this.blurWidth = _opts.blurWidth != undefined ? _opts.blurWidth : 4;
 	        _this.keepTrack = _opts.keepTrack != undefined ? _opts.keepTrack : false;
 	        if (_this.keepTrack) {
@@ -2858,7 +2872,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    _createClass(CanvasOverlayer, [{
-	        key: "_init",
+	        key: '_init',
 	        value: function _init() {
 	            var shadow = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
 	            var keepTrack = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
@@ -2879,16 +2893,35 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 
 	    }, {
-	        key: "_initTrackCtx",
+	        key: '_initTrackCtx',
 	        value: function _initTrackCtx() {
 	            if (this.trackLayer) {
 	                this.trackCtx = this.trackLayer.getContext("2d");
 	                this.movedTo = false;
 	                initCtx(this.trackCtx, this.blurWidth, "rgba(255,255,255,.4");
-	                this.trackCtx.lineWidth = 2;
-	                this.trackCtx.strokeStyle = "rgba(255,255,255,.6)";
+	                this.trackCtx.lineWidth = this.lineWidth || 3;
+	                this.trackCtx.strokeStyle = this.lineColor || "rgba(255,255,20,.6)";
 	                this.trackCtx.beginPath();
 	            }
+	        }
+
+	        /**
+	         * set tracks coordinates of overlayer.
+	         * @param {*array of track points.} tracks 
+	         */
+
+	    }, {
+	        key: 'setTracks',
+	        value: function setTracks(tracks) {
+	            if (Array.isArray(tracks)) {
+	                this.tracks = tracks;
+	                return this;
+	            }
+	        }
+	    }, {
+	        key: 'getTracks',
+	        value: function getTracks() {
+	            return this.tracks;
 	        }
 
 	        /**
@@ -2896,7 +2929,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 
 	    }, {
-	        key: "redrawTrack",
+	        key: 'redrawTrack',
 	        value: function redrawTrack() {
 	            if (this.trackCtx && this.tracks && this.tracks.length > 0) {
 	                var pix = [0, 0];
@@ -2949,59 +2982,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else {
 	            ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
 	        }
-	        // ctx.fillStyle = "rgba(240,200,20,.7)";
-	        // ctx.fillRect(0,0,canv.width, canv.height);
-
 	        initCtx(ctx, this.blurWidth, "rgba(255,255,255,.4");
-	        for (var i = 0; i < objs.length; i++) {
-	            var x = objs[i]['lon'],
-	                y = objs[i]['lat'],
-	                radius = objs[i]['radius'] || 2,
+
+	        var _loop = function _loop(i) {
+	            var x = objs[i][_this2.xfield],
+	                y = objs[i][_this2.yfield],
+	                radius = objs[i]['radius'] || 3,
 	                icon = objs[i]['icon'],
 	                label = objs[i]['name'],
-	                rotate = objs[i]['direction'];
+	                rotate = objs[i]['direction'] || 0;
 	            radius = Math.abs(radius);
-	            var pix = this.lnglat2pix(x, y);
-	            if (pix == null) continue;
-	            ctx.fillStyle = objs[i]['color'];
+	            var pix = _this2.lnglat2pix(x, y);
+	            if (pix == null) return 'continue';
+	            ctx.fillStyle = objs[i]['color'] || 'rgba(255,240,4,.9)';
 	            ctx.beginPath();
 	            if (label !== undefined && label.startsWith("Play")) radius = iconSize * 0.75;
 	            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
 	            if (icon !== undefined) {
-	                var min = icon.height > icon.width ? icon.width : icon.height;
 	                ctx.save();
 	                ctx.translate(pix[0], pix[1]);
 	                ctx.rotate(rotate * Math.PI / 180);
+	                var min = icon.height > icon.width ? icon.width : icon.height;
 	                try {
 	                    ctx.drawImage(icon, 0, 0, min, min, -iconSize / 2, -iconSize / 2, iconSize, iconSize);
 	                } catch (e) {
 	                    console.warn("ctx.drawImage.. error.");
 	                }
-	                if (this.trackCtx && !this.movedTo) {
-	                    this.trackCtx.moveTo(pix[0], pix[1]);
-	                    this.movedTo = true;
-	                } else if (this.trackCtx) {
-	                    this.trackCtx.lineTo(pix[0], pix[1]);
-	                    this.tracks.push([x, y]);
-	                    setTimeout(function () {
-	                        //// closePath would auto-complete the path to polygon..
-	                        // this.trackCtx.closePath();
-	                        _this2.trackCtx.stroke();
-	                        _this2.initTrackCtx();
-	                    }, 0);
-	                }
 	                ctx.restore();
-	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
-	                ctx.stroke();
-	                // or drawSome Triangle things to present the Sprites..
 	            } else {
 	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
 	                ctx.fill();
 	            }
-	            // if (label !== undefined) {
-	            //     ctx.strokeText(label, pix[0], pix[1]);
-	            // }
-	            ctx.closePath();
+	            if (_this2.keepTrack && _this2.tracks.length == 0) {
+	                _this2.initTrackCtx();
+	                _this2.trackCtx.moveTo(pix[0], pix[1]);
+	                _this2.tracks.push([x, y]);
+	                // this.movedTo = true;
+	            } else if (_this2.trackCtx) {
+	                _this2.trackCtx.lineTo(pix[0], pix[1]);
+	                _this2.tracks.push([x, y]);
+	                setTimeout(function () {
+	                    //// closePath would auto-complete the path to polygon..
+	                    _this2.trackCtx.stroke();
+	                    _this2.trackCtx.beginPath();
+	                    _this2.trackCtx.moveTo(pix[0], pix[1]);
+	                }, 0);
+	            }
+	            if (label !== undefined && _this2.labelOn) {
+	                ctx.strokeText(label, pix[0], pix[1]);
+	            }
+	            // ctx.closePath();
+	        };
+
+	        for (var i = 0; i < objs.length; i++) {
+	            var _ret = _loop(i);
+
+	            if (_ret === 'continue') continue;
 	        }
 	        if (this.shadow) {
 	            ctx.restore();
@@ -3009,11 +3045,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
-	function initCtx(ctx, blurWidth, shadowColor) {
+	function initCtx(ctx, blurWidth) {
+	    var shadowColor = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : "rgba(255,255,255,.8)";
+
 	    if (ctx === undefined) return;
+	    ctx.linecap = 'round';
 	    ctx.shadowBlur = blurWidth;
-	    ctx.shadowColor = "rgba(255,255,255,.8)";
+	    ctx.shadowColor = shadowColor;
 	    ctx.strokeStyle = "rgba(255,255,255,.9)";
+	    ctx.fillStyle = "rgba(255,240,91,.8)";
 	}
 
 	/**
@@ -3603,6 +3643,40 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ }),
 /* 34 */
+/***/ (function(module, exports) {
+
+	"use strict";
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	exports.default = {
+	    tk: "pk.eyJ1IjoiaHVhbmd5aXhpdSIsImEiOiI2WjVWR1hFIn0.1P90Q-tkbHS38BvnrhTI6w",
+	    mapStyles: {
+	        "version": 8,
+	        "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+	        // "sprite": "../../assets/sprite",
+	        "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+	        "sources": {
+	            "custom-tms": {
+	                'type': 'raster',
+	                'tiles': [
+	                // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+	                "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"],
+	                'tileSize': 256
+	            }
+	        },
+	        "layers": [{
+	            'id': 'custom-tms',
+	            'type': 'raster',
+	            'source': 'custom-tms',
+	            'paint': {}
+	        }]
+	    }
+	};
+
+/***/ }),
+/* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3610,7 +3684,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = rbush;
 	module.exports.default = rbush;
 
-	var quickselect = __webpack_require__(35);
+	var quickselect = __webpack_require__(36);
 
 	function rbush(maxEntries, format) {
 	    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
@@ -4170,7 +4244,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports) {
 
 	'use strict';
