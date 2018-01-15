@@ -10,21 +10,20 @@ Note: pls visit all demo with **HTTPS**..
 
 ![Sprite track screenshot](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/sprite_demo.png)
 
-[Sprite track DEMO](https://alex2wong.github.io/mapbox-plugins/examples/sprite)
+## Online demo
+[placeholder]:p
 
-[Custom dom overlay DEMO](https://alex2wong.github.io/mapbox-plugins/examples/domoverlay)
+| demo title |  |
+| :-------- | :--------:|
+| [Sprite track DEMO](https://alex2wong.github.io/mapbox-plugins/examples/sprite) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/sprite) |
+| [Custom dom overlay DEMO](https://alex2wong.github.io/mapbox-plugins/examples/domoverlay) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/domoverlay) |
+| [R-tree search (5000 rectangles) DEMO](https://alex2wong.github.io/mapbox-plugins/examples/rbush) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/rbush) |
+| [Global Wind Layer. render 1w point animation with Canvas](https://alex2wong.github.io/mapbox-plugins/examples/windLayer) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/windLayer) |
+| [Integrate with Chart.js](https://alex2wong.github.io/mapbox-plugins/examples/chartlayer)  | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/chartlayer) |
+| [(NEW) Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/line_animation) |
 
-[R-tree search (5000 rectangles) DEMO](https://alex2wong.github.io/mapbox-plugins/examples/rbush)
 
-[Global Wind Layer. render 1w point animation with Canvas](https://alex2wong.github.io/mapbox-plugins/examples/windLayer)
-
-[Integrate with Chart.js](https://alex2wong.github.io/mapbox-plugins/examples/chartlayer) 
-
-[Chart.js](http://www.chartjs.org/) is a great chart lib on canvas.
-
-[(NEW) Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation)
-
-# run locally
+## run locally
 
 > npm install
 
@@ -33,7 +32,7 @@ Note: pls visit all demo with **HTTPS**..
 visit from localhost:8080/examples/
 
 
-# how to use
+## how to use
 plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:
 
 ```
