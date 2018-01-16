@@ -108,7 +108,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var rbush = __webpack_require__(35);
 
 	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
-	mapboxgl.accessToken = Config.default.tk;
+	if (typeof mapboxgl != 'undefined') mapboxgl.accessToken = Config.default.tk;
 	// Static Props..
 	exports.Drone = _drone2.default;
 	exports.Canvas = _canvas2.default;

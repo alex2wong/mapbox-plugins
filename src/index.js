@@ -13,7 +13,8 @@ import * as Config from './config';
 var rbush = require('rbush');
 
 // var HexgridHeatmap = require('./layers/hexgridHeatLayer');
-mapboxgl.accessToken = Config.default.tk;
+if(typeof mapboxgl != 'undefined')
+    mapboxgl.accessToken = Config.default.tk;
 // Static Props..
 export {
     Drone, Canvas, Chart, Util, Controllers, myTween, 
