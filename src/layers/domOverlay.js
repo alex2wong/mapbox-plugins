@@ -11,16 +11,15 @@ export class DomOverlayer extends Overlayer {
         super(opts);
         this.domContainer = this._init();
         this.redraw = _redraw.bind(this);
+        this.domOpts = opts.doms;  // store dom config
         if (opts && opts.map) {
             this.setMap(opts.map);
             // bind render doms to each move..performance to be promoted.
-            opts.map.on("move", () => {
-                this.redraw(opts);
-            });
+            opts.map.on("move", this.redraw);
         }
-        this.doms = [];
+        this.doms = []; // store dom elements.
         this.lastData = [];
-        this.redraw(opts);
+        this.redraw();
         console.log("Dom overlayer add to Map...");
     }
 
@@ -39,11 +38,12 @@ export class DomOverlayer extends Overlayer {
     /**
      * updateDoms and redraw..
      */
-    set setDom(opts) {
-         opts.map.un("move", () => {
-            this.redraw(opts);
-        });
-        this.redraw(opts);
+    setDoms(Doms) {
+        if (Array.isArray(Doms)) {
+            this.domOpts = Doms;
+            this.clearDoms();
+            this.redraw();
+        }
     }
 
     findDom(domId) {
@@ -60,12 +60,9 @@ export class DomOverlayer extends Overlayer {
 
     clearDoms() {
         for(let i = 0;i<this.doms.length;i++) {
-            try {
-                this.domContainer.removeChild(this.doms[i]);
-            } catch (error) {
-
-            }            
+            this.domContainer.removeChild(this.doms[i]);         
         }
+        this.doms = [];
     }
 }
 
@@ -75,18 +72,19 @@ const lineHeight = 100, dotRadius = 4, chartHeight = 60;
  * domOverlay register&render above default canvas..
  * keep in absolute geolocation..
  */
-function _redraw(domOpts) {
-    if (domOpts && domOpts.doms) {
-        let doms = domOpts.doms;
+function _redraw() {
+    let doms = this.domOpts;
+    if (doms && Array.isArray(doms)) {
         // append each of domPopups to domContainer.
         for (let i=0;i<doms.length;i++) {
             let domOpt = doms[i];
+            if (typeof domOpt == undefined) continue;
             // let sanity = Util.checkSanity(this.lastDoms[i], domOpt);
             let x = domOpt['lon'], y = domOpt['lat'], 
                 pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
             let iconName = domOpt['icon'], resources = domOpt['resources'], 
-                moveClass = domOpt['class']? domOpt['class'] + ' animated': '',
+                moveClass = domOpt['class']? domOpt['class'] + ' animated': 'bounceIn animated',
                 chartData = domOpt['data'], chartType = domOpt['type'];
             // data sanity should be checked, domOpts not changed then just update position!
             let dom = this.doms[i*3] || document.createElement("div"),
@@ -106,6 +104,8 @@ function _redraw(domOpts) {
                 // setChart would contaminate input Data.
                 Util.setChart(dom, dataClone, chartType, chartHeight*2);
                 this.lastData[i] = chartData;
+            } else {
+                dom.innerHTML = (domOpt['content']|| '') + '</br>';
             }
             if (chartType != undefined) styleChartContainer(dom)
 

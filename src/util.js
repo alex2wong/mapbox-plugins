@@ -117,7 +117,7 @@ export default class util {
             let filetype = this.getFiletype(res[i]);
             if (filetype !== "") {
                 let ele = document.createElement(filetype);
-                ele.style.height = '250px';
+                ele.style.height = '150px';
                 ele.style.width = 'auto';
                 ele.src = res[i];
                 ele.setAttribute('autoplay', true);

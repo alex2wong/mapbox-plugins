@@ -468,7 +468,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var filetype = this.getFiletype(res[i]);
 	                if (filetype !== "") {
 	                    var ele = document.createElement(filetype);
-	                    ele.style.height = '250px';
+	                    ele.style.height = '150px';
 	                    ele.style.width = 'auto';
 	                    ele.src = res[i];
 	                    ele.setAttribute('autoplay', true);
@@ -3305,6 +3305,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	});
 	exports.DomOverlayer = undefined;
 
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
+
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
 	var _overlay = __webpack_require__(30);
@@ -3339,16 +3341,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        _this.domContainer = _this._init();
 	        _this.redraw = _redraw.bind(_this);
+	        _this.domOpts = opts.doms; // store dom config
 	        if (opts && opts.map) {
 	            _this.setMap(opts.map);
 	            // bind render doms to each move..performance to be promoted.
-	            opts.map.on("move", function () {
-	                _this.redraw(opts);
-	            });
+	            opts.map.on("move", _this.redraw);
 	        }
-	        _this.doms = [];
+	        _this.doms = []; // store dom elements.
 	        _this.lastData = [];
-	        _this.redraw(opts);
+	        _this.redraw();
 	        console.log("Dom overlayer add to Map...");
 	        return _this;
 	    }
@@ -3372,6 +3373,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	         */
 
 	    }, {
+	        key: 'setDoms',
+	        value: function setDoms(Doms) {
+	            if (Array.isArray(Doms)) {
+	                this.domOpts = Doms;
+	                this.clearDoms();
+	                this.redraw();
+	            }
+	        }
+	    }, {
 	        key: 'findDom',
 	        value: function findDom(domId) {
 	            for (var i = 0; i < this.doms.length; i++) {
@@ -3386,20 +3396,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'clearDoms',
 	        value: function clearDoms() {
 	            for (var i = 0; i < this.doms.length; i++) {
-	                try {
-	                    this.domContainer.removeChild(this.doms[i]);
-	                } catch (error) {}
+	                this.domContainer.removeChild(this.doms[i]);
 	            }
-	        }
-	    }, {
-	        key: 'setDom',
-	        set: function set(opts) {
-	            var _this2 = this;
-
-	            opts.map.un("move", function () {
-	                _this2.redraw(opts);
-	            });
-	            this.redraw(opts);
+	            this.doms = [];
 	        }
 	    }]);
 
@@ -3413,12 +3412,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * domOverlay register&render above default canvas..
 	 * keep in absolute geolocation..
 	 */
-	function _redraw(domOpts) {
-	    if (domOpts && domOpts.doms) {
-	        var doms = domOpts.doms;
+	function _redraw() {
+	    var doms = this.domOpts;
+	    if (doms && Array.isArray(doms)) {
 	        // append each of domPopups to domContainer.
 	        for (var i = 0; i < doms.length; i++) {
 	            var domOpt = doms[i];
+	            if ((typeof domOpt === 'undefined' ? 'undefined' : _typeof(domOpt)) == undefined) continue;
 	            // let sanity = Util.checkSanity(this.lastDoms[i], domOpt);
 	            var x = domOpt['lon'],
 	                y = domOpt['lat'],
@@ -3426,7 +3426,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (pix == null) continue;
 	            var iconName = domOpt['icon'],
 	                resources = domOpt['resources'],
-	                moveClass = domOpt['class'] ? domOpt['class'] + ' animated' : '',
+	                moveClass = domOpt['class'] ? domOpt['class'] + ' animated' : 'bounceIn animated',
 	                chartData = domOpt['data'],
 	                chartType = domOpt['type'];
 	            // data sanity should be checked, domOpts not changed then just update position!
@@ -3446,6 +3446,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	                // setChart would contaminate input Data.
 	                _util2.default.setChart(dom, dataClone, chartType, chartHeight * 2);
 	                this.lastData[i] = chartData;
+	            } else {
+	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	            }
 	            if (chartType != undefined) styleChartContainer(dom);
 
@@ -3682,7 +3684,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	module.exports = rbush;
-	module.exports.default = rbush;
 
 	var quickselect = __webpack_require__(36);
 
@@ -3772,7 +3773,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 
-	        // recursively build the tree with the given data from scratch using OMT algorithm
+	        // recursively build the tree with the given data from stratch using OMT algorithm
 	        var node = this._build(data.slice(), 0, data.length - 1, 0);
 
 	        if (!this.data.children.length) {

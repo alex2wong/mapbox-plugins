@@ -10,10 +10,25 @@
     <link rel="stylesheet"
   href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
 </head>
-<body>
-    <div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'></div>
+<style>
+    input[type='button'] {
+        padding: 5px;
+        border-radius: 5px;
+        background: transparent;
+        display: absolute;
+        top: 10px;
+        left: 10px;
+    }
+    input[type='button']：hover {
+        background: rgba(255,255,255,.3);
+    }
+</style>
+<body onload='init()'>
+    <div id='map' style='width: 800px; height: 600px; border: 1px dotted #aaa;'>
+        <input type="button" value="addPopUp" id="btn"/>
+    </div>
     <script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>
     <!-- <script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script> -->
-    <script src='../../dist/bundle.js'></script>
+    <script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
     <script src='domdemo.js'></script>
 </body>

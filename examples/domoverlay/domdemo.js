@@ -12,20 +12,12 @@ var map = new mapboxgl.Map({
             "custom-tms": {   
                 'type': 'raster',
                 'tiles': [
-                    "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
-                    // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}",
                     // "https://stamen-tiles.a.ssl.fastly.net/toner/{z}/{x}/{y}.png"
                 ],
                 'tileSize': 256
             },
         },
         "layers": [
-            // {
-            //     'id': 'custom-tms',
-            //     'type': 'raster',
-            //     'source': 'custom-tms',
-            //     'paint': {}
-            // },
         ]
     },
     center: mapCenter,
@@ -73,13 +65,6 @@ map.on('load', function() {
                 lat: mapCenter[1]
             },
             {
-                resources: [`https://f.us.sinaimg.cn/000Jvtr4lx07gEkbnofK0
-                10402002R2V0k01.mp4?label=mp4_hd&template=28&Expires=1514018239&ssig=arQTKitfcr&KID=unistore,video`],
-                content: "load video",
-                lon: mapCenter[0] + 1.5,
-                lat: mapCenter[1] + 1.5,
-            },
-            {
                 resources: ['https://wx1.sinaimg.cn/mw690/4507b64aly1fmju1qfe03j21kw11t7wj.jpg'],
                 content: "ready to load picture",
                 class: 'bounceInUp',
@@ -89,3 +74,16 @@ map.on('load', function() {
         ]
     });
 });
+
+function init() {
+    document.querySelector("#btn").addEventListener("click", addDoms);
+
+    function addDoms() {
+        domLayer.setDoms(domLayer.domOpts.concat({
+            content: "new add pop",
+            class: 'bounceIn',
+            lon: mapCenter[0] + (Math.random()*6 - 3),
+            lat: mapCenter[1] + (Math.random()*6 - 3)
+        }));
+    }
+}

@@ -2,6 +2,7 @@
 
 var data = null;
 var mapCenter = [121.470, 31.165];
+var animation = null;
 var map = new mapboxgl.Map({
     // style: Alex.Config.default.mapStyles,
     style: "mapbox://styles/huangyixiu/cjbhyg80s19m42rqg0kdpkntw",
@@ -28,17 +29,28 @@ function init() {
         xfield: 'lng',
         yfield: 'lat'
     });
+    domLayer = new Alex.DomOverlayer({
+        map: map,
+        doms: [
+        ]});
 
     Alex.Util.getJSON(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/121.47088607666387%2C31.165132066708765%3B121.76845541758418%2C31.068959449424998.json?geometries=geojson&alternatives=true&steps=false&overview=full&access_token=${mapboxgl.accessToken}`)
         .then((res) => {
                 data = res.routes[0].geometry;
                 console.log("got routes data..");
+                domLayer.setDoms([{
+                    icon: 'rocket-11',
+                    content: "start!",
+                    class: 'bounceIn',
+                    lon: data.coordinates[0][0],
+                    lat: data.coordinates[0][1]
+                }]);
                 update();
         });
     
     function update(){
         animateLine(data);
-        requestAnimationFrame(update);
+        animation = requestAnimationFrame(update);
     }
     // update();
 
@@ -54,6 +66,12 @@ function init() {
             // add one stopPoint to render for each frame.
             canvasLayer.redraw(arr2objs(data.coordinates[currentIndex + 1]));
         } else {
+            domLayer.setDoms(domLayer.domOpts.slice(0,1).concat({
+                icon: 'rocket-11',
+                content: "destination!",
+                lon: data.coordinates[segmentNum-1][0],
+                lat: data.coordinates[segmentNum-1][1]
+            }));
             canvasLayer.setTracks([]);
         }
     }
