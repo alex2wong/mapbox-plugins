@@ -2,7 +2,11 @@
 // import * as Alex from "../../src/index";
 
 var tree = Alex.rbush();
-
+var img = new Image();
+img.onload = function(){
+    pattern = canv.getContext('2d').createPattern(img, "no-repeat");
+}
+img.src = './vincent_sky.jpg';
 var canv = document.querySelector("#map");
 Alex.Canvas.init(canv);
 Alex.Canvas.setWidth(1);
@@ -67,7 +71,7 @@ function handler(evt){
         Alex.Canvas.drawRect(item);
     });
 
-    Alex.Canvas.setFill("rgba(255,255,255,0.8)");
+    canv.getContext('2d').fillStyle = pattern;
     selected.forEach((item)=>{
         // redraw all items..
         Alex.Canvas.drawRect(item, fill=true);
