@@ -3436,16 +3436,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            preStyleEles(line, dot, dom, pix, chartType);
 
 	            var dataClone = _util2.default.deepClone(chartData);
+	            // handle different typesof domOverlay.
 	            if (resources != undefined) {
 	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	                _util2.default.setResource(dom, resources);
 	            } else if (iconName != undefined) {
 	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	                _util2.default.setIconDiv(dom, iconName);
-	            } else if (chartData != undefined && chartType != undefined && _util2.default.isChanged(this.lastData[i], chartData)) {
-	                // setChart would contaminate input Data.
-	                _util2.default.setChart(dom, dataClone, chartType, chartHeight * 2);
-	                this.lastData[i] = chartData;
+	            } else if (chartData != undefined && chartType != undefined) {
+	                if (_util2.default.isChanged(this.lastData[i], chartData)) {
+	                    // setChart would contaminate input Data.
+	                    _util2.default.setChart(dom, dataClone, chartType, chartHeight * 2);
+	                    this.lastData[i] = chartData;
+	                }
 	            } else {
 	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	            }

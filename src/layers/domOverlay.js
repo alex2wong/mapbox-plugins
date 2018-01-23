@@ -93,17 +93,19 @@ function _redraw() {
             preStyleEles(line, dot, dom, pix, chartType);
 
             let dataClone = Util.deepClone(chartData);
+            // handle different typesof domOverlay.
             if (resources != undefined) {
                 dom.innerHTML = (domOpt['content'] || ``) + '</br>';
                 Util.setResource(dom, resources);
             } else if (iconName != undefined) {
                 dom.innerHTML = (domOpt['content'] || ``) + '</br>';
                 Util.setIconDiv(dom, iconName);
-            } else if (chartData != undefined && chartType != undefined 
-                        && Util.isChanged(this.lastData[i], chartData)) {
-                // setChart would contaminate input Data.
-                Util.setChart(dom, dataClone, chartType, chartHeight*2);
-                this.lastData[i] = chartData;
+            } else if (chartData != undefined && chartType != undefined) {
+                if (Util.isChanged(this.lastData[i], chartData)) {
+                    // setChart would contaminate input Data.
+                    Util.setChart(dom, dataClone, chartType, chartHeight*2);
+                    this.lastData[i] = chartData;
+                }
             } else {
                 dom.innerHTML = (domOpt['content']|| '') + '</br>';
             }
