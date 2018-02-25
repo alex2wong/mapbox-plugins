@@ -467,12 +467,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	            for (var i = 0; i < res.length; i++) {
 	                var filetype = this.getFiletype(res[i]);
 	                if (filetype !== "") {
-	                    var ele = document.createElement(filetype);
-	                    ele.style.height = '150px';
-	                    ele.style.width = 'auto';
-	                    ele.src = res[i];
+	                    var _ele = document.createElement(filetype);
+	                    _ele.style.width = _ele.style.height = dom.style.width = dom.style.height = '60px';
+	                    _ele.style.borderRadius = "50%";
+	                    _ele.src = res[i];
+	                    dom.style.borderRadius = "50%";
+	                    dom.appendChild(_ele);
+	                }
+	                if (filetype == 'video') {
 	                    ele.setAttribute('autoplay', true);
-	                    dom.appendChild(ele);
 	                }
 	            }
 	        }
@@ -555,7 +558,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	                var image = new Image();
 	                image.onload = resolve;
 	                image.onerror = reject;
-	                image.src = path;
+	                image.src = url;
 	            });
 	        }
 
@@ -3405,7 +3408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return DomOverlayer;
 	}(_overlay2.default);
 
-	var lineHeight = 100,
+	var lineHeight = 60,
 	    dotRadius = 4,
 	    chartHeight = 60;
 	/**
@@ -3426,20 +3429,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (pix == null) continue;
 	            var iconName = domOpt['icon'],
 	                resources = domOpt['resources'],
-	                moveClass = domOpt['class'] ? domOpt['class'] + ' animated' : 'bounceIn animated',
+	                domStyle = domOpt['style'] ? domOpt['style'] + ' animated' : 'bounceIn animated',
 	                chartData = domOpt['data'],
 	                chartType = domOpt['type'];
 	            // data sanity should be checked, domOpts not changed then just update position!
 	            var dom = this.doms[i * 3] || document.createElement("div"),
 	                line = this.doms[i * 3 + 1] || document.createElement("div"),
 	                dot = this.doms[i * 3 + 2] || document.createElement("div");
-	            preStyleEles(line, dot, dom, pix, chartType);
+	            preStyleEles(line, dot, dom, pix, chartType || resources);
 
 	            var dataClone = _util2.default.deepClone(chartData);
 	            // handle different typesof domOverlay.
 	            if (resources != undefined) {
-	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
-	                _util2.default.setResource(dom, resources);
+	                dom.title = domOpt['content'] || '';
+	                if (!dom.hasChildNodes() || dom.firstChild.src !== resources[0]) {
+	                    _util2.default.setResource(dom, resources);
+	                }
 	            } else if (iconName != undefined) {
 	                dom.innerHTML = (domOpt['content'] || '') + '</br>';
 	                _util2.default.setIconDiv(dom, iconName);
@@ -3464,8 +3469,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	            if (this.doms[i * 3] == undefined) {
 	                var _doms;
 
-	                dom.className = 'dom-popup ' + moveClass;
-	                console.warn('add ' + moveClass + ' css to dom.');
+	                dom.className = 'dom-popup ' + domStyle;
+	                line.className = dot.className = 'dom-ele ' + domStyle;
+	                console.warn('add ' + domStyle + ' css to dom.');
 	                this.domContainer.appendChild(dom);
 	                this.domContainer.appendChild(line);
 	                this.domContainer.appendChild(dot);
@@ -3475,20 +3481,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	}
 
+	/**
+	 *  ___________
+	 * |chart/img  |   main popup. /// It is key topic to place popup align.
+	 *  -----------
+	 *       |         line/triangle.. (should implement by psuedoClass!)
+	 *       。         point..
+	 * chartWidth always 2*chartHeight if using Chart.js
+	 */
 	function preStyleEles(line, dot, dom, pix, chartType) {
+	    var isImg = Array.isArray(chartType);
 	    line.style.height = lineHeight - 10 + 'px';
 	    line.style.width = '1px';
 	    line.style.position = "absolute";
 	    dot.style.borderRadius = '50%';
 	    dot.style.width = dot.style.height = dotRadius * 2 + 'px';
 	    dot.style.position = "absolute";
-
 	    dom.style.position = "absolute";
+	    if (!chartType) {
+	        dom.style.minWidth = "100px"; // consistant with chart/image dom width/height.
+	    }
 	    dom.style.background = "#fff";
-	    dom.style.padding = '5px';
-	    // set domOverlay position. dom box animation needed.
-	    dom.style.left = pix[0] - (chartType ? chartHeight : 0) + "px";
-	    dom.style.top = pix[1] - lineHeight - (chartType ? chartHeight : 0) + "px";
+	    dom.style.textAlign = "center";
+	    dom.style.padding = '3px';
+	    // if has chartType, display chart above vertical line.
+	    dom.style.left = pix[0] - (isImg ? chartHeight / 2 : chartHeight) + "px";
+	    dom.style.top = pix[1] - lineHeight - (chartType ? chartHeight : 20) + "px";
 	}
 
 	function styleChartContainer(dom) {
@@ -3687,6 +3705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	'use strict';
 
 	module.exports = rbush;
+	module.exports.default = rbush;
 
 	var quickselect = __webpack_require__(36);
 
@@ -3776,7 +3795,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return this;
 	        }
 
-	        // recursively build the tree with the given data from stratch using OMT algorithm
+	        // recursively build the tree with the given data from scratch using OMT algorithm
 	        var node = this._build(data.slice(), 0, data.length - 1, 0);
 
 	        if (!this.data.children.length) {

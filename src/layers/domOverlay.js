@@ -67,7 +67,7 @@ export class DomOverlayer extends Overlayer {
 }
 
 
-const lineHeight = 100, dotRadius = 4, chartHeight = 60;
+const lineHeight = 60, dotRadius = 4, chartHeight = 60;
 /**
  * domOverlay register&render above default canvas..
  * keep in absolute geolocation..
@@ -84,19 +84,21 @@ function _redraw() {
                 pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
             let iconName = domOpt['icon'], resources = domOpt['resources'], 
-                moveClass = domOpt['class']? domOpt['class'] + ' animated': 'bounceIn animated',
+                domStyle = domOpt['style']? domOpt['style'] + ' animated': 'bounceIn animated',
                 chartData = domOpt['data'], chartType = domOpt['type'];
             // data sanity should be checked, domOpts not changed then just update position!
             let dom = this.doms[i*3] || document.createElement("div"),
                 line = this.doms[i*3+1] ||document.createElement("div"),
                 dot =this.doms[i*3+2] || document.createElement("div");
-            preStyleEles(line, dot, dom, pix, chartType);
+            preStyleEles(line, dot, dom, pix, chartType||resources);
 
             let dataClone = Util.deepClone(chartData);
             // handle different typesof domOverlay.
             if (resources != undefined) {
-                dom.innerHTML = (domOpt['content'] || ``) + '</br>';
-                Util.setResource(dom, resources);
+                dom.title = (domOpt['content'] || ``);
+                if (!dom.hasChildNodes() || dom.firstChild.src !== resources[0]) {
+                    Util.setResource(dom, resources);
+                }
             } else if (iconName != undefined) {
                 dom.innerHTML = (domOpt['content'] || ``) + '</br>';
                 Util.setIconDiv(dom, iconName);
@@ -119,8 +121,9 @@ function _redraw() {
 
             // add dom to container at init process.
             if (this.doms[i*3] == undefined) {
-                dom.className = `dom-popup ${moveClass}`;
-                console.warn(`add ${moveClass} css to dom.`)
+                dom.className = `dom-popup ${domStyle}`;
+                line.className = dot.className = `dom-ele ${domStyle}`
+                console.warn(`add ${domStyle} css to dom.`)
                 this.domContainer.appendChild(dom);
                 this.domContainer.appendChild(line);
                 this.domContainer.appendChild(dot);
@@ -130,20 +133,32 @@ function _redraw() {
     }
 }
 
+/**
+ *  ___________
+ * |chart/img  |   main popup. /// It is key topic to place popup align.
+ *  -----------
+ *       |         line/triangle.. (should implement by psuedoClass!)
+ *       。         point..
+ * chartWidth always 2*chartHeight if using Chart.js
+ */
 function preStyleEles(line, dot, dom, pix, chartType) {
+    const isImg = Array.isArray(chartType);
     line.style.height = lineHeight - 10 + 'px';
     line.style.width = '1px';
     line.style.position = "absolute";
     dot.style.borderRadius = '50%';
     dot.style.width = dot.style.height = dotRadius * 2 + 'px';
     dot.style.position = "absolute";
-
     dom.style.position = "absolute";
+    if (!chartType) {
+        dom.style.minWidth = "100px"; // consistant with chart/image dom width/height.
+    }
     dom.style.background = "#fff";
-    dom.style.padding = '5px';
-    // set domOverlay position. dom box animation needed.
-    dom.style.left = (pix[0] - (chartType ? chartHeight : 0)) + "px";
-    dom.style.top = (pix[1] - lineHeight - (chartType ? chartHeight : 0)) + "px";
+    dom.style.textAlign = "center";
+    dom.style.padding = '3px';
+    // if has chartType, display chart above vertical line.
+    dom.style.left = (pix[0] - (isImg? chartHeight/2: chartHeight)) + "px";
+    dom.style.top = (pix[1] - lineHeight - (chartType? chartHeight : 20)) + "px";
 }
 
 function styleChartContainer(dom) {

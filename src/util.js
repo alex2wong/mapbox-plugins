@@ -117,11 +117,14 @@ export default class util {
             let filetype = this.getFiletype(res[i]);
             if (filetype !== "") {
                 let ele = document.createElement(filetype);
-                ele.style.height = '150px';
-                ele.style.width = 'auto';
+                ele.style.width = ele.style.height = dom.style.width = dom.style.height = '60px';
+                ele.style.borderRadius = "50%";
                 ele.src = res[i];
-                ele.setAttribute('autoplay', true);
+                dom.style.borderRadius = "50%";
                 dom.appendChild(ele);
+            } 
+            if (filetype == 'video') {
+                ele.setAttribute('autoplay', true);
             }
         }
     }
@@ -197,7 +200,7 @@ export default class util {
             let image = new Image();
             image.onload = resolve;
             image.onerror = reject;
-            image.src = path;
+            image.src = url;
         })
     }
 

@@ -1,13 +1,14 @@
 // import * as Alex from '../../src/index';
 
 var data = null;
-var mapCenter = [121.470, 31.165];
+// var mapCenter = [121.470, 31.165];
+var mapCenter = [-4.534, 39.749];
 var animation = null;
 var map = new mapboxgl.Map({
-    // style: Alex.Config.default.mapStyles,
-    style: "mapbox://styles/huangyixiu/cjbhyg80s19m42rqg0kdpkntw",
+    style: Alex.Config.default.mapStyles,
+    // style: "mapbox://styles/mapbox/dark-v9",
     center: mapCenter,
-    zoom: 10.6,
+    zoom: 7.6,
     maxzoom: 10,
     pitch: 15,
     container: 'map',
@@ -34,25 +35,23 @@ function init() {
         doms: [
         ]});
 
-    Alex.Util.getJSON(`https://api.mapbox.com/directions/v5/mapbox/driving-traffic/121.47088607666387%2C31.165132066708765%3B121.76845541758418%2C31.068959449424998.json?geometries=geojson&alternatives=true&steps=false&overview=full&access_token=${mapboxgl.accessToken}`)
+    Alex.Util.getJSON('../../assets/demo/toledo2sevilla.json')
         .then((res) => {
-                data = res.routes[0].geometry;
+                data = res.routes[0].geometry; // consider simplify data.coordinates..
                 console.log("got routes data..");
                 domLayer.setDoms([{
-                    icon: 'rocket-11',
-                    content: "start!",
-                    class: 'bounceIn',
+                    resources: ['https://wx2.sinaimg.cn/mw690/4507b64aly1fom2fkkywkj218w0u0b29.jpg'],
+                    content: "西班牙-托莱多",
                     lon: data.coordinates[0][0],
                     lat: data.coordinates[0][1]
                 }]);
-                update();
+                setTimeout(update, 500);
         });
     
     function update(){
-        animateLine(data);
         animation = requestAnimationFrame(update);
+        animateLine(data); // first rerender.. then register next frame function.
     }
-    // update();
 
     /**
      * animate routes from start to end.
@@ -67,12 +66,13 @@ function init() {
             canvasLayer.redraw(arr2objs(data.coordinates[currentIndex + 1]));
         } else {
             domLayer.setDoms(domLayer.domOpts.slice(0,1).concat({
-                icon: 'rocket-11',
-                content: "destination!",
+                resources: ['https://wx4.sinaimg.cn/mw690/4507b64aly1fmjnc9rqqaj21kw11tu0z.jpg'],
+                content: "塞维利亚",
                 lon: data.coordinates[segmentNum-1][0],
                 lat: data.coordinates[segmentNum-1][1]
             }));
-            canvasLayer.setTracks([]);
+            // cancelAnimationFrame(animation)
+            canvasLayer.setTracks([]); // restart route animation
         }
     }
 

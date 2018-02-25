@@ -60,14 +60,14 @@ map.on('load', function() {
             {
                 icon: 'rocket-11',
                 content: "This is domOverlay",
-                class: 'bounceIn',
+                class: 'fadeIn',
                 lon: mapCenter[0],
                 lat: mapCenter[1]
             },
             {
                 resources: ['https://wx1.sinaimg.cn/mw690/4507b64aly1fmju1qfe03j21kw11t7wj.jpg'],
                 content: "ready to load picture",
-                class: 'bounceInUp',
+                class: 'bounceIn',
                 lon: mapCenter[0]-1.5,
                 lat: mapCenter[1]-1.5
             }
@@ -81,7 +81,7 @@ function init() {
     function addDoms() {
         domLayer.setDoms(domLayer.domOpts.concat({
             content: "new add pop",
-            class: 'bounceIn',
+            class: 'fadeIn',
             lon: mapCenter[0] + (Math.random()*6 - 3),
             lat: mapCenter[1] + (Math.random()*6 - 3)
         }));
