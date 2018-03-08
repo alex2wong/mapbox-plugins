@@ -5,8 +5,8 @@ var data = null;
 var mapCenter = [-4.534, 39.749];
 var animation = null;
 var map = new mapboxgl.Map({
-    style: Alex.Config.default.mapStyles,
-    // style: "mapbox://styles/mapbox/dark-v9",
+    // style: Alex.Config.default.mapStyles,
+    style: "mapbox://styles/huangyixiu/cjeijjf6x0u3l2soy45dc0mw7",
     center: mapCenter,
     zoom: 7.6,
     maxzoom: 10,

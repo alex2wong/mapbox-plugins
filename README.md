@@ -6,9 +6,15 @@ https://alex2wong.github.io/mapbox-plugins/
 
 Note: pls visit all demo with **HTTPS**..
 
-![DEMO screenshot](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/ss.gif)
+![Point animation](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/point.gif)
 
-![Sprite track screenshot](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/sprite_demo.png)
+![Custom popup/Route animation](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/popup.gif)
+
+![Chartjs integration](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/chart.gif)
+
+![Glow animation](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/glow.gif)
+
+![Rbush demo](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/rbush.gif)
 
 ## Online demo
 [placeholder]:p
@@ -20,6 +26,8 @@ Note: pls visit all demo with **HTTPS**..
 | [R-tree search (5000 rectangles) DEMO](https://alex2wong.github.io/mapbox-plugins/examples/rbush) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/rbush) |
 | [Global Wind Layer. render 1w point animation with Canvas](https://alex2wong.github.io/mapbox-plugins/examples/windLayer) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/windLayer) |
 | [Integrate with Chart.js](https://alex2wong.github.io/mapbox-plugins/examples/chartlayer)  | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/chartlayer) |
+| [Glow animation](https://alex2wong.github.io/mapbox-plugins/examples/glowstyle) | [view code]
+(https://github.com/alex2wong/mapbox-plugins/tree/master/examples/glowstyle) |
 | [(NEW) Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/line_animation) |
 
 
