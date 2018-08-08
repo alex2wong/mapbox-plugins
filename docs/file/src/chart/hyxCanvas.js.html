@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/chart/hyxCanvas.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/chart/hyxCanvas.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">// hyxCanvas.js
+
+window.onload=function(){
+        var points = [];
+        logFlag = 0;
+        initCanvas();
+        /*inter = setInterval(function(){
+            var newPoint = Math.random()*200;
+            if(points.length&gt;60){
+                points.shift();
+            }
+            points.push(newPoint);
+            drawLines(points);
+
+        },1000);
+        clearInterval(inter);*/
+    }
+
+    canvWidth = 600;
+    canvHeight = 400;   
+    (function gl(){
+        g = &quot;aaa&quot;;        
+        env = 11;
+        val = 22;
+        container = null;
+        getVal = function (){
+            return val;
+        }
+    })();
+    //&#x533F;&#x540D;&#x51FD;&#x6570;&#x4E2D;&#x7684;&#x5168;&#x5C40;&#x53D8;&#x91CF;&#x81EA;&#x52A8;&#x9644;&#x52A0;&#x4E3A; window&#x7684;&#x5C5E;&#x6027;&#xFF08;window&#x4EE3;&#x8868;&#x7A97;&#x4F53;&#xFF0C;&#x5305;&#x542B;location&#xFF0C;history&#xFF09;
+
+    function gele(id){
+        return document.getElementById(id);
+    }
+
+    function local(name,age){
+        this.name = name;
+        this.age = age;
+        return this;
+    }
+    //&#x7ED8;&#x5236;&#x76F4;&#x7EBF;&#x548C;&#x66F2;&#x7EBF;&#x8DEF;&#x5F84; beginPath()&#x5F00;&#x59CB;&#x65B0;&#x8DEF;&#x5F84; moveTo()&#x8BBE;&#x5B9A;&#x8D77;&#x70B9; lineTo()&#x76F4;&#x7EBF; arcTo()
+    function initCanvas(){
+        //var container = document.createElement(&apos;canvas&apos;);
+        container = gele(&quot;canv&quot;);
+        container.width = canvWidth;
+        container.height = canvHeight;
+        
+        ctx = container.getContext(&apos;2d&apos;);
+        ctx.strokeStyle = &quot;#03A9F4&quot;;
+        ctx.lineWidth = 1;
+                
+    }    
+    //var inter = setInterval(drawRect,1000);
+    //inter.clear();
+
+    var drawRect = function(){
+        //&#x6E05;&#x9664;&#x4E0A;&#x6B21;&#x7684;&#x7ED3;&#x679C;
+        clearCanv();
+        //&#x5B9A;&#x4E49;&#x968F;&#x673A;&#x989C;&#x8272;&#x586B;&#x5145;
+        //ctx.fillStyle = randRgba();
+        ctx.fillStyle = &quot;#03A9F4&quot;;
+        var barX = -10, barHeight;
+        for (var i = 18; i &gt;= 0; i--) {
+            barX += 30;
+            barHeight = Math.random()*-200;
+            //ctx.strokeRect(barX,canvHeight,20, barHeight);
+            ctx.fillRect(barX,canvHeight,20, barHeight);
+        }        
+    }
+
+    // &#x7ED8;&#x5236;&#x7EBF; &#x6BD4;&#x8F83;&#x7279;&#x522B;&#xFF0C;&#x4E00;&#x6BB5;&#x6298;&#x7EBF;&#x9700;&#x8981;&#x4E00;&#x4E2A;&#x8D77;&#x59CB;&#x70B9;&#x3002;&#x7528;moveTo&#x6307;&#x5B9A;&#x8D77;&#x59CB;&#x70B9;&#x3002;
+    // &#x9700;&#x8981;&#x4F20;&#x5165;&#x4E00;&#x4E2A;&#x70B9;&#x6570;&#x636E;&#x8FDB;&#x5165;&#x961F;&#x5217;&#xFF0C;var 
+    function drawLine(){
+        clearCanv();
+        //&#x5B9A;&#x4E49;&#x968F;&#x673A;&#x989C;&#x8272;&#x586B;&#x5145;
+        ctx.beginPath();
+        ctx.strokeStyle = &quot;#03A9F4&quot;;
+        //&#x5B9A;&#x4E49;&#x7EBF;&#x6761;&#x5BBD;&#x5EA6;&#xFF08;&#x50CF;&#x7D20;&#xFF09;
+        ctx.lineWidth = 2;
+        var pointX = 20, pointY = Math.random()*200;
+        ctx.moveTo(pointX, pointY);
+        for (var i = 18; i &gt;= 0; i--) {
+            pointX += 30;
+            pointY = Math.random()*200;
+            ctx.lineTo(pointX,pointY);            
+        }
+        //&#x95ED;&#x5408;&#x66F2;&#x7EBF;&#xFF0C;&#x53EF;&#x4EE5;&#x586B;&#x5145;&#x4E3A;&#x591A;&#x8FB9;&#x5F62;&#x3002;
+        //ctx.closePath();
+        ctx.stroke();
+    }
+
+    //&#x9488;&#x5BF9;&#x6D41;&#x6570;&#x636E;&#x7684;&#x5C55;&#x793A;&#xFF0C;&#x4ECE;&#x6700;&#x540E;&#x4E00;&#x4E2A;&#x70B9;&#x5F00;&#x59CB;&#x7ED8;&#x5236;&#x3002;
+    function drawLines(points){
+        clearCanv();
+        ctx.beginPath();
+        ctx.lineStyle = &quot;#03A9F4&quot;;
+        ctx.lineWidth =2;
+        var pointX = canvWidth;
+        if( points instanceof Array ){
+            var pnums = points.length;
+            var pointY = points[pnums-1];
+            ctx.moveTo(pointX, pointY);
+            for (var i = points.length - 2; i &gt;= 0; i--) {
+                pointY = points[i];
+                pointX -= 10;
+                ctx.lineTo(pointX, pointY);
+            }
+            ctx.stroke();
+        }
+    }
+
+    function deg2rad(deg){
+        return deg * Math.PI / 180;
+    }
+    function rad2deg(rad){
+        return rad * 180 / Math.PI;
+    }
+
+    //arc &#x7ED8;&#x5236;&#x5F27;&#x7EBF;&#x3002;
+    function drawArc(){
+        //arc(x,y,radius,startAngle,endAngle,anticlockwise)
+        var endAgle = 0.0;
+        //&#x5F00;&#x59CB;&#x4E00;&#x4E2A;&#x65B0;&#x7684;&#x7ED8;&#x5236;&#x8DEF;&#x5F84;
+        ctx.beginPath();
+        ctx.strokeStyle = &quot;blue&quot;;
+        //ctx.moveTo(x, 190);
+        endAgle +=(2 * Math.PI)/5;
+        ctx.arc(50,50,50,0,Math.PI/2,false);
+        ctx.stroke();        
+    }
+    //drawArc();
+
+    var randColor =  function(){
+
+        var hexR = Math.floor( Math.random()*255).toString(16);
+        var hexG = Math.floor( Math.random()*255).toString(16);
+        var hexB = Math.floor( Math.random()*255).toString(16);
+        return &quot;#&quot;+ hexR +hexG +hexB;
+    }
+
+    // &#x51FD;&#x6570;&#x8868;&#x8FBE;&#x5F0F;&#xFF0C;&#x5FC5;&#x987B;&#x5728;&#x8C03;&#x7528;&#x524D;&#x58F0;&#x660E;&#x3002;
+    var randRgba = function (){
+        var decR = Math.floor( Math.random()*255);
+        var decG = Math.floor( Math.random()*255);
+        var decB = Math.floor( Math.random()*255);
+        return &quot;rgba(&quot; + decR + &quot;,&quot; + decG + &quot;,&quot; + decB + &quot;,&quot; + &quot;0.5)&quot;;
+    }
+
+    // &#x51FD;&#x6570;&#x58F0;&#x660E;&#xFF0C;&#x5728;&#x6309;&#x987A;&#x5E8F;&#x6267;&#x884C;JS&#x4EE3;&#x7801; &#x4E4B;&#x524D;&#x5C31;&#x89E3;&#x6790;&#x3002;
+    function drawPoint(x, y, width){
+        if (typeof x == &quot;number&quot; &amp;&amp; typeof y == &quot;number&quot;){
+            ctx.beginPath();
+            //&#x5B9A;&#x4E49;&#x968F;&#x673A;&#x989C;&#x8272;&#x8FB9;&#x7EBF; randRgba();
+            ctx.strokeStyle = &quot;rgba(255,255,255,0.7)&quot;;
+            ctx.fillStyle = &quot;rgba(10,10,200,0.5)&quot;;
+            ctx.strokeWidth = 1;
+            if (typeof arguments[2] == &quot;undefined&quot;){
+                var width = 4;
+            }
+            ctx.arc(x, y, width, 0, Math.PI*2, false);
+            //ctx.stroke();
+            ctx.fill();
+        }
+        else return;
+    }
+
+    //&#x968F;&#x673A;&#x751F;&#x6210; &#x6CE1;&#x6CE1;&#x70B9;
+    function randPoint(nums){
+        if(typeof nums == &quot;number&quot;){
+            clearCanv()
+            var pointX, pointY;
+            for (var i = nums - 1; i &gt;= 0; i--) {
+                pointX = Math.random()*canvWidth;
+                pointY = Math.random()*canvHeight;
+                radius = Math.random()*10;
+                drawPoint(pointX, pointY, radius);
+            };            
+        }
+
+    }
+    function clearCanv(){
+        ctx.clearRect(0,0,canvWidth,canvHeight);
+    }</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

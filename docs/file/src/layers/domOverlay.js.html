@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/layers/domOverlay.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/layers/domOverlay.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Overlayer from &apos;./overlay&apos;;
+import Util from &apos;../util&apos;;
+
+const duration = 1200;
+
+/**
+ * initDomOverlayer
+ */
+export class DomOverlayer extends Overlayer {
+    constructor(opts) {
+        super(opts);
+        this.domContainer = this._init();
+        this.redraw = _redraw.bind(this);
+        this.domOpts = opts.doms;  // store dom config
+        if (opts &amp;&amp; opts.map) {
+            this.setMap(opts.map);
+            // bind render doms to each move..performance to be promoted.
+            opts.map.on(&quot;move&quot;, this.redraw);
+        }
+        this.doms = []; // store dom elements.
+        this.lastData = [];
+        this.redraw();
+        console.log(&quot;Dom overlayer add to Map...&quot;);
+    }
+
+    _init() {
+        let canvasContainer = this.map._canvasContainer,
+            mapboxCanvas = this.map._canvas,
+            domContainer = document.createElement(&quot;div&quot;);
+        domContainer.style.position = &quot;absolute&quot;;
+        domContainer.className = &quot;overlay-dom&quot;;
+        domContainer.style.width = mapboxCanvas.style.width;
+        domContainer.style.height = &apos;0&apos;;
+        canvasContainer.parentElement.appendChild(domContainer);
+        return domContainer;
+    }
+
+    /**
+     * updateDoms and redraw..
+     */
+    setDoms(Doms) {
+        if (Array.isArray(Doms)) {
+            this.domOpts = Doms;
+            this.clearDoms();
+            this.redraw();
+        }
+    }
+
+    findDom(domId) {
+        for(let i = 0;i&lt;this.doms.length;i++) {
+            try {
+                if (this.doms[i] === domId) {
+                    return this.doms[i];
+                }
+            } catch (error) {
+
+            }
+        }
+    }
+
+    clearDoms() {
+        for(let i = 0;i&lt;this.doms.length;i++) {
+            this.domContainer.removeChild(this.doms[i]);         
+        }
+        this.doms = [];
+    }
+}
+
+
+const lineHeight = 60, dotRadius = 4, chartHeight = 60;
+/**
+ * domOverlay register&amp;render above default canvas..
+ * keep in absolute geolocation..
+ */
+function _redraw() {
+    let doms = this.domOpts;
+    if (doms &amp;&amp; Array.isArray(doms)) {
+        // append each of domPopups to domContainer.
+        for (let i=0;i&lt;doms.length;i++) {
+            let domOpt = doms[i];
+            if (typeof domOpt == undefined) continue;
+            // let sanity = Util.checkSanity(this.lastDoms[i], domOpt);
+            let x = domOpt[&apos;lon&apos;], y = domOpt[&apos;lat&apos;], 
+                pix = this.lnglat2pix(x, y);
+            if (pix == null) continue;
+            let iconName = domOpt[&apos;icon&apos;], resources = domOpt[&apos;resources&apos;], 
+                domStyle = domOpt[&apos;style&apos;]? domOpt[&apos;style&apos;] + &apos; animated&apos;: &apos;bounceIn animated&apos;,
+                chartData = domOpt[&apos;data&apos;], chartType = domOpt[&apos;type&apos;];
+            // data sanity should be checked, domOpts not changed then just update position!
+            let dom = this.doms[i*3] || document.createElement(&quot;div&quot;),
+                line = this.doms[i*3+1] ||document.createElement(&quot;div&quot;),
+                dot =this.doms[i*3+2] || document.createElement(&quot;div&quot;);
+            preStyleEles(line, dot, dom, pix, chartType||resources);
+
+            let dataClone = Util.deepClone(chartData);
+            // handle different typesof domOverlay.
+            if (resources != undefined) {
+                dom.title = (domOpt[&apos;content&apos;] || ``);
+                if (!dom.hasChildNodes() || dom.firstChild.src !== resources[0]) {
+                    Util.setResource(dom, resources);
+                }
+            } else if (iconName != undefined) {
+                dom.innerHTML = (domOpt[&apos;content&apos;] || ``) + &apos;&lt;/br&gt;&apos;;
+                Util.setIconDiv(dom, iconName);
+            } else if (chartData != undefined &amp;&amp; chartType != undefined) {
+                if (Util.isChanged(this.lastData[i], chartData)) {
+                    // setChart would contaminate input Data.
+                    Util.setChart(dom, dataClone, chartType, chartHeight*2);
+                    this.lastData[i] = chartData;
+                }
+            } else {
+                dom.innerHTML = (domOpt[&apos;content&apos;]|| &apos;&apos;) + &apos;&lt;/br&gt;&apos;;
+            }
+            if (chartType != undefined) styleChartContainer(dom)
+
+            line.className = &quot;dom-ele&quot;, dot.className = &quot;dom-ele&quot;;
+            line.style.left = pix[0] + &quot;px&quot;;
+            line.style.top = (pix[1] - (lineHeight - 10)) + &quot;px&quot;;
+            dot.style.left = pix[0] - dotRadius + &quot;px&quot;;
+            dot.style.top = pix[1] - dotRadius + &quot;px&quot;;
+
+            // add dom to container at init process.
+            if (this.doms[i*3] == undefined) {
+                dom.className = `dom-popup ${domStyle}`;
+                line.className = dot.className = `dom-ele ${domStyle}`
+                console.warn(`add ${domStyle} css to dom.`)
+                this.domContainer.appendChild(dom);
+                this.domContainer.appendChild(line);
+                this.domContainer.appendChild(dot);
+                this.doms.push(...[dom, line, dot]);
+            }
+        }
+    }
+}
+
+/**
+ *  ___________
+ * |chart/img  |   main popup. /// It is key topic to place popup align.
+ *  -----------
+ *       |         line/triangle.. (should implement by psuedoClass!)
+ *       &#x3002;         point..
+ * chartWidth always 2*chartHeight if using Chart.js
+ */
+function preStyleEles(line, dot, dom, pix, chartType) {
+    const isImg = Array.isArray(chartType);
+    line.style.height = lineHeight - 10 + &apos;px&apos;;
+    line.style.width = &apos;1px&apos;;
+    line.style.position = &quot;absolute&quot;;
+    dot.style.borderRadius = &apos;50%&apos;;
+    dot.style.width = dot.style.height = dotRadius * 2 + &apos;px&apos;;
+    dot.style.position = &quot;absolute&quot;;
+    dom.style.position = &quot;absolute&quot;;
+    if (!chartType) {
+        dom.style.minWidth = &quot;100px&quot;; // consistant with chart/image dom width/height.
+    }
+    dom.style.background = &quot;#fff&quot;;
+    dom.style.textAlign = &quot;center&quot;;
+    dom.style.padding = &apos;3px&apos;;
+    // if has chartType, display chart above vertical line.
+    dom.style.left = (pix[0] - (isImg? chartHeight/2: chartHeight)) + &quot;px&quot;;
+    dom.style.top = (pix[1] - lineHeight - (chartType? chartHeight : 20)) + &quot;px&quot;;
+}
+
+function styleChartContainer(dom) {
+    dom.style.borderWidth = &apos;0&apos;;
+    dom.style.zIndex = 9999;
+    dom.style.backgroundColor = &apos;rgba(0,0,0,0.0)&apos;;
+}
+
+function animLine (line){
+    line.className = &quot;dom-line&quot;;    
+}
+
+const htmlTemplate = {
+
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

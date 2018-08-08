@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/layers/canvasOverlay.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/layers/canvasOverlay.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Overlayer from &apos;./overlay&apos;;
+
+/**
+ * initCanvasOverlayer based on mapboxgl-canvas
+ */
+export class CanvasOverlayer extends Overlayer {
+    constructor(opts) {
+        let _opts = opts || {};
+        super(_opts);
+        this.canvas = this._init();
+        this.redraw = _redraw.bind(this);
+        // how to deconstruct opts to this if we need defaultValue.
+        this.labelOn = _opts.labelOn || false;
+        this.xfield = _opts.xfield || &apos;lon&apos;;
+        this.yfield = _opts.yfield || &apos;lat&apos;;
+        this.shadow = _opts.shadow != undefined? _opts.shadow : false;
+        this.lineColor = _opts.lineColor;
+        this.blurWidth = _opts.blurWidth != undefined? _opts.blurWidth: 4;
+        this.keepTrack = _opts.keepTrack != undefined? _opts.keepTrack : false;
+        if (this.keepTrack) {
+            // create trackLayer to render history track lines..
+            this.trackLayer = this._init();
+            this._initTrackCtx();
+        }
+        this.tracks  = [];
+        this.initTrackCtx = this._initTrackCtx.bind(this);
+        if (_opts &amp;&amp; _opts.map) {
+            this.setMap(_opts.map);
+            // &#x7ED1;&#x5B9A;&#x6BCF;&#x6B21;move &#x90FD;&#x91CD;&#x7ED8;doms..
+            _opts.map.on(&quot;move&quot;, () =&gt; {
+                this.redrawTrack();
+            });
+        }
+    }
+
+    _init(shadow=false,keepTrack=false) {
+        let canvasContainer = this.map._canvasContainer,
+            mapboxCanvas = this.map._canvas,
+            canvasOverlay = document.createElement(&quot;canvas&quot;);
+        canvasOverlay.style.position = &quot;absolute&quot;;
+        canvasOverlay.className = &quot;overlay-canvas&quot;;
+        canvasOverlay.width = parseInt(mapboxCanvas.style.width);
+        canvasOverlay.height = parseInt(mapboxCanvas.style.height);
+        canvasContainer.appendChild(canvasOverlay);
+        return canvasOverlay;
+    }
+
+    /**
+     * init track ctx for each track segment rendering..
+     */
+    _initTrackCtx() {
+        if(this.trackLayer) {
+            this.trackCtx = this.trackLayer.getContext(&quot;2d&quot;);
+            this.movedTo = false;
+            initCtx(this.trackCtx, this.blurWidth,&quot;rgba(255,255,255,.4&quot;);
+            this.trackCtx.lineWidth = this.lineWidth || 3;
+            this.trackCtx.strokeStyle = this.lineColor || &quot;rgba(255,255,20,.6)&quot;;
+            this.trackCtx.beginPath();
+        }
+    }
+
+    /**
+     * set tracks coordinates of overlayer.
+     * @param {*array of track points.} tracks 
+     */
+    setTracks(tracks) {
+        if (Array.isArray(tracks)) {
+            this.tracks = tracks;
+            return this;
+        }
+    }
+
+    getTracks() {
+        return this.tracks;
+    }
+
+    /**
+     * render cached tracks to line when map moved..
+     */
+    redrawTrack() {
+        if(this.trackCtx &amp;&amp; this.tracks &amp;&amp; this.tracks.length &gt; 0) {
+            let pix = [0, 0];
+            this.trackCtx.clearRect(0,0,this.trackLayer.width, this.trackLayer.height);
+            this.trackCtx.beginPath();
+            pix = this.lnglat2pix(this.tracks[0][0], this.tracks[0][1]);
+            this.trackCtx.moveTo(pix[0], pix[1]);
+            for(let i = 1; i &lt; this.tracks.length; i ++) {
+                pix = this.lnglat2pix(this.tracks[i][0], this.tracks[i][1]);
+                this.trackCtx.lineTo(pix[0], pix[1]);
+            }
+            this.trackCtx.stroke();
+        }
+    }
+}
+
+function _preSetCtx(context) {
+//&#x9ED8;&#x8BA4;&#x503C;&#x4E3A;source-over
+    let prev = context.globalCompositeOperation;
+    //&#x53EA;&#x663E;&#x793A;canvas&#x4E0A;&#x539F;&#x56FE;&#x50CF;&#x7684;&#x91CD;&#x53E0;&#x90E8;&#x5206; source-in, source, destination-in
+    context.globalCompositeOperation = &apos;destination-in&apos;;
+    //&#x8BBE;&#x7F6E;&#x4E3B;canvas&#x7684;&#x7ED8;&#x5236;&#x900F;&#x660E;&#x5EA6;
+    context.globalAlpha = 0.95;
+    //&#x8FD9;&#x4E00;&#x6B65;&#x76EE;&#x7684;&#x662F;&#x5C06;canvas&#x4E0A;&#x7684;&#x56FE;&#x50CF;&#x53D8;&#x7684;&#x900F;&#x660E;
+    // context.fillStyle = &quot;rgba(0,0,0,.95)&quot;;
+    context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+    //&#x5728;&#x539F;&#x56FE;&#x50CF;&#x4E0A;&#x91CD;&#x53E0;&#x65B0;&#x56FE;&#x50CF;
+    context.globalCompositeOperation = prev;
+}
+
+const iconSize = 32; 
+/**
+ * expoid this method, can be overwritten
+ * for special render requirements..
+ * Important ! redraw may use this.map as projector!
+ * @param: keepLog, keep render Sprites location log.. 
+ */
+function _redraw(objs) {
+    if (this.canvas) {
+        let ctx = this.canvas.getContext(&quot;2d&quot;);
+        // ctx.clearRect(0,0,canv.width, canv.height);
+        if (this.shadow) {
+            _preSetCtx(ctx);
+            ctx.save();
+        } else {
+            ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
+        }
+        initCtx(ctx,this.blurWidth,&quot;rgba(255,255,255,.4&quot;);        
+        for(let i=0;i&lt;objs.length;i++) {
+            let x = objs[i][this.xfield], y = objs[i][this.yfield], 
+                radius = objs[i][&apos;radius&apos;] || 3, icon = objs[i][&apos;icon&apos;],
+                label = objs[i][&apos;name&apos;], rotate = objs[i][&apos;direction&apos;] || 0;
+            radius = Math.abs(radius);
+            let pix = this.lnglat2pix(x, y);
+            if (pix == null) continue;
+            ctx.fillStyle = objs[i][&apos;color&apos;] || &apos;rgba(255,240,4,.9)&apos;;
+            ctx.beginPath();
+            if (label !== undefined &amp;&amp; label.startsWith(&quot;Play&quot;)) radius = iconSize*0.75;
+            // icon: ImageUrl/CanvasFunction..., clip part of img sometimes...
+            if (icon !== undefined) {
+                ctx.save();
+                ctx.translate(pix[0], pix[1]);
+                ctx.rotate(rotate*Math.PI/180);
+                let min = icon.height &gt; icon.width ? icon.width : icon.height;
+                try {
+                    ctx.drawImage(icon,0,0,min,min, -iconSize/2, -iconSize/2, iconSize, iconSize);
+                } 
+                catch (e) {
+                    console.warn(&quot;ctx.drawImage.. error.&quot;);
+                }
+                ctx.restore();
+            } else {
+                ctx.arc(pix[0], pix[1], radius, 0, Math.PI*2);
+                ctx.fill();
+            }
+            if (this.keepTrack &amp;&amp; this.tracks.length == 0) {
+                this.initTrackCtx();
+                this.trackCtx.moveTo(pix[0],pix[1]);
+                this.tracks.push([x, y]);
+                // this.movedTo = true;
+            } else if (this.trackCtx) {
+                this.trackCtx.lineTo(pix[0],pix[1]);
+                this.tracks.push([x, y]);
+                setTimeout(()=&gt;{
+                    //// closePath would auto-complete the path to polygon..
+                    this.trackCtx.stroke();
+                    this.trackCtx.beginPath();
+                    this.trackCtx.moveTo(pix[0],pix[1]);
+                }, 0);
+            }
+            if (label !== undefined &amp;&amp; this.labelOn) {
+                ctx.strokeText(label, pix[0], pix[1]);
+            }
+            // ctx.closePath();
+        }
+        if(this.shadow) {
+            ctx.restore();
+        }
+    }
+}
+
+function initCtx(ctx, blurWidth, shadowColor=&quot;rgba(255,255,255,.8)&quot;) {
+    if (ctx === undefined) return;
+    ctx.linecap = &apos;round&apos;;
+    ctx.shadowBlur = blurWidth;
+    ctx.shadowColor = shadowColor;
+    ctx.strokeStyle = &quot;rgba(255,255,255,.9)&quot;;
+    ctx.fillStyle = &quot;rgba(255,240,91,.8)&quot;;
+}
+
+/**
+ * draw tri on canvas by center and rotation..
+ * @param rotate: degree number,
+ * @param radius: number, tri radius..
+ *      /\  default beta angle is 30 degree.
+ *     /  \
+ *    /____\ 
+ * draw triangle 
+ */
+function drawTri(ctx, coord, rotate, radius=iconSize/2, beta=30) {
+    // calc the head point of triangle.
+    let headPoint = [undefined, undefined], tailPoint = [undefined, undefined],
+        rad = rotate*Math.PI/180;
+    headPoint[0] = coord[0] + Math.cos(rad)*radius;
+    headPoint[1] = coord[1] + Math.sin(rad)*radius;
+    tailPoint[0] = coord[0] - Math.cos(rad)*radius;
+    tailPoint[1] = coord[1] - Math.sin(rad)*radius;
+    let rot = (rotate - beta/2),
+        rPoint = [undefined, undefined];
+    rPoint[0] = Math.cos(rot*Math.PI/180);
+
+    ctx.lineTo(headPoint);
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

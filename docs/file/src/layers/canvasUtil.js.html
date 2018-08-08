@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/layers/canvasUtil.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/layers/canvasUtil.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">
+function drawDashLine(ctx, line) {
+    if (ctx instanceof CanvasRenderingContext2D &amp;&amp; line instanceof Array) {
+        ctx.setLineDash([10, 5]);
+        ctx.strokeStyle = &apos;rgba(0,252,100,0.6)&apos;;
+        ctx.lineWidth = 6;
+        
+        ctx.beginPath();
+        ctx.moveTo(line[0][0], line[0][1]);
+        for (let i = 1; i &lt; line.length; i += 1) {
+            ctx.lineTo(line[i][0], line[i][1]);
+        }
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
+
+function drawGradientLine(ctx, line, shadow = false) {
+    if (ctx instanceof CanvasRenderingContext2D &amp;&amp; line instanceof Array) {
+        // build gradient style
+        var gradient = ctx.createLinearGradient(0, 0, 600, 0);
+        gradient.addColorStop(0, &quot;rgba(0,255,100,0.9)&quot;);
+        gradient.addColorStop(1, &quot;rgba(255,255,255,0.1)&quot;);
+
+        if (shadow) {
+            console.warn(`enabling line shadowBlur`);
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = &apos;#0f0&apos;;
+        }
+
+        ctx.strokeStyle = gradient;
+        ctx.setLineDash([]);
+        ctx.globalAlpha = 0.9;
+        ctx.globalCompositeOperation = &apos;source-over&apos;;
+
+        // ctx.strokeStyle = &apos;green&apos;;
+        ctx.lineCap = &quot;round&quot;;  // square
+        ctx.lineJoin = &apos;round&apos;; // bevel
+        ctx.lineWidth = 6;
+
+        ctx.beginPath();
+        ctx.moveTo(line[0][0], line[0][1]);
+        for (let i = 1; i &lt; line.length; i += 1) {
+            ctx.lineTo(line[i][0], line[i][1]);
+        }
+        ctx.stroke();
+        ctx.closePath();
+    }
+}
+
+function drawArrowLine(ctx, line, enableAni = false) {
+    if (ctx instanceof CanvasRenderingContext2D &amp;&amp; line instanceof Array) {
+        
+            // ctx.fillRect(0, 0, 600, 400);
+            setLineStyle(ctx);
+
+            ctx.beginPath();
+            ctx.moveTo(line[0][0], line[0][1]);
+            for (let i = 1; i &lt; line.length; i += 1) {
+                ctx.lineTo(line[i][0], line[i][1]);
+            }
+            ctx.stroke();
+            ctx.closePath();
+
+        function drawArrows() {
+            let aniOffset = .2;        
+            aniOffset = aniOffset &lt; 1 ? aniOffset + .01 : .2;
+            for (let i = 1; i &lt; line.length; i += 1) {
+                drawArrow(ctx, line[i-1], line[i], aniOffset); // one segment.
+            }
+            if (enableAni) requestAnimationFrame(drawArrows);
+        }
+        drawArrows();
+    }
+}
+
+function setLineStyle(ctx, shadow = false) {
+    ctx.strokeStyle = &apos;green&apos;;
+    ctx.setLineDash([]);
+    ctx.globalAlpha = 0.95;
+    ctx.globalCompositeOperation = &apos;source-over&apos;;
+    if (shadow) {
+        console.warn(`enabling line shadowBlur`);
+        ctx.shadowBlur = 4;
+        ctx.shadowColor = &apos;#0f0&apos;;
+    } else {
+        ctx.shadowBlur = 0;
+    }
+
+    // ctx.strokeStyle = &apos;green&apos;;
+    ctx.lineCap = &quot;round&quot;;  // square
+    ctx.lineJoin = &apos;round&apos;; // bevel
+    ctx.lineWidth = 12;
+}
+
+function drawArrow(ctx, startPoint, endPoint, aniOffset) {
+    ctx.beginPath();
+    ctx.strokeStyle = &apos;white&apos;;
+    ctx.lineWidth = 2;
+    
+    // arrow img: assets/up.png
+    var points = generatePoints(startPoint, endPoint, 30, ctx, aniOffset);
+    // console.warn(`draw segment arrows done... from ${startPoint.join()} to ${endPoint.join()}`);
+    // // calc left/right point.
+    // var lrPoints = calcLRPoints(point, rotate);   
+
+    ctx.closePath();
+}
+
+function generatePoints(startP, endP, stepSize = 20, ctx, aniOffset = 0.5) {
+    const radA = Math.atan((endP[1] - startP[1]) / (endP[0] - startP[0]));  // k should be transform to a in Rad.
+    const dist = calcDist(startP, endP);
+    let points = [];
+    const steps = dist / stepSize;
+
+    const drawImg = (pX, pY) =&gt; {
+        if (img &amp;&amp; ctx) {
+            ctx.save();
+            // ctx.beginPath();
+            ctx.translate(pX , pY);  // consider img position and imgWidth/Height.
+            const rotateAng = 180 * radA / Math.PI; 
+            ctx.rotate(radA);
+            // ctx.arc(0, 0, 2, 0, 2 * Math.PI);
+            ctx.drawImage(img, -img.width / 2,  -img.width/2);
+            // ctx.stroke();
+            console.warn(`drawIcon at ${pX}, ${pY}, with angle rad: ${radA}`);
+            // ctx.closePath();
+            ctx.restore();
+        }
+    }
+
+    // gen points by stepSize.. if enable corner arrow, start s with (0~1) float number.
+    for (let s = aniOffset; s &lt;= steps; s += 1) {
+        const pX = startP[0] + s * stepSize * Math.cos(radA);
+        const pY = startP[1] + s * stepSize * Math.sin(radA);
+        points.push([pX, pY]);
+        if (ctx) {
+            var img = new Image();
+            img.src = &apos;../../assets/arrow.png&apos;;
+            img.onload = function() {
+                drawImg(pX, pY);
+            }
+        }
+    }
+    return points;
+}
+
+function calcDist(startP, endP) {
+    return Math.sqrt((endP[1] - startP[1]) ** 2 + (endP[0] - startP[0]) ** 2);
+}
+
+/**
+ *      . &lt;-- center coordinate [x, y].
+ *     / \
+ *    `   ` 
+ * 
+ */
+function calcLRPoints(center, rotate) {
+    const arrawRadius = 3;
+    return center;
+}
+
+function drawGradientRect(ctx, line) {
+    
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

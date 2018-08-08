@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="mapbox-plugins--img-src--https---travis-ci-org-alex2wong-mapbox-plugins-svg-branch-master--alt--travisstatus----a-href--https---app-fossa-io-projects-git-2bgithub-com-2falex2wong-2fmapbox-plugins-ref-badge-shield---img-src--https---app-fossa-io-api-projects-git-2bgithub-com-2falex2wong-2fmapbox-plugins-svg-type-shield--alt--fossa-status----a-">mapbox-plugins <img src="https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master" alt="travisStatus"> <a href="https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_shield"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=shield" alt="FOSSA Status"></a></h1><p>Customized Mapbox plugins, including game control, canvasOverlayer, scene animation</p>
+<p><a href="https://alex2wong.github.io/mapbox-plugins/">https://alex2wong.github.io/mapbox-plugins/</a></p>
+<p>Note: pls visit all demo with <strong>HTTPS</strong>..</p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/point.gif" alt="Point animation"></p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/popup.gif" alt="Custom popup/Route animation"></p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/chart.gif" alt="Chartjs integration"></p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/glow.gif" alt="Glow animation"></p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/rbush.gif" alt="Rbush demo"></p>
+<h2 id="online-demo">Online demo</h2><table>
+<thead>
+<tr>
+<th style="text-align:left">demo title</th>
+<th style="text-align:center"></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/sprite">Sprite track DEMO</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/sprite">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/domoverlay">Custom dom overlay DEMO</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/domoverlay">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/rbush">R-tree search (5000 rectangles) DEMO</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/rbush">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/windLayer">Global Wind Layer. render 1w point animation with Canvas</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/windLayer">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/chartlayer">Integrate with Chart.js</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/chartlayer">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/glowstyle">Glow animation</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/glowstyle">view code</a></td>
+</tr>
+<tr>
+<td style="text-align:left"><a href="https://alex2wong.github.io/mapbox-plugins/examples/line_animation">(NEW) Cool Route Animation</a></td>
+<td style="text-align:center"><a href="https://github.com/alex2wong/mapbox-plugins/tree/master/examples/line_animation">view code</a></td>
+</tr>
+</tbody>
+</table>
+<h2 id="run-locally">run locally</h2><blockquote>
+<p>npm install</p>
+</blockquote>
+<blockquote>
+<p>npm start</p>
+</blockquote>
+<p>visit from localhost:8080/examples/</p>
+<h2 id="how-to-use">how to use</h2><p>plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:</p>
+<pre><code><code class="source-code prettyprint">// create a CanvasOverlayer on Mapbox map instance..
+var canvasLayer = new Alex.CanvasOverlayer({
+    map: map,
+    shadow: false,
+    keepTrack: true,
+    blurWidth: 4
+});
+
+// create a Drone inherites Sprite Class
+var drone = new Alex.Drone({
+    direction: 45,
+    icon: &quot;https://alex2wong.github.io/mapbox-plugins/assets/tri2.png&quot;
+});
+
+// add keyboard control to Sprite.
+Alex.Controllers.gameControl(drone);
+function update(){
+    drone.updateStatus();
+    // render drone on canvasLayer.
+    canvasLayer.redraw([drone]);
+    requestAnimationFrame(update);
+}
+update();
+</code>
+</code></pre><h3 id="any--strong-&#x2606;star--enhancement-and-pr--strong--are-welcome---">Any <strong>&#x2606;Star, Enhancement and PR</strong> are welcome :)</h3><h2 id="license">License</h2><p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=large" alt="FOSSA Status"></a></p>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

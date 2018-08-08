@@ -53,7 +53,7 @@ window.onload=function(){
     //var inter = setInterval(drawRect,1000);
     //inter.clear();
 
-    drawRect = function(){
+    var drawRect = function(){
         //清除上次的结果
         clearCanv();
         //定义随机颜色填充
@@ -130,7 +130,7 @@ window.onload=function(){
     }
     //drawArc();
 
-    randColor =  function(){
+    var randColor =  function(){
 
         var hexR = Math.floor( Math.random()*255).toString(16);
         var hexG = Math.floor( Math.random()*255).toString(16);
@@ -139,7 +139,7 @@ window.onload=function(){
     }
 
     // 函数表达式，必须在调用前声明。
-    randRgba = function (){
+    var randRgba = function (){
         var decR = Math.floor( Math.random()*255);
         var decG = Math.floor( Math.random()*255);
         var decB = Math.floor( Math.random()*255);

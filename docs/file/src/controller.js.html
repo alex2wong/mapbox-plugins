@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/controller.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/controller.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Drone from &apos;./drone&apos;;
+import { deprecate } from &apos;core-decorators&apos;;
+import { CanvasOverlayer} from &apos;./layers/canvasOverlay&apos;;
+
+const interval = 25;
+export default class controllers {
+    /**
+     * GameController bind with a drone instance.. 
+     * After start this controller, use WSAD to move drone.
+     */
+    static gameControl(drone) {
+        if ((drone instanceof Drone) !== true ) {
+            console.error(&quot;gameControl must bind with a drone instance.&quot;);
+            return;
+        }
+        // bind key event with drone..
+        drone.u=drone.r=drone.d=drone.l=0;onkeydown=(e)=&gt;t(e,1);onkeyup=(e)=&gt;t(e);
+        let t=(e,v,l,i)=&gt;{
+            for(i in l={u:[38,90,87],r:[39,68],d:[40,83],l:[37,65,81]})
+            if(l[i].includes(e.keyCode))
+            drone[i]=v
+        }
+        setInterval(()=&gt;{
+            if (drone.u) drone.accelerate();
+            if (drone.d) drone.brake();
+            if (drone.r) drone.turnRight();
+            if (drone.l) drone.turnLeft();
+        }, interval);
+        console.log(&quot;gameControl register success.&quot;);
+    }
+
+    /**
+     * pickupObj control, need to bind with canvasOverlay, to fetch the objs drawn
+     * each moveEnd, rebuild the pixList depend on objs in viewport!
+     * pixList&apos;s index is vital for pickUp performance.
+     */
+    static pickupControl(canvasOverlay) {
+        if (canvasOverlay instanceof CanvasOverlayer) {
+            // establish pixList storing objs&apos; location. canvasOverlay.source.lon, lat
+            let pix = canvasOverlay.lnglat2pix(canvasOverlay.source[0].lon,
+                canvasOverlay.source[1].lat);
+        }
+    }
+
+    /**
+     * Calculate bullets location based on drones.
+     */
+    static bulletCalculator(drones) {
+        if (Array.isArray(drones)) {
+            for(let i = 0;i &lt; drones.length; i ++) {
+                let curDrone = drone[i];
+                let curBullets = curDrone.bullets;
+                // Calculate bullets coords
+                if (curDrone.firing &amp;&amp; curBullets) {
+
+                } else {
+                    
+                }
+            }
+        }
+    }
+
+    
+    /**
+     * Add AI robots shooting at player..
+     * @input num: number. how many robots to create. 
+     */
+    static addRobots(num) {
+        let robot = new Drone({});
+        return robot;
+    }
+
+
+    /**
+     * Dashboard bind with a drone instance and div element... 
+     * After start this controller, use WSAD to move drone.
+     */
+    // @deprecate
+    static dashBoard(drone, ele) {
+        if ((drone instanceof Drone) !== true ) {
+            console.error(&quot;dashBoard must bind with a drone instance.&quot;);
+            return;
+        }
+        try {
+            setInterval( function(){
+                ele.innerHTML = drone.name + &quot;&lt;br&gt; coords: &quot; +
+                     drone.lon.toFixed(1) + &quot;, &quot; +
+		             drone.lat.toFixed(1) + &quot;&lt;br&gt;&quot; +
+                     &apos;speed: &apos; + drone.speed + &quot;&lt;br&gt;&quot; +
+                     &apos;direction: &apos; + (drone.direction%(360)).toFixed(1)
+            }, 200);
+
+        } catch(e) {
+            console.error(e);
+        }        
+        console.log(&quot;dashBoard register success.&quot;);
+    }
+
+    /** create refreshable features list.  */
+    static featureList(containerId) {
+        if (containerId == undefined || typeof containerId !== &quot;string&quot;) {
+            console.warn(&quot;invalid containerId..&quot;);
+            return null;
+        }
+        // var miniRefresh = new MiniRefresh({
+        //     container: &apos;#&apos; + containerId,
+        //     down: {
+        //         callback: function() {
+        //             // &#x4E0B;&#x62C9;&#x4E8B;&#x4EF6;
+        //             console.log(&quot;list dragged ..&quot;);
+        //         }
+        //     },
+        //     up: {
+
+        //         callback: function() {
+        //             // &#x4E0A;&#x62C9;&#x4E8B;&#x4EF6;
+        //         }
+        //     }
+        // });
+        // return miniRefresh;
+    }
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+[
+  {
+    "name": "drawTri",
+    "filePath": "src/layers/canvasOverlay.js",
+    "lines": [
+      {
+        "lineNumber": 189,
+        "line": "/**\r"
+      },
+      {
+        "lineNumber": 190,
+        "line": " * draw tri on canvas by center and rotation..\r"
+      },
+      {
+        "lineNumber": 191,
+        "line": " * @param rotate: degree number,\r"
+      },
+      {
+        "lineNumber": 192,
+        "line": " * @param radius: number, tri radius..\r"
+      },
+      {
+        "lineNumber": 193,
+        "line": " *      /\\  default beta angle is 30 degree.\r"
+      },
+      {
+        "lineNumber": 194,
+        "line": " *     /  \\\r"
+      },
+      {
+        "lineNumber": 195,
+        "line": " *    /____\\ \r"
+      },
+      {
+        "lineNumber": 196,
+        "line": " * draw triangle \r"
+      },
+      {
+        "lineNumber": 197,
+        "line": " */\r"
+      },
+      {
+        "lineNumber": 198,
+        "line": "function drawTri(ctx, coord, rotate, radius=iconSize/2, beta=30) {\r"
+      }
+    ],
+    "codeParams": [
+      "ctx",
+      "coord",
+      "rotate",
+      "radius",
+      "beta"
+    ],
+    "docParams": [
+      "rotate:",
+      "radius:"
+    ]
+  },
+  {
+    "name": "WindLayer#updateWind",
+    "filePath": "src/layers/windLayer.js",
+    "lines": [
+      {
+        "lineNumber": 14,
+        "line": "    /**\r"
+      },
+      {
+        "lineNumber": 15,
+        "line": "     * render particles based on image\r"
+      },
+      {
+        "lineNumber": 16,
+        "line": "     * @param {*grid wind image} image \r"
+      },
+      {
+        "lineNumber": 17,
+        "line": "     */\r"
+      },
+      {
+        "lineNumber": 18,
+        "line": "    updateWind(image, geojson, compressRatio) {\r"
+      }
+    ],
+    "codeParams": [
+      "image",
+      "geojson",
+      "compressRatio"
+    ],
+    "docParams": [
+      "image"
+    ]
+  },
+  {
+    "name": "util.setResource",
+    "filePath": "src/util.js",
+    "lines": [
+      {
+        "lineNumber": 108,
+        "line": "    /**\r"
+      },
+      {
+        "lineNumber": 109,
+        "line": "     * add img, video element to domContainer.\r"
+      },
+      {
+        "lineNumber": 110,
+        "line": "     * @param {*domEle} dom, dom container..\r"
+      },
+      {
+        "lineNumber": 111,
+        "line": "     * @param {*Array} res, urls of img/video loaded to dom. \r"
+      },
+      {
+        "lineNumber": 112,
+        "line": "     */\r"
+      },
+      {
+        "lineNumber": 113,
+        "line": "    static setResource(dom, res) {\r"
+      }
+    ],
+    "codeParams": [
+      "dom",
+      "res"
+    ],
+    "docParams": [
+      "dom,",
+      "res,"
+    ]
+  }
+]

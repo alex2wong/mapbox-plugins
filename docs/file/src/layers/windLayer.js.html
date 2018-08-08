@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/layers/windLayer.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/layers/windLayer.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import {CanvasOverlayer} from &apos;./canvasOverlay&apos;;
+
+/**
+ * initWindlayer based on mapboxgl-canvas
+ */
+export class WindLayer extends CanvasOverlayer {
+    constructor(opts) {
+        let _opts = opts || {};
+        super(_opts);
+        this.windImage = _opts.image || new Image();
+        this.radius = _opts.radius || 2; 
+        // this.redraw = _redraw.bind(this);
+    }
+    
+    /**
+     * render particles based on image
+     * @param {*grid wind image} image 
+     */
+    updateWind(image, geojson, compressRatio) {
+        let canvas = this.canvas, pix2render = [],
+            ctx = this.canvas.getContext(&quot;2d&quot;);
+        if (this.particles == undefined) {
+            console.log(&quot;generating particles...&quot;);
+            this.particles = genParticles(image, geojson, compressRatio, this.radius);
+        }
+        // ctx.globalAlpha = 0.95;
+        if (!geojson) {
+            console.log(&quot;generating particles complete! num: &quot; + this.particles.length);
+            this.redraw(this.particles);
+        } else {
+            // wind data should be rendered as mapboxgl vector.
+            console.log(&quot;generating particles complete! num: &quot; + this.particles.features.length + &quot; in geojson.&quot;);
+        }
+    }
+}
+
+function _redraw() {
+    // this.particles
+}
+
+/**
+ * generate particles based on got Grid wind image.
+ * (actually image -&gt; particles)
+ * called after wind image loaded event..
+ * return particles: Array, particles with wind strength and angle.
+ */
+function genParticles(image, geojson, compressRatio, radius) {
+    let windImage = image || this.windImage,
+        tmpCanvas = document.createElement(&quot;canvas&quot;),
+        tmpCtx = tmpCanvas.getContext(&quot;2d&quot;),
+        particles = [], features = [];
+    if (geojson) {
+        particles = {
+            &quot;type&quot;: &quot;FeatureCollection&quot;,
+            &quot;name&quot;: &quot;particles&quot;,
+            &quot;features&quot;: features
+        }
+    }
+
+    tmpCanvas.width = windImage.width;
+    tmpCanvas.height = windImage.height;
+    tmpCtx.drawImage(windImage, 0, 0);
+    // imageData.data.length: width*height*4
+    let imageData = tmpCtx.getImageData(0, 0, tmpCanvas.width, tmpCanvas.height),
+        dataLength = imageData.data.byteLength;
+    if (compressRatio == undefined || (compressRatio !== undefined &amp;&amp; compressRatio &lt; 1)) {
+        console.warn(&quot;Input compressRatio invalid, use default 1.&quot;);
+        compressRatio = 1;
+    }
+    compressRatio = parseInt(Number(compressRatio));
+    for (let i=1;i&lt;tmpCanvas.height-1;i+=compressRatio) {
+        // i:0~180, j:0~360
+        for (let j=0;j&lt;tmpCanvas.width;j+=compressRatio) {
+            let particle = {
+                &apos;lon&apos;: -180 + j,
+                &apos;lat&apos;: -90 + i,
+            };            
+            let uIndex = (i * 360 + j) * 4, vIndex = uIndex + 1;
+            let uVal = imageData.data[uIndex], vVal = imageData.data[vIndex],
+                windPow = Math.pow(uVal, 2) + Math.pow(vVal, 2),
+                angle = Number(Math.atan(vVal/uVal).toFixed(2)),
+                color = &apos;rgba(&apos;+ (windPow/255).toFixed(0) + &apos;, 255, 100, 0.7)&apos;;
+            // return geojson dataSource for mapboxgl.vector layer.
+            if (geojson) {
+                particle = { &quot;type&quot;: &quot;Feature&quot;, 
+                    &quot;properties&quot;: {
+                        &quot;angle&quot;: angle,
+                        &quot;color&quot;: color
+                    },
+                    &quot;geometry&quot;: {
+                        &quot;type&quot;: &quot;Point&quot;,
+                        &quot;coordinates&quot;: [-180 + j, -90 + i]
+                    }
+                }
+                features.push(particle);
+            } else {
+                particle.color = color;
+                particle.angle = angle;
+                particle.radius = radius;
+                particles.push(particle);
+            }
+        }
+    }
+    return particles;
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

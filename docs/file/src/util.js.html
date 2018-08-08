@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../">
+  <title data-ice="title">src/util.js | mapbox-plugins</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="mapbox-plugins"><meta property="twitter:description" content="Customized Mapbox plugins, including game control, canvasOverlayer, scene animation"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/alex2wong/mapbox-plugins"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/bullet.js~Bullet.html">Bullet</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/const.js~Const.html">Const</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/controller.js~controllers.html">controllers</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/drone.js~Drone.html">Drone</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/util.js~util.html">util</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-rbush">rbush</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#chart">chart</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/canvas.js~Canvas.html">Canvas</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/chart/chartmodel.js~chart.html">chart</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#layers">layers</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/canvasOverlay.js~CanvasOverlayer.html">CanvasOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/domOverlay.js~DomOverlayer.html">DomOverlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/overlay.js~Overlayer.html">Overlayer</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/layers/windLayer.js~WindLayer.html">WindLayer</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#sprites">sprites</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/sprites/sprite.js~Sprite.html">Sprite</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-genId">genId</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-randomName">randomName</a></span></span></li>
+<li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#tween">tween</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-sleep">sleep</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-variable">V</span><span data-ice="name"><span><a href="variable/index.html#static-variable-myTween">myTween</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/util.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Const from &apos;./const&apos;;
+
+export default class util {
+
+    static getAnimationFrame() {
+        
+    }
+
+    /**
+     * use promise to implement xmlHttpRequest process
+     * promise.then receive 2 params.(resolve func, reject func)
+     */
+    // static xhr(){
+    //     // promise will excute immediately after init.
+    //     let promise = new Promise(() =&gt; {
+
+    //     })
+    // }
+
+    /**
+     * Promise.prototype.then()
+     * receive resolve callback and reject callback.
+     * SO important, if series of Async Process is required, 
+     * Promise is better than callback hell !
+     * 
+     * xhr().then(data =&gt; { // resolve actions.. }, 
+     *          err =&gt; { // reject actions.. }
+     *      ).then()
+     * 
+     */
+
+    /**
+     * return promise obj.
+     */
+    static getJSON(url, resolve, reject) {
+        let promise = new Promise((resolve, reject) =&gt; {
+            let xhr = new XMLHttpRequest();
+            xhr.open(&quot;GET&quot;, url);
+            xhr.onreadystatechange = handler;
+            xhr.responseType = &quot;json&quot;;
+            xhr.setRequestHeader(&quot;Accept&quot;, &quot;application/json&quot;);
+            xhr.send();
+
+            function handler() {
+                if (this.readyState !== 4) {
+                    return;
+                }
+                if (this.status === 200) {
+                    // if server response success
+                    resolve(this.response);
+                } else {
+                    reject(new Error(this.statusText));
+                }
+            };
+        })
+
+        return promise;
+    }
+
+    static deepClone(obj) {
+        let cloned = {};
+        if (typeof obj !== &apos;object&apos;) return null;
+        for(let k in obj){
+            if (obj.hasOwnProperty(k) &amp;&amp; typeof obj[k] !== &apos;object&apos;) {
+                cloned[k] = obj[k];
+            } else if (obj[k].constructor.toString().indexOf(&quot;Object&quot;) &gt; 0) {
+                cloned[k] = this.deepClone(obj[k]);
+            } else if (Array.isArray(obj[k])) {
+                cloned[k] = obj[k].map((ele) =&gt; {
+                    // let ret = null;
+                    if (typeof ele !== &apos;object&apos;) return ele;
+                    else return this.deepClone(ele);
+                });
+                // cloned[k] = [].concat(obj[k]);
+            }
+        }
+        return cloned;
+    }
+
+    static isChanged(lastData, data) {
+        if (JSON.stringify(lastData) == JSON.stringify(data))
+            return false;
+        else {
+            console.warn(&apos;chartData changed..&apos;)
+            return true;
+        }
+    }
+
+    /**
+     * return iconposition style by iconName
+     */
+    static setIconDiv(dom, iconName) {        
+        let icons = Const.Sprites;
+        if (iconName &amp;&amp; icons[iconName]) {
+            let iconStyle = icons[iconName],
+                iconDiv = document.createElement(&quot;div&quot;);
+            iconDiv.style.width = iconStyle.width + &quot;px&quot;;
+            iconDiv.style.height = iconStyle.height + &quot;px&quot;;
+            iconDiv.style.overflow = &apos;hidden&apos;;
+            let iconImg = document.createElement(&quot;img&quot;);
+            iconImg.src = Const.SpritesUrl + &quot;.png&quot;;
+            iconImg.style.marginLeft = &quot;-&quot; + iconStyle.x + &quot;px&quot;;
+            iconImg.style.marginTop = &quot;-&quot; + iconStyle.y + &quot;px&quot;;
+            iconDiv.appendChild(iconImg);
+            dom.appendChild(iconDiv);
+        }
+    }
+
+    /**
+     * add img, video element to domContainer.
+     * @param {*domEle} dom, dom container..
+     * @param {*Array} res, urls of img/video loaded to dom. 
+     */
+    static setResource(dom, res) {
+        if (!(res instanceof Array)) return;
+        for (let i = 0; i &lt; res.length; i ++) {
+            let filetype = this.getFiletype(res[i]);
+            if (filetype !== &quot;&quot;) {
+                let ele = document.createElement(filetype);
+                ele.style.width = ele.style.height = dom.style.width = dom.style.height = &apos;60px&apos;;
+                ele.style.borderRadius = &quot;50%&quot;;
+                ele.src = res[i];
+                dom.style.borderRadius = &quot;50%&quot;;
+                dom.appendChild(ele);
+            } 
+            if (filetype == &apos;video&apos;) {
+                ele.setAttribute(&apos;autoplay&apos;, true);
+            }
+        }
+    }
+
+    static getFiletype(uri) {
+        let isIMG = uri.match(/\.(jpg)|(png)|(gif)/g) ? true: false;
+        let isMP4 = uri.match(/\.mp4\?+/g) ? true: false;
+        if (isIMG) return &apos;img&apos;;
+        else if (isMP4) return &apos;video&apos;;
+        else {
+            console.log(`filetype of ${uri} is not supported`);
+            return &apos;&apos;;
+        }
+    }
+
+    static setChart(dom, data, type, height) {
+        if (Chart == undefined) {
+            console.warn(`Chart module ${Chart.toString()} not defined or data invalid: ${data.toString()}`);
+            return;
+        }
+        let canv = document.createElement(&apos;canvas&apos;),
+            ctx = canv.getContext(&apos;2d&apos;);
+        let piechart = new Chart(ctx, {
+                type: type,
+                data: data,
+                options: {
+                    legend: {
+                        display: false
+                    }
+                }
+            });
+        canv.height = height; canv.style.height = canv.height + &apos;px&apos;;
+        canv.width = height; canv.style.width = canv.width + &apos;px&apos;;
+        dom.appendChild(canv);
+    }
+
+    // random point objs with given number
+    static rdObjs(num, mapCenter) {
+        var objs = [], index = 0;
+        if (!mapCenter) return objs;
+        for(var i=0;i&lt;num;i++) {
+            objs.push({
+                name: &quot;line&quot; + i.toString(),
+                lon: parseInt(((Math.random()*8)+mapCenter[0]-4).toFixed(2)),
+                lat: parseInt(((Math.random()*4)+mapCenter[1]-2).toFixed(2)),
+                color: &apos;rgba(10,200,&apos;+ (Math.random()*251).toFixed(0) +&apos;,0.7)&apos;,
+            });
+        }
+        objs.push({
+            name: &quot;circle1&quot;,
+                lon: mapCenter[0],
+                lat: mapCenter[1],
+                radius: parseInt(Math.random()*10),
+                color: &apos;rgba(251,200,20,0.6)&apos;,
+        });
+        return objs;
+    }
+
+    /**
+     * getJSON(&quot;somedata.json&quot;).then((data) =&gt; {
+     *      console.log(&quot;got data: &quot; + data);
+     * })
+     * .catch((err) =&gt; {
+     *      console.error(&quot;encounter error..&quot;);
+     * })
+     */
+
+    /**
+     * compared with traditional imageload. what is the advantage ?
+     */
+    static loadImageAsync(url, resolve, reject) {
+        return new Promise((resolve, reject) =&gt; {
+            let image = new Image();
+            image.onload = resolve;
+            image.onerror = reject;
+            image.src = url;
+        })
+    }
+
+    /**
+     * This decorator func.
+     */
+    static readonly(target, name, descriptor) {
+        descriptor.writable = false;
+        return descriptor;
+    }
+
+    /**
+     * target.descriptor..
+     * this decorator used for log before calling target function.
+     */
+    static log(target, name, descriptor) {
+        let oldValue = descriptor.value;
+
+        descriptor.value = function() {
+            console.log(`Calling &quot;${name}&quot; with`, arguments);
+            // descriptor.value refer to the target itself.. func or attri
+            return oldValue.apply(null, arguments);
+        }
+    }
+
+    /**
+     * @param fn {Function}
+     * @param delay {Number}
+     * @return {Function}
+     */
+    static debounce(fn, delay) {
+        let timer;
+        // timer is closure in mem.. returned function is the listener..
+        return function() {
+            var context = this;
+            var args = arguments;
+            // clear the previous timer to prevent the function call.
+            clearTimeout(timer);
+            timer = setTimeout(() =&gt; {
+                fn.apply(context, args)
+            }, delay);
+        }
+    }
+    
+}
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.1.0)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

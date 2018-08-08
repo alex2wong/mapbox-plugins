@@ -7,7 +7,7 @@ module.exports = {
     output: {
         path: "./dist",
         filename: "bundle.js",
-	    library: 'Alex',
+	    library: 'Mapbox',
         libraryTarget: 'umd',
     },
     module: {

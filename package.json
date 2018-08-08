@@ -10,6 +10,8 @@
     "@turf/hex-grid": "^3.10.3",
     "core-decorators": "^0.15.0",
     "core-js": "^2.4.1",
+    "esdoc": "^1.1.0",
+    "esdoc-standard-plugin": "^1.0.0",
     "lowpoly": "^0.1.0",
     "mapbox-gl": "^0.39.1",
     "rbush": "^2.0.1",
