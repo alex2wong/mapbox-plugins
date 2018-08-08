@@ -16,6 +16,8 @@ Note: pls visit all demo with **HTTPS**..
 
 ![Rbush demo](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/rbush.gif)
 
+![Canvas Line Style](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/canvasLine.jpg)
+canvas line style which can be integrate to any map/chart lib.
 ## Online demo
 [placeholder]:p
 
@@ -71,7 +73,4 @@ update();
 
 
 ### Any **☆Star, Enhancement and PR** are welcome :)
-
-## License
-[![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=large)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_large)
 
