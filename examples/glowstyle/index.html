@@ -17,7 +17,7 @@
 <script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>
 <script src="https://alex2wong.github.io/mapbox-plugins/dist/OSMBuildings.debug.js"></script>
 <script>
-    // import * as Alex from '../src/index';
+    // import * as Mapbox from '../src/index';
 
     var data = null;
     mapboxgl.accessToken = false;
@@ -66,7 +66,7 @@
 
     map.on('load', function() {
         // https://alex2wong.github.io/mapbox-plugins
-        Alex.Util.getJSON("../../assets/countries.geojson")
+        Mapbox.Util.getJSON("../../assets/countries.geojson")
             .then((res) => {
                 console.log("got jsonData..");
                 data = res;
@@ -86,7 +86,7 @@
                     // "filter": ["==", "$type", "Polygon"]
                 });
             });
-        Alex.Util.getJSON("../../assets/berlinRoad.geojson")
+        Mapbox.Util.getJSON("../../assets/berlinRoad.geojson")
             .then((res) => {
                 console.log("got line data..");
                 map.addSource("roads", {

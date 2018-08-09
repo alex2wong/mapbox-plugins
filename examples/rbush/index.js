@@ -1,22 +1,22 @@
 // // var rbush = require('rbush');
-// import * as Alex from "../../src/index";
+// import * as Mapbox from "../../src/index";
 
-var tree = Alex.rbush();
+var tree = Mapbox.rbush();
 var img = new Image();
 img.onload = function(){
     pattern = canv.getContext('2d').createPattern(img, "no-repeat");
 }
 img.src = './vincent_sky.jpg';
 var canv = document.querySelector("#map");
-Alex.Canvas.init(canv);
-Alex.Canvas.setWidth(1);
-Alex.Canvas.setStroke("rgba(255,255,255,0.7)");
+Mapbox.Canvas.init(canv);
+Mapbox.Canvas.setWidth(1);
+Mapbox.Canvas.setStroke("rgba(255,255,255,0.7)");
 // random rect and bulk insert to rbush..
 var items = [], itemIndex = 0;
 for(var i = 0; i< 5000; i++) {
     var item = randomRect(canv);
     items.push(item);
-    Alex.Canvas.drawRect(item);
+    Mapbox.Canvas.drawRect(item);
 }
 // console.log("items")
 tree.load(items);
@@ -64,21 +64,21 @@ function handler(evt){
     var tmp = tree.search(bbox);
     selected = tmp;    
     
-    Alex.Canvas.clearCanv();    
-    Alex.Canvas.setStroke("rgba(255,255,255,0.7)");
+    Mapbox.Canvas.clearCanv();    
+    Mapbox.Canvas.setStroke("rgba(255,255,255,0.7)");
     items.forEach((item)=>{
         // redraw all items..
-        Alex.Canvas.drawRect(item);
+        Mapbox.Canvas.drawRect(item);
     });
 
     canv.getContext('2d').fillStyle = pattern;
     selected.forEach((item)=>{
         // redraw all items..
-        Alex.Canvas.drawRect(item, fill=true);
+        Mapbox.Canvas.drawRect(item, fill=true);
     })
 
-    Alex.Canvas.setStroke("rgba(255,0,0,0.9)");
-    Alex.Canvas.drawRect(bbox);
+    Mapbox.Canvas.setStroke("rgba(255,0,0,0.9)");
+    Mapbox.Canvas.drawRect(bbox);
 
     var elapse = getElapse(start);
     elapses.push(elapse);

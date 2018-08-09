@@ -1,11 +1,11 @@
-// import * as Alex from '../../src/index';
+// import * as Mapbox from '../../src/index';
 
 var data = null;
 // var mapCenter = [121.470, 31.165];
 var mapCenter = [-4.534, 39.749];
 var animation = null;
 var map = new mapboxgl.Map({
-    // style: Alex.Config.default.mapStyles,
+    // style: Mapbox.Config.default.mapStyles,
     style: "mapbox://styles/huangyixiu/cjeijjf6x0u3l2soy45dc0mw7",
     center: mapCenter,
     zoom: 7.6,
@@ -17,25 +17,25 @@ var map = new mapboxgl.Map({
 
 map.on('load', function() {
     console.log("map loaded...");
-    Alex.myTween.fps = 40;
-    Alex.myTween.loop = true;
+    Mapbox.myTween.fps = 40;
+    Mapbox.myTween.loop = true;
     init();
 });
 
 function init() {
-    var objNum = 14, canvasLayer = new Alex.CanvasOverlayer({
+    var objNum = 14, canvasLayer = new Mapbox.CanvasOverlayer({
         map: map,
         shadow: true,
         keepTrack: true,
         xfield: 'lng',
         yfield: 'lat'
     });
-    domLayer = new Alex.DomOverlayer({
+    domLayer = new Mapbox.DomOverlayer({
         map: map,
         doms: [
         ]});
 
-    Alex.Util.getJSON('../../assets/demo/toledo2sevilla.json')
+    Mapbox.Util.getJSON('../../assets/demo/toledo2sevilla.json')
         .then((res) => {
                 data = res.routes[0].geometry; // consider simplify data.coordinates..
                 console.log("got routes data..");

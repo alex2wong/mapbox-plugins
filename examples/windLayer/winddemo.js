@@ -1,4 +1,4 @@
-// import { Alex } from '../../dist/bundle.js';
+// import { Mapbox } from '../../dist/bundle.js';
 //// https://alex2wong.github.io/mapbox-plugins
 
 mapboxgl.accessToken = false;
@@ -35,7 +35,7 @@ var map = new mapboxgl.Map({
 });
 
 map.on('load', function() {
-    Alex.Util.getJSON("../../assets/countries.geojson")
+    Mapbox.Util.getJSON("../../assets/countries.geojson")
         .then((res) => {
             console.log("got jsonData..: " + res);
             data = res;
@@ -55,13 +55,13 @@ map.on('load', function() {
                 // "filter": ["==", "$type", "Polygon"]
             });
         });
-    Alex.myTween.fps = 10;
-    Alex.myTween.loop = true;
+    Mapbox.myTween.fps = 10;
+    Mapbox.myTween.loop = true;
     setTimeout(init, 500);
 });
 
 function init() {
-    var objNum = 10, windlayer = new Alex.WindLayer({
+    var objNum = 10, windlayer = new Mapbox.WindLayer({
         map: map,
         shadow: true,
         blurWidth: 0,
@@ -75,7 +75,7 @@ function init() {
         if (!geojson) {
             objs = windlayer.particles; targets = genWinTarget(objs);
             // hello, nice2meet you. calc targets depend on its angle, use 1 degree as dist.
-            Alex.myTween.get(objs).to(targets, 8000, windlayer.redraw);
+            Mapbox.myTween.get(objs).to(targets, 8000, windlayer.redraw);
             map.on('moveend', function(){
                 windlayer.redraw(objs);
             });

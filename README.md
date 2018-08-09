@@ -44,9 +44,9 @@ visit from localhost:8080/examples/
 ## how to use
 plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:
 
-```
+```javascript
 // create a CanvasOverlayer on Mapbox map instance..
-var canvasLayer = new Alex.CanvasOverlayer({
+var canvasLayer = new Mapbox.CanvasOverlayer({
     map: map,
     shadow: false,
     keepTrack: true,
@@ -54,13 +54,13 @@ var canvasLayer = new Alex.CanvasOverlayer({
 });
 
 // create a Drone inherites Sprite Class
-var drone = new Alex.Drone({
+var drone = new Mapbox.Drone({
     direction: 45,
     icon: "https://alex2wong.github.io/mapbox-plugins/assets/tri2.png"
 });
 
 // add keyboard control to Sprite.
-Alex.Controllers.gameControl(drone);
+Mapbox.Controllers.gameControl(drone);
 function update(){
     drone.updateStatus();
     // render drone on canvasLayer.

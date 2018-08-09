@@ -1,4 +1,4 @@
-// import * as Alex from '../src/index';
+// import * as Mapbox from '../src/index';
 
 var data = null;
 mapboxgl.accessToken = false;
@@ -34,7 +34,7 @@ var map = new mapboxgl.Map({
 
 var domLayer = null;
 map.on('load', function() {
-    Alex.Util.getJSON("../../assets/countries.geojson")
+    Mapbox.Util.getJSON("../../assets/countries.geojson")
         .then((res) => {
                 console.log("got jsonData..");
                 data = res;
@@ -54,7 +54,7 @@ map.on('load', function() {
                     // "filter": ["==", "$type", "Polygon"]
                 });
             });
-    domLayer = new Alex.DomOverlayer({
+    domLayer = new Mapbox.DomOverlayer({
         map: map,
         doms: [
             {

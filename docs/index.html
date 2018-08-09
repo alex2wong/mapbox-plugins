@@ -58,6 +58,8 @@
 <p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/chart.gif" alt="Chartjs integration"></p>
 <p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/glow.gif" alt="Glow animation"></p>
 <p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/rbush.gif" alt="Rbush demo"></p>
+<p><img src="https://github.com/alex2wong/mapbox-plugins/blob/master/assets/canvasLine.jpg" alt="Canvas Line Style">
+canvas line style which can be integrate to any map/chart lib.</p>
 <h2 id="online-demo">Online demo</h2><table>
 <thead>
 <tr>
@@ -104,8 +106,8 @@
 </blockquote>
 <p>visit from localhost:8080/examples/</p>
 <h2 id="how-to-use">how to use</h2><p>plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:</p>
-<pre><code><code class="source-code prettyprint">// create a CanvasOverlayer on Mapbox map instance..
-var canvasLayer = new Alex.CanvasOverlayer({
+<pre><code class="lang-javascript"><code class="source-code prettyprint">// create a CanvasOverlayer on Mapbox map instance..
+var canvasLayer = new Mapbox.CanvasOverlayer({
     map: map,
     shadow: false,
     keepTrack: true,
@@ -113,13 +115,13 @@ var canvasLayer = new Alex.CanvasOverlayer({
 });
 
 // create a Drone inherites Sprite Class
-var drone = new Alex.Drone({
+var drone = new Mapbox.Drone({
     direction: 45,
     icon: &quot;https://alex2wong.github.io/mapbox-plugins/assets/tri2.png&quot;
 });
 
 // add keyboard control to Sprite.
-Alex.Controllers.gameControl(drone);
+Mapbox.Controllers.gameControl(drone);
 function update(){
     drone.updateStatus();
     // render drone on canvasLayer.
@@ -128,8 +130,8 @@ function update(){
 }
 update();
 </code>
-</code></pre><h3 id="any--strong-&#x2606;star--enhancement-and-pr--strong--are-welcome---">Any <strong>&#x2606;Star, Enhancement and PR</strong> are welcome :)</h3><h2 id="license">License</h2><p><a href="https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_large"><img src="https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=large" alt="FOSSA Status"></a></p>
-</div>
+</code></pre>
+<h3 id="any--strong-&#x2606;star--enhancement-and-pr--strong--are-welcome---">Any <strong>&#x2606;Star, Enhancement and PR</strong> are welcome :)</h3></div>
 </div>
 
 <footer class="footer">

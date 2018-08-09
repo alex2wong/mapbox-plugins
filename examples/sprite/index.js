@@ -1,11 +1,11 @@
-// import * as Alex from '../../src/index';
+// import * as Mapbox from '../../src/index';
 
     var data = null;
     mapboxgl.accessToken = false;
     var mapCenter = [120.8066, 30.6135];
     // var mapCenter = [13.41, 52.52];
     var map = new mapboxgl.Map({
-        style: Alex.Config.default.mapStyles,
+        style: Mapbox.Config.default.mapStyles,
         center: mapCenter,
         zoom: 7,
         maxzoom: 8,
@@ -22,7 +22,7 @@
 
     map.on('load', function() {
         console.log("map loaded...");
-        Alex.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/countries.geojson")
+        Mapbox.Util.getJSON("https://alex2wong.github.io/mapbox-plugins/assets/countries.geojson")
             .then((res) => {
                 console.log("got jsonData..");
                 data = res;
@@ -44,19 +44,19 @@
     });
 
     function init() {
-        var canvasLayer = new Alex.CanvasOverlayer({
+        var canvasLayer = new Mapbox.CanvasOverlayer({
             map: map,
             shadow: false,
             keepTrack: true,
             blurWidth: 4,
             lineWidth: 2
         });
-        var drone = new Alex.Drone({
+        var drone = new Mapbox.Drone({
             direction: 45,
             icon: "https://alex2wong.github.io/mapbox-plugins/assets/tri2.png"
         });
 
-        Alex.Controllers.gameControl(drone);
+        Mapbox.Controllers.gameControl(drone);
         // canvasLayer.initTrackCtx();
         console.log("dom loaded !... register animation...");
         
