@@ -4,6 +4,8 @@ Customized Mapbox plugins, including game control, canvasOverlayer, scene animat
 
 https://alex2wong.github.io/mapbox-plugins/
 
+[API Docs](https://alex2wong.github.io/mapbox-plugins/docs/)
+
 Note: pls visit all demo with **HTTPS**..
 
 ![Point animation](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/point.gif)
