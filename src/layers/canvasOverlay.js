@@ -8,7 +8,8 @@ export class CanvasOverlayer extends Overlayer {
         let _opts = opts || {};
         super(_opts);
         this.canvas = this._init();
-        this.redraw = _redraw.bind(this);
+        this.redraw = _opts.render ? _opts.render : _redraw.bind(this);
+        this.data = _opts.data ? _opts.data: null;
         // how to deconstruct opts to this if we need defaultValue.
         this.labelOn = _opts.labelOn || false;
         this.xfield = _opts.xfield || 'lon';
@@ -26,11 +27,13 @@ export class CanvasOverlayer extends Overlayer {
         this.initTrackCtx = this._initTrackCtx.bind(this);
         if (_opts && _opts.map) {
             this.setMap(_opts.map);
-            // 绑定每次move 都重绘doms..
+            console.warn(`register map moveend rerender handler..`);
             _opts.map.on("move", () => {
+                this.redraw();
                 this.redrawTrack();
             });
         }
+        this.redraw();
     }
 
     _init(shadow=false,keepTrack=false) {
@@ -43,6 +46,17 @@ export class CanvasOverlayer extends Overlayer {
         canvasOverlay.height = parseInt(mapboxCanvas.style.height);
         canvasContainer.appendChild(canvasOverlay);
         return canvasOverlay;
+    }
+
+    _transformLnglat() {
+        // transform lnglat data to pix.
+        if (Array.isArray(this.data)) {
+            console.warn(`transformed lnglat data to pix..`);
+            const pixArr = this.data.map((lnglatArr) => { 
+                return this.lnglat2pix(lnglatArr[0], lnglatArr[1]);
+            });
+            return pixArr;
+        }
     }
 
     /**

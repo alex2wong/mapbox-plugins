@@ -4,21 +4,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title> Line Style in canvas </title>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
 </head>
 <body>
-    <canvas id="canv" width="600" height="400"></canvas>
+    <div id='map' style='width: 600px; height: 400px; background-color:#222;'></div>
 </body>
-<script src="../../src/layers/canvasUtil.js"></script>
+<script src="../../dist/mapbox-gl.js"></script>
+<script src="../../dist/bundle.js"></script>
+<!-- <script src="../../src/layers/canvasUtil.js"></script> -->
 <script>
-    var canv = document.querySelector('#canv');
-    var ctx = canv.getContext('2d');
-    ctx.fillRect(0, 0, 600, 400);
-    drawDashLine(ctx, [[50, 100], [150, 100], [200, 200], [350, 250], [450, 300]]);
-    drawGradientLine(ctx, [[200, 100], [300, 100], [300, 200], [500, 200], [550, 100]]);
-    drawGradientLine(ctx, [[100, 350], [200, 300], [200, 210], [400, 150], [550, 200]]);
-    drawGradientLine(ctx, [[50, 250], [550, 260]], true);
-    drawGradientLine(ctx, [[20, 220], [590, 230]], true);
-    drawArrowLine(ctx, [[20, 300], [200, 320], [380, 280], [550, 390]]);
-    console.warn('drawDashline done..');
+    // var canv = document.querySelector('#canv');
+    // var ctx = canv.getContext('2d');
+    // ctx.fillRect(0, 0, 600, 400);
+    // drawDashLine(ctx, [[50, 100], [150, 100], [200, 200], [350, 250], [450, 300]]);
+    // drawGradientLine(ctx, [[200, 100], [300, 100], [300, 200], [500, 200], [550, 100]]);
+    // drawGradientLine(ctx, [[100, 350], [200, 300], [200, 210], [400, 150], [550, 200]]);
+    // drawGradientLine(ctx, [[50, 250], [550, 260]], true);
+    // drawGradientLine(ctx, [[20, 220], [590, 230]], true);
+    // drawArrowLine(ctx, [[20, 300], [200, 320], [380, 280], [550, 390]]);
+    // console.warn('drawDashline done..');
+    
+    mapboxgl.accessToken = false;
+    var mapCenter = [120.66, 30.01];
+    var map = new mapboxgl.Map({
+        style: Mapbox.Config.streetStyle,
+        center: mapCenter,
+        pitch: 15,
+        zoom: 8,
+        container: 'map',
+    });
+
+    map.on('load', init);
+
+    function init() {
+        var canvasLayer = new Mapbox.CanvasOverlayer({
+            map,
+            data: [[120.21, 30.21], [120.66, 30.01], [120.59, 29.70], [120.83, 29.81]],
+            lineWidth: 2,
+            render: Mapbox.drawArrowLine
+        });
+    }
+
 </script>
 </html>

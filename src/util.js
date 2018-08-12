@@ -227,13 +227,14 @@ export default class util {
     }
 
     /**
+     * return function to be debounced.
      * @param fn {Function}
      * @param delay {Number}
      * @return {Function}
      */
     static debounce(fn, delay) {
         let timer;
-        // timer is closure in mem.. returned function is the listener..
+        // timer is closure in memory.. returned function will be debounced..
         return function() {
             var context = this;
             var args = arguments;
