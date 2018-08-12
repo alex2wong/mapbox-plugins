@@ -66,7 +66,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.Config = exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
+	exports.drawArrowLine = exports.Config = exports.rbush = exports.WindLayer = exports.DomOverlayer = exports.CanvasOverlayer = exports.myTween = exports.Controllers = exports.Util = exports.Chart = exports.Canvas = exports.Drone = undefined;
 
 	var _drone = __webpack_require__(2);
 
@@ -100,15 +100,17 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var Config = _interopRequireWildcard(_config);
 
+	var _canvasUtil = __webpack_require__(35);
+
 	function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
 	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-	// this is Root Module for Whole app, require lib we need.
-	var rbush = __webpack_require__(35);
+	var rbush = __webpack_require__(36);
 
 	// var HexgridHeatmap = require('./layers/hexgridHeatLayer');
-	if (typeof mapboxgl != 'undefined') mapboxgl.accessToken = Config.default.tk;
+	// this is Root Module for Whole app, require lib we need.
+	if (typeof mapboxgl != 'undefined') mapboxgl.accessToken = Config.tk;
 	// Static Props..
 	exports.Drone = _drone2.default;
 	exports.Canvas = _canvas2.default;
@@ -121,6 +123,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.WindLayer = _windLayer.WindLayer;
 	exports.rbush = rbush;
 	exports.Config = Config;
+	exports.drawArrowLine = _canvasUtil.drawArrowLine;
 
 /***/ }),
 /* 2 */
@@ -591,6 +594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 
 	        /**
+	         * return function to be debounced.
 	         * @param fn {Function}
 	         * @param delay {Number}
 	         * @return {Function}
@@ -600,7 +604,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: "debounce",
 	        value: function debounce(fn, delay) {
 	            var timer = void 0;
-	            // timer is closure in mem.. returned function is the listener..
+	            // timer is closure in memory.. returned function will be debounced..
 	            return function () {
 	                var context = this;
 	                var args = arguments;
@@ -2848,7 +2852,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var _this = _possibleConstructorReturn(this, (CanvasOverlayer.__proto__ || Object.getPrototypeOf(CanvasOverlayer)).call(this, _opts));
 
 	        _this.canvas = _this._init();
-	        _this.redraw = _redraw.bind(_this);
+	        _this.redraw = _opts.render ? _opts.render : _redraw.bind(_this);
+	        _this.data = _opts.data ? _opts.data : null;
 	        // how to deconstruct opts to this if we need defaultValue.
 	        _this.labelOn = _opts.labelOn || false;
 	        _this.xfield = _opts.xfield || 'lon';
@@ -2866,11 +2871,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _this.initTrackCtx = _this._initTrackCtx.bind(_this);
 	        if (_opts && _opts.map) {
 	            _this.setMap(_opts.map);
-	            // 绑定每次move 都重绘doms..
+	            console.warn('register map moveend rerender handler..');
 	            _opts.map.on("move", function () {
+	                _this.redraw();
 	                _this.redrawTrack();
 	            });
 	        }
+	        _this.redraw();
 	        return _this;
 	    }
 
@@ -2889,6 +2896,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	            canvasOverlay.height = parseInt(mapboxCanvas.style.height);
 	            canvasContainer.appendChild(canvasOverlay);
 	            return canvasOverlay;
+	        }
+	    }, {
+	        key: '_transformLnglat',
+	        value: function _transformLnglat() {
+	            var _this2 = this;
+
+	            // transform lnglat data to pix.
+	            if (Array.isArray(this.data)) {
+	                console.warn('transformed lnglat data to pix..');
+	                var pixArr = this.data.map(function (lnglatArr) {
+	                    return _this2.lnglat2pix(lnglatArr[0], lnglatArr[1]);
+	                });
+	                return pixArr;
+	            }
 	        }
 
 	        /**
@@ -2974,7 +2995,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param: keepLog, keep render Sprites location log.. 
 	 */
 	function _redraw(objs) {
-	    var _this2 = this;
+	    var _this3 = this;
 
 	    if (this.canvas) {
 	        var ctx = this.canvas.getContext("2d");
@@ -2988,14 +3009,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	        initCtx(ctx, this.blurWidth, "rgba(255,255,255,.4");
 
 	        var _loop = function _loop(i) {
-	            var x = objs[i][_this2.xfield],
-	                y = objs[i][_this2.yfield],
+	            var x = objs[i][_this3.xfield],
+	                y = objs[i][_this3.yfield],
 	                radius = objs[i]['radius'] || 3,
 	                icon = objs[i]['icon'],
 	                label = objs[i]['name'],
 	                rotate = objs[i]['direction'] || 0;
 	            radius = Math.abs(radius);
-	            var pix = _this2.lnglat2pix(x, y);
+	            var pix = _this3.lnglat2pix(x, y);
 	            if (pix == null) return 'continue';
 	            ctx.fillStyle = objs[i]['color'] || 'rgba(255,240,4,.9)';
 	            ctx.beginPath();
@@ -3016,22 +3037,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	                ctx.arc(pix[0], pix[1], radius, 0, Math.PI * 2);
 	                ctx.fill();
 	            }
-	            if (_this2.keepTrack && _this2.tracks.length == 0) {
-	                _this2.initTrackCtx();
-	                _this2.trackCtx.moveTo(pix[0], pix[1]);
-	                _this2.tracks.push([x, y]);
+	            if (_this3.keepTrack && _this3.tracks.length == 0) {
+	                _this3.initTrackCtx();
+	                _this3.trackCtx.moveTo(pix[0], pix[1]);
+	                _this3.tracks.push([x, y]);
 	                // this.movedTo = true;
-	            } else if (_this2.trackCtx) {
-	                _this2.trackCtx.lineTo(pix[0], pix[1]);
-	                _this2.tracks.push([x, y]);
+	            } else if (_this3.trackCtx) {
+	                _this3.trackCtx.lineTo(pix[0], pix[1]);
+	                _this3.tracks.push([x, y]);
 	                setTimeout(function () {
 	                    //// closePath would auto-complete the path to polygon..
-	                    _this2.trackCtx.stroke();
-	                    _this2.trackCtx.beginPath();
-	                    _this2.trackCtx.moveTo(pix[0], pix[1]);
+	                    _this3.trackCtx.stroke();
+	                    _this3.trackCtx.beginPath();
+	                    _this3.trackCtx.moveTo(pix[0], pix[1]);
 	                }, 0);
 	            }
-	            if (label !== undefined && _this2.labelOn) {
+	            if (label !== undefined && _this3.labelOn) {
 	                ctx.strokeText(label, pix[0], pix[1]);
 	            }
 	            // ctx.closePath();
@@ -3137,8 +3158,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        value: function lnglat2pix(lng, lat) {
 	            if (this.map != undefined && this.map.project instanceof Function) {
 	                var lnglat = this.map.project(new mapboxgl.LngLat(lng, lat));
-	                var x = lnglat.x.toFixed(0),
-	                    y = lnglat.y.toFixed(0);
+	                var x = Math.round(lnglat.x),
+	                    y = Math.round(lnglat.y);
 	                return [x, y];
 	            }
 	            return [lng, lat];
@@ -3668,38 +3689,278 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 34 */
 /***/ (function(module, exports) {
 
+	'use strict';
+
+	Object.defineProperty(exports, "__esModule", {
+	    value: true
+	});
+	var satSource = {
+	    "custom-tms": {
+	        'type': 'raster',
+	        'tiles': [
+	        // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
+	        "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"],
+	        'tileSize': 256
+	    }
+	};
+
+	var streetSource = {
+	    "custom-tms": {
+	        'type': 'raster',
+	        'tiles': ['http://www.google.cn/maps/vt?pb=!1m5!1m4!1i{z}!2i{x}!3i{y}!4i256!2m3!1e0!2sm!3i342009817!3m9!2sen-US!3sCN!5e18!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0&token=32965'],
+	        'tileSize': 256
+	    }
+	};
+
+	var tk = "pk.eyJ1IjoiaHVhbmd5aXhpdSIsImEiOiI2WjVWR1hFIn0.1P90Q-tkbHS38BvnrhTI6w";
+
+	var basicStyle = {
+	    "version": 8,
+	    "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+	    // "sprite": "../../assets/sprite",
+	    "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+	    "sources": satSource,
+	    "layers": [{
+	        'id': 'custom-tms',
+	        'type': 'raster',
+	        'source': 'custom-tms',
+	        'paint': {}
+	    }]
+	};
+
+	var streetStyle = {
+	    "version": 8,
+	    "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+	    // "sprite": "../../assets/sprite",
+	    "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+	    "sources": streetSource,
+	    "layers": [{
+	        'id': 'custom-tms',
+	        'type': 'raster',
+	        'source': 'custom-tms',
+	        'paint': {}
+	    }]
+	};
+
+	exports.tk = tk;
+	exports.basicStyle = basicStyle;
+	exports.streetStyle = streetStyle;
+
+/***/ }),
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
 	"use strict";
 
 	Object.defineProperty(exports, "__esModule", {
 	    value: true
 	});
-	exports.default = {
-	    tk: "pk.eyJ1IjoiaHVhbmd5aXhpdSIsImEiOiI2WjVWR1hFIn0.1P90Q-tkbHS38BvnrhTI6w",
-	    mapStyles: {
-	        "version": 8,
-	        "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
-	        // "sprite": "../../assets/sprite",
-	        "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
-	        "sources": {
-	            "custom-tms": {
-	                'type': 'raster',
-	                'tiles': [
-	                // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
-	                "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"],
-	                'tileSize': 256
-	            }
-	        },
-	        "layers": [{
-	            'id': 'custom-tms',
-	            'type': 'raster',
-	            'source': 'custom-tms',
-	            'paint': {}
-	        }]
+	exports.drawArrowLine = drawArrowLine;
+
+	var _util = __webpack_require__(5);
+
+	var _util2 = _interopRequireDefault(_util);
+
+	function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+	function drawDashLine(ctx, line) {
+	    if (ctx instanceof CanvasRenderingContext2D && line instanceof Array) {
+	        ctx.setLineDash([10, 5]);
+	        ctx.strokeStyle = 'rgba(0,252,100,0.6)';
+	        ctx.lineWidth = 6;
+
+	        ctx.beginPath();
+	        ctx.moveTo(line[0][0], line[0][1]);
+	        for (var i = 1; i < line.length; i += 1) {
+	            ctx.lineTo(line[i][0], line[i][1]);
+	        }
+	        ctx.stroke();
+	        ctx.closePath();
 	    }
-	};
+	}
+
+	/**
+	 * drawGradientline
+	 * @param {* 2d context } ctx 
+	 * @param {* line vertex array typed in flat x,y} line 
+	 * @param {* draw line with shadow blur } shadow 
+	 */
+	function drawGradientLine(ctx, line) {
+	    var shadow = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+	    if (ctx instanceof CanvasRenderingContext2D && line instanceof Array) {
+	        // build gradient style
+	        var gradient = ctx.createLinearGradient(0, 0, 600, 0);
+	        gradient.addColorStop(0, "rgba(0,255,100,0.9)");
+	        gradient.addColorStop(1, "rgba(255,255,255,0.1)");
+
+	        if (shadow) {
+	            console.warn("enabling line shadowBlur");
+	            ctx.shadowBlur = 4;
+	            ctx.shadowColor = '#0f0';
+	        }
+
+	        ctx.strokeStyle = gradient;
+	        ctx.setLineDash([]);
+	        ctx.globalAlpha = 0.9;
+	        ctx.globalCompositeOperation = 'source-over';
+
+	        // ctx.strokeStyle = 'green';
+	        ctx.lineCap = "round"; // square
+	        ctx.lineJoin = 'round'; // bevel
+	        ctx.lineWidth = 6;
+
+	        ctx.beginPath();
+	        ctx.moveTo(line[0][0], line[0][1]);
+	        for (var i = 1; i < line.length; i += 1) {
+	            ctx.lineTo(line[i][0], line[i][1]);
+	        }
+	        ctx.stroke();
+	        ctx.closePath();
+	    }
+	}
+
+	function drawArrows(ctx, line) {
+	    var enableAni = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : false;
+
+	    var aniOffset = .5;
+	    aniOffset = aniOffset < 1 ? aniOffset + .01 : .5;
+	    for (var i = 1; i < line.length; i += 1) {
+	        drawArrow(ctx, line[i - 1], line[i], aniOffset); // one segment.
+	        // console.warn(`draw segment#${i} arrows done... from ${line[i-1].join()}
+	        //      to ${line[i].join()}`);
+	    }
+	    if (enableAni) requestAnimationFrame(drawArrows);
+	}
+	var debDrawArrows = function debDrawArrows() {};
+	if (_util2.default) {
+	    debDrawArrows = _util2.default.debounce(drawArrows, 100);
+	}
+
+	/**
+	 * drawArrowline in canvasOverlayer, can mutate input line data !
+	 * @param {*array typed line vertex.} line 
+	 * @param {*enable animation of draw arrow..} enableAni 
+	 */
+	function drawArrowLine() {
+	    var _this = this;
+
+	    var enableAni = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : false;
+	    var lineStyle = arguments[1];
+
+	    var ctx = void 0;
+	    if (this.canvas) {
+	        ctx = this.canvas.getContext('2d');
+	    }
+	    if (ctx instanceof CanvasRenderingContext2D) {
+	        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	        setLineStyle(ctx);
+	        var line = [0, 0];
+	        if (Array.isArray(this.data)) {
+	            line = this.data.map(function (lnglat) {
+	                return _this.lnglat2pix(lnglat[0], lnglat[1]);
+	            });
+	        } else return;
+
+	        ctx.beginPath();
+	        ctx.moveTo(line[0][0], line[0][1]);
+	        for (var i = 1; i < line.length; i += 1) {
+	            ctx.lineTo(line[i][0], line[i][1]);
+	        }
+	        ctx.stroke();
+	        ctx.closePath();
+	        debDrawArrows(ctx, line);
+	    }
+	}
+
+	function setLineStyle(ctx) {
+	    var shadow = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : false;
+
+	    ctx.strokeStyle = 'green';
+	    ctx.setLineDash([]);
+	    ctx.globalAlpha = 0.95;
+	    ctx.globalCompositeOperation = 'source-over';
+	    if (shadow) {
+	        console.warn("enabling line shadowBlur");
+	        ctx.shadowBlur = 4;
+	        ctx.shadowColor = '#0f0';
+	    } else {
+	        ctx.shadowBlur = 0;
+	    }
+
+	    // ctx.strokeStyle = 'green';
+	    ctx.lineCap = "round"; // square
+	    ctx.lineJoin = 'round'; // bevel
+	    ctx.lineWidth = 12;
+	}
+
+	function drawArrow(ctx, startPoint, endPoint, aniOffset) {
+	    // arrow img: assets/up.png
+	    var img = new Image();
+	    img.src = '../../assets/arrowright.png'; //arrowright/double right/arrow
+	    img.onload = function () {
+	        generatePoints(startPoint, endPoint, 30, ctx, aniOffset, img);
+	    };
+	}
+
+	function generatePoints(startP, endP) {
+	    var stepSize = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 30;
+	    var ctx = arguments[3];
+	    var aniOffset = arguments.length > 4 && arguments[4] !== undefined ? arguments[4] : 0.5;
+	    var img = arguments[5];
+
+	    var radA = Math.atan((endP[1] - startP[1]) / (endP[0] - startP[0]));
+	    if (endP[0] - startP[0] < 0) {
+	        radA += Math.PI;
+	    }
+	    var dist = calcDist(startP, endP);
+	    var points = [];
+	    var steps = dist / stepSize;
+
+	    var drawImg = function drawImg(pX, pY) {
+	        if (img && ctx) {
+	            ctx.save();
+	            // ctx.beginPath();
+	            ctx.translate(pX, pY); // consider img position and imgWidth/Height.
+	            ctx.rotate(radA);
+	            // ctx.arc(0, 0, 2, 0, 2 * Math.PI);
+	            ctx.drawImage(img, -img.width / 2, -img.width / 2);
+	            // ctx.stroke();
+	            // ctx.closePath();
+	            ctx.restore();
+	        }
+	    };
+
+	    // gen points by stepSize.. if enable corner arrow, start s with (0~1) float number.
+	    for (var s = aniOffset; s <= steps; s += 1) {
+	        var pX = Math.round(startP[0] + s * stepSize * Math.cos(radA));
+	        var pY = Math.round(startP[1] + s * stepSize * Math.sin(radA));
+	        points.push([pX, pY]);
+	        drawImg(pX, pY);
+	    }
+	    // console.warn(`icon Number: ${points.length}`);
+	    return points;
+	}
+
+	function calcDist(startP, endP) {
+	    return Math.sqrt(Math.pow(endP[1] - startP[1], 2) + Math.pow(endP[0] - startP[0], 2));
+	}
+
+	/**
+	 *      . <-- center coordinate [x, y].
+	 *     / \
+	 *    `   ` 
+	 * 
+	 */
+	function calcLRPoints(center, rotate) {
+	    var arrawRadius = 3;
+	    return center;
+	}
+
+	function drawGradientRect(ctx, line) {}
 
 /***/ }),
-/* 35 */
+/* 36 */
 /***/ (function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -3707,7 +3968,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = rbush;
 	module.exports.default = rbush;
 
-	var quickselect = __webpack_require__(36);
+	var quickselect = __webpack_require__(37);
 
 	function rbush(maxEntries, format) {
 	    if (!(this instanceof rbush)) return new rbush(maxEntries, format);
@@ -4267,7 +4528,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ }),
-/* 36 */
+/* 37 */
 /***/ (function(module, exports) {
 
 	'use strict';
