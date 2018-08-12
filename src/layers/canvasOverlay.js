@@ -128,9 +128,11 @@ const iconSize = 32;
  * Important ! redraw may use this.map as projector!
  * @param: keepLog, keep render Sprites location log.. 
  */
-function _redraw(objs) {
+function _redraw(data) {
     if (this.canvas) {
         let ctx = this.canvas.getContext("2d");
+        const objs = data ? data : this.data;
+        if (!Array.isArray(objs)) return;
         // ctx.clearRect(0,0,canv.width, canv.height);
         if (this.shadow) {
             _preSetCtx(ctx);
@@ -138,7 +140,7 @@ function _redraw(objs) {
         } else {
             ctx.clearRect(0,0,this.canvas.width,this.canvas.height);
         }
-        initCtx(ctx,this.blurWidth,"rgba(255,255,255,.4");        
+        initCtx(ctx,this.blurWidth,"rgba(255,255,255,.4");
         for(let i=0;i<objs.length;i++) {
             let x = objs[i][this.xfield], y = objs[i][this.yfield], 
                 radius = objs[i]['radius'] || 3, icon = objs[i]['icon'],

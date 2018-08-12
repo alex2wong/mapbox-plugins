@@ -1,18 +1,17 @@
 // import * as Mapbox from '../../src/index';
-
+mapboxgl.accessToken = false;
 var data = null;
 // var mapCenter = [121.470, 31.165];
 var mapCenter = [-4.534, 39.749];
 var animation = null;
 var map = new mapboxgl.Map({
-    // style: Mapbox.Config.default.mapStyles,
-    style: "mapbox://styles/huangyixiu/cjeijjf6x0u3l2soy45dc0mw7",
+    style: Mapbox.Config.darkStyle,
+    // style: "mapbox://styles/huangyixiu/cjeijjf6x0u3l2soy45dc0mw7",
     center: mapCenter,
-    zoom: 7.6,
+    zoom: 7,
     maxzoom: 10,
     pitch: 15,
     container: 'map',
-    hash: true
 });
 
 map.on('load', function() {

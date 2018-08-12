@@ -11,23 +11,11 @@
 </body>
 <script src="../../dist/mapbox-gl.js"></script>
 <script src="../../dist/bundle.js"></script>
-<!-- <script src="../../src/layers/canvasUtil.js"></script> -->
-<script>
-    // var canv = document.querySelector('#canv');
-    // var ctx = canv.getContext('2d');
-    // ctx.fillRect(0, 0, 600, 400);
-    // drawDashLine(ctx, [[50, 100], [150, 100], [200, 200], [350, 250], [450, 300]]);
-    // drawGradientLine(ctx, [[200, 100], [300, 100], [300, 200], [500, 200], [550, 100]]);
-    // drawGradientLine(ctx, [[100, 350], [200, 300], [200, 210], [400, 150], [550, 200]]);
-    // drawGradientLine(ctx, [[50, 250], [550, 260]], true);
-    // drawGradientLine(ctx, [[20, 220], [590, 230]], true);
-    // drawArrowLine(ctx, [[20, 300], [200, 320], [380, 280], [550, 390]]);
-    // console.warn('drawDashline done..');
-    
+<script>    
     mapboxgl.accessToken = false;
     var mapCenter = [120.66, 30.01];
     var map = new mapboxgl.Map({
-        style: Mapbox.Config.streetStyle,
+        style: Mapbox.Config.lightStyle,
         center: mapCenter,
         pitch: 15,
         zoom: 8,

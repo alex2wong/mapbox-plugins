@@ -38,7 +38,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "server": "http-server",
     "babel": "babel src -d lib",
-    "build": "webpack -p",
+    "build": "webpack -p && npm run server",
     "start": "webpack && npm run server",
     "lint": "eslint --cache --ignore-path .gitignore src"
   },
