@@ -6,6 +6,12 @@ https://alex2wong.github.io/mapbox-plugins/
 
 [API Docs](https://alex2wong.github.io/mapbox-plugins/docs/)
 
+For more detailed wiki, pls read **issue blogs**:
+
+- [canvas wind layer](https://github.com/alex2wong/mapbox-plugins/issues/3)
+
+- [canvas line style](https://github.com/alex2wong/mapbox-plugins/issues/4)
+
 Note: pls visit all demo with **HTTPS**..
 
 ![Point animation](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/point.gif)
