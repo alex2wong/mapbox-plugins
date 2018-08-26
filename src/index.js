@@ -1,5 +1,6 @@
 // this is Root Module for Whole app, require lib we need.
 import Drone from './drone';
+import xMarker from './sprites/x_marker';
 import Canvas from "./chart/canvas";
 import Chart from "./chart/chartmodel";
 import Util from "./util";
@@ -21,5 +22,5 @@ if(typeof mapboxgl != 'undefined')
 export {
     Drone, Canvas, Chart, Util, Controllers, myTween, 
     CanvasOverlayer, DomOverlayer, WindLayer, rbush, Config,
-    drawArrowLine,
+    drawArrowLine, xMarker,
 }

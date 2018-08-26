@@ -18,9 +18,11 @@ export class Sprite {
 
     _init () {
         let img = new Image();
-        img.src = this.iconUrl;
-        img.onload = () => {
-            this.icon = img;
+        if (this.iconUrl) {
+            img.src = this.iconUrl;
+            img.onload = () => {
+                this.icon = img;
+            }
         }
     }
 

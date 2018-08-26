@@ -1,0 +1,95 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> xMarker | VectorTile Demo </title>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
+</head>
+<style>
+    .marker {
+        display: block;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+    .marker__inner {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        opacity: .7;
+        box-shadow: 0px 0px 5px 2px rgba(0,0,0,0.3);
+    }
+    .marker__inner:hover {
+        opacity: .9;
+        /* margin-top: -1px; */
+        transition: margin-top .1s ease-in;
+        box-shadow: 0px 0px 5px 3.5px rgba(0,0,0,0.2);
+    }
+</style>
+<body>
+    <div id='map' style='width: 600px; height: 400px; background-color:#222;'></div>
+</body>
+<script src="../../dist/mapbox-gl.js"></script>
+<script src="../../dist/bundle.js"></script>
+<script>    
+    mapboxgl.accessToken = false;
+    var mapCenter = [-121.8175,37.297];
+    var map = new mapboxgl.Map({
+        style: Mapbox.Config.lightStyle,
+        // style: './mapStyle.json',
+        center: mapCenter,
+        pitch: 40,
+        minZoom: 12,
+        zoom: 12,
+        maxZoom: 12,
+        container: 'map',
+        hash: true
+    });
+
+    map.on('load', init);
+
+    function init() {
+        map.addControl(new mapboxgl.NavigationControl());
+
+        var geojson = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "message": "Foo",
+                        "iconSize": [32, 32],
+                        rotate: -135,
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-121.8175, 37.2975],
+                    }
+                },
+                {
+                    "type": "Feature",
+                    "properties": {
+                        "message": "Car2",
+                        "iconSize": [32, 32],
+                        rotate: -45,
+                    },
+                    "geometry": {
+                        "type": "Point",
+                        "coordinates": [-121.8275, 37.287]
+                    }
+                },
+            ]
+        };
+        geojson.features.forEach(gfeature => {
+            new Mapbox.xMarker(gfeature, {
+                map,
+                backgroundColor: 'rgb(255, 0, 87)',
+                iconRotateOffset: gfeature.properties.rotate,
+                // icon: '../../assets/navi2x.png',
+            });
+        });
+    }
+
+</script>
+</html>

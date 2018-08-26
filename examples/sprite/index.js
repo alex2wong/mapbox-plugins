@@ -5,7 +5,7 @@
     var mapCenter = [120.8066, 30.6135];
     // var mapCenter = [13.41, 52.52];
     var map = new mapboxgl.Map({
-        style: Mapbox.Config.default.mapStyles,
+        style: Mapbox.Config.emptyStyle,
         center: mapCenter,
         zoom: 7,
         maxzoom: 8,

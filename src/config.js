@@ -81,9 +81,18 @@ const darkStyle = {
     ]
 }
 
+const emptyStyle = {
+    "version": 8,
+    "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+    "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
+    "sources": lightSource,
+    "layers": []
+}
+
 export {
     tk,
     basicStyle,
     lightStyle,
     darkStyle,
+    emptyStyle,
 };
