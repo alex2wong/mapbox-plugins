@@ -1,0 +1,46 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>particle mask layer on any DOM?</title>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
+</head>
+<body>
+    <div id='map' style='width: 800px; height: 600px; background-color:#222;'></div>
+</body>
+<script src="../../dist/mapbox-gl.js"></script>
+<script src="../../dist/bundle.js"></script>
+<script src="particle.js"></script>
+<script>    
+    mapboxgl.accessToken = false;
+    var mapCenter = [120.66, 30.01];
+    var map = new mapboxgl.Map({
+        style: Mapbox.Config.darkStyle,
+        center: mapCenter,
+        pitch: 15,
+        zoom: 8,
+        container: 'map',
+    });
+
+    map.on('load', init);
+
+    // var data = [];
+    // for (var i = 0; i < 100; i += 1) {
+    //     // mapCenter surrounding.
+    //     loc = [Math.random() * 2 + (mapCenter[0] - 1), Math.random() * 2 + (mapCenter[1] - 1)];
+    //     data.push(loc);
+    // }
+
+    function init() {
+        var canvasLayer = new Mapbox.CanvasOverlayer({
+            map,
+        });
+        if (renderParticle instanceof Function) {
+            renderParticle(canvasLayer.canvas);
+        }
+    }
+
+</script>
+</body>
+</html>
