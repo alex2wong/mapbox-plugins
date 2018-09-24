@@ -26,6 +26,7 @@ Note: pls visit all demo with **HTTPS**..
 
 ![Canvas Line Style](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/canvasLine.jpg)
 canvas line style which can be integrate to any map/chart lib.
+
 ## Online demo
 [placeholder]:p
 
@@ -39,6 +40,8 @@ canvas line style which can be integrate to any map/chart lib.
 | [Glow animation](https://alex2wong.github.io/mapbox-plugins/examples/glowstyle) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/glowstyle) |
 | [Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/line_animation) |
 | [Canvas Line Style](https://alex2wong.github.io/mapbox-plugins/examples/line_style/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/line_style/index.html) |
+| [Canvas Staring Demo](https://alex2wong.github.io/mapbox-plugins/examples/particle_mask/) ||
+| [Tilting Ui Marker](https://alex2wong.github.io/mapbox-plugins/examples/vectortile/)||
 
 
 ## run locally
