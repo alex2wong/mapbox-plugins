@@ -1,3 +1,5 @@
+const path = require('path');
+
 module.exports = {
     entry: {
         index: [
@@ -5,34 +7,31 @@ module.exports = {
             ]
     },
     output: {
-        path: "./dist",
+        path: path.resolve(__dirname, "dist"),
         filename: "bundle.js",
 	    library: 'Mapbox',
         libraryTarget: 'umd',
     },
     module: {
-        loaders: [
+        rules: [
         {
             // extention: ".js",
             test: /\.js$/,
             exclude: /node_modules/,
-            loader: 'babel'
-            // query: {
-            //     compact: false
-            // }
+            loader: 'babel-loader'
         },
         {
             test: /\.html$/,
             exclude: /(node_modules)/,
-            loader: 'raw'
+            loader: 'html-loader'
         }, {
             test: /\.sass$/,
             exclude: /(node_modules)/,
-            loader: 'style!css!sass'
+            loader: 'sass-loader'
         }, {
             test: /\.css$/,
             exclude: /(node_modules)/,
-            loader: 'style!css'
+            loader: 'style-loader'
         }]
     },
     plugins: [

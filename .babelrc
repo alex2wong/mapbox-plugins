@@ -1,6 +1,8 @@
 {
   "presets": [
-    "latest"
+    "@babel/preset-env"
   ],
-  "plugins": ["transform-decorators"]
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", { "legacy": true }]
+  ]
 }

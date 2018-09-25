@@ -1,5 +1,5 @@
 import Drone from './drone';
-import { deprecate } from 'core-decorators';
+// import { deprecate } from 'core-decorators';
 import { CanvasOverlayer} from './layers/canvasOverlay';
 
 const interval = 25;
@@ -75,7 +75,6 @@ export default class controllers {
      * Dashboard bind with a drone instance and div element... 
      * After start this controller, use WSAD to move drone.
      */
-    // @deprecate
     static dashBoard(drone, ele) {
         if ((drone instanceof Drone) !== true ) {
             console.error("dashBoard must bind with a drone instance.");

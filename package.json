@@ -8,12 +8,11 @@
     "@turf/destination": "^3.10.3",
     "@turf/distance": "^3.10.3",
     "@turf/hex-grid": "^3.10.3",
-    "core-decorators": "^0.15.0",
     "core-js": "^2.4.1",
     "esdoc": "^1.1.0",
     "esdoc-standard-plugin": "^1.0.0",
     "lowpoly": "^0.1.0",
-    "mapbox-gl": "^0.39.1",
+    "mapbox-gl": "^0.49.0",
     "rbush": "^2.0.1",
     "reflect-metadata": "^0.1.8",
     "request": "^2.81.0",
@@ -22,17 +21,18 @@
     "zone.js": "^0.7.2"
   },
   "devDependencies": {
+    "@babel/core": "^7.1.0",
+    "@babel/plugin-proposal-decorators": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
     "babel-cli": "^6.18.0",
-    "babel-core": "^6.18.2",
-    "babel-loader": "^6.2.8",
-    "babel-plugin-transform-decorators": "^6.13.0",
-    "babel-preset-latest": "^6.16.0",
+    "babel-loader": "^8.0.2",
     "eslint": "^4.7.2",
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "gulp": "^3.9.1",
-    "webpack": "^1.13.3"
+    "webpack": "^4.19.1",
+    "webpack-cli": "^3.1.1"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
