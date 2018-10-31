@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Display buildings in 3D</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='../../dist/mapbox-gl.js'></script>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />
+    <script src="../../dist/bundle.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        .text {
+          color: rgb(255, 255, 255);
+        }
+    </style>
+</head>
+<body>
+<h4 class="text">Loading Data..</h4>
+<div id='map'></div>
+<script>
+const center = [-87.61694, 41.86625];
+mapboxgl.accessToken = false;
+var map = new mapboxgl.Map({
+    container: 'map',
+    style: Mapbox.Config.emptyStyle,
+    center: center,
+    zoom: 10,
+    pitch: 40,
+    bearing: 20
+});
+
+var voxelGjson = { features: [], type: 'FeatureCollection' };
+map.on('load', function() {
+    loadHeight(addTerrainLayer);
+});
+
+function addTerrainLayer() {
+    map.addLayer({
+        'id': 'room-extrusion',
+        'type': 'fill-extrusion',
+        'source': {
+            // GeoJSON Data source used in vector tiles, documented at
+            // https://gist.github.com/ryanbaumann/a7d970386ce59d11c16278b90dde094d
+            'type': 'geojson',
+            'data': voxelGjson,
+        },
+        'paint': {
+            // See the Mapbox Style Specification for details on data expressions.
+            // https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions
+
+            // Get the fill-extrusion-color from the source 'color' property.
+            'fill-extrusion-color': ['get', 'color'],
+
+            // Get fill-extrusion-height from the source 'height' property.
+            'fill-extrusion-height': ['get', 'height'],
+
+            // // Get fill-extrusion-base from the source 'base_height' property.
+            'fill-extrusion-base': ['get', 'base_height'],
+
+            // Make extrusions slightly opaque for see through indoor walls.
+            'fill-extrusion-opacity': 0.7
+        }
+    });
+}
+
+// set z-depth value for vertices in geometry
+function attachHeight(geometry, data) {
+    // return position vertices in geometry.
+    var vertices = geometry.attributes.position.array;
+    console.log('bufferGeom Position Array length: '+ vertices.length/3.0);
+    for ( var i = 0, j = 0, l = vertices.length; i < l; i ++, j += 3 ) {
+        if (!data[i]) {
+            break;
+        } else {
+            // set z-depth value namely height
+            vertices[ j-1 ] = data[i] * 0.1;
+        }
+    }
+    console.log('height attach finished...');
+    return geometry;
+}
+
+const voxelWidth = 0.0005; // real geom distance each voxel width represent.
+const startLng = center[0];
+const startLat = center[1];
+function loadHeight(cb) {
+    var img = new Image();
+    img.onload = function(blob) {
+        var canv = document.createElement('canvas');
+        canv.height = img.height/2;
+        canv.width = img.width/2;
+        var ctx = canv.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        var imageData = ctx.getImageData(img.width/4, img.height/4, img.width/4, img.width/4).data;
+        
+        // image = context.getImageData( 0, 0, width, height );
+        console.log('image data length: '+ imageData.length);
+        // get the band4 value from height source image.
+        for (var i = 0, j = 0, rowNum = 0, colNum = 0; i < imageData.length; j++, i+=4) {
+            // i denotes the voxel* bandIndex, j is the voxel index it self.
+            if (j > 100000) break;
+            if (j % Math.round(img.width/4) == 0) {
+                // console.warn(`current j ${j} represent how many voxel we've traversed, row ${rowNum}, col ${colNum}`);
+                rowNum += 1;
+                colNum = 0;
+            } else {
+                colNum += 1;
+            }
+            // generate voxel feature with height prop.
+            voxelGjson.features.push(genVoxelFeature(startLng + colNum*2*voxelWidth, startLat - rowNum*2*voxelWidth, imageData[i]));
+        }
+        console.warn(`generate terrain from height image completed..`);
+        if (cb && typeof cb == 'function') {
+            cb.apply(this);
+        }
+        // debugger;
+        // // attach height to a virtual geojson geoms
+        // attachHeight(bufferPlane, data);
+    }
+    img.src = './height.png';
+}
+
+function genVoxelFeature(centerX, centerY, height) {
+    var voxelColor = 'rgb(20, 20, 40)';
+    if (height < 10 && height < 60) {
+        voxelColor = 'rgb(40, 60, 160)'; // blue water
+    } else if (height < 80) {
+        voxelColor = 'rgb(60, 120, 80)'; // green grass
+    } else if (height < 100) {
+        voxelColor = 'rgb(60, 170, 80)'; // green grass
+    } else if (height < 140) {
+        voxelColor = 'rgb(170, 160, 80)'; // land
+    } else {
+        voxelColor = 'rgb(220, 240, 240)'; // mountain
+    }
+    return {"type": "Feature",
+      "properties": {
+        "level": 1,
+        "name": "voxel",
+        "height": height*10,
+        "base_height": 0,
+        color: voxelColor
+        // "color": `rgb(1, ${height}, ${height})`
+      },
+      "geometry": {
+        "coordinates": [
+          [
+            [
+              centerX-voxelWidth,
+              centerY+voxelWidth
+            ],
+            [
+              centerX+voxelWidth,
+              centerY+voxelWidth
+            ],
+            [
+              centerX+voxelWidth,
+              centerY-voxelWidth
+            ],
+            [
+              centerX-voxelWidth,
+              centerY-voxelWidth
+            ],
+            [
+              centerX-voxelWidth,
+              centerY+voxelWidth
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      id: `${centerX}${centerY}${height}`
+    };
+}
+
+</script>
+
+</body>
+</html>
