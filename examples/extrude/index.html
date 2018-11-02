@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset='utf-8' />
-    <title>Display buildings in 3D</title>
+    <title>Display voxel world</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
     <script src='../../dist/mapbox-gl.js'></script>
     <link href='../../dist/mapbox-gl.css' rel='stylesheet' />
@@ -10,14 +10,31 @@
     <style>
         body { margin:0; padding:0; }
         #map { position:absolute; top:0; bottom:0; width:100%; }
-        .text {
+        #status {
+          position: absolute;
+          right: 10px;
           color: rgb(255, 255, 255);
+        }
+        #canvas {
+          border: 1px solid grey;
+          position: absolute;
+        }
+        #color {
+          position: absolute;
+          left: 5px;
+        }
+        input[type="color"]  {
+            border: 0 solid transparent;
+            border-image: url('');
+            /* -webkit-appearance:  */
         }
     </style>
 </head>
 <body>
-<h4 class="text">Loading Data..</h4>
 <div id='map'></div>
+<canvas id="canvas" width="400" height="400"></canvas>
+<input type="color" id="color">
+<h4 id="status">Loading Data..</h4>
 <script>
 const center = [-87.61694, 41.86625];
 mapboxgl.accessToken = false;
@@ -84,23 +101,24 @@ function attachHeight(geometry, data) {
 const voxelWidth = 0.0005; // real geom distance each voxel width represent.
 const startLng = center[0];
 const startLat = center[1];
-function loadHeight(cb) {
+function loadHeight(cb, lodRate) {
     var img = new Image();
     img.onload = function(blob) {
-        var canv = document.createElement('canvas');
-        canv.height = img.height/2;
-        canv.width = img.width/2;
+        var canv = document.querySelector('#canvas');
+        canv.height = img.height;
+        canv.width = img.width;
         var ctx = canv.getContext('2d');
         ctx.drawImage(img, 0, 0);
-        var imageData = ctx.getImageData(img.width/4, img.height/4, img.width/4, img.width/4).data;
+        var imageData = ctx.getImageData(0, 0, canv.width, canv.width).data;
         
         // image = context.getImageData( 0, 0, width, height );
         console.log('image data length: '+ imageData.length);
-        // get the band4 value from height source image.
+        // get the band1 value from height source image.
         for (var i = 0, j = 0, rowNum = 0, colNum = 0; i < imageData.length; j++, i+=4) {
             // i denotes the voxel* bandIndex, j is the voxel index it self.
+            // // limit voxel number for performance !
             if (j > 100000) break;
-            if (j % Math.round(img.width/4) == 0) {
+            if (j % Math.round(canv.width) == 0) {
                 // console.warn(`current j ${j} represent how many voxel we've traversed, row ${rowNum}, col ${colNum}`);
                 rowNum += 1;
                 colNum = 0;
@@ -111,6 +129,8 @@ function loadHeight(cb) {
             voxelGjson.features.push(genVoxelFeature(startLng + colNum*2*voxelWidth, startLat - rowNum*2*voxelWidth, imageData[i]));
         }
         console.warn(`generate terrain from height image completed..`);
+        document.querySelector('#status').innerHTML = 'Data loaded, start rendering '
+             + canv.height * canv.width + ' voxels';
         if (cb && typeof cb == 'function') {
             cb.apply(this);
         }
@@ -118,18 +138,18 @@ function loadHeight(cb) {
         // // attach height to a virtual geojson geoms
         // attachHeight(bufferPlane, data);
     }
-    img.src = './height.png';
+    img.src = './height2.png';
 }
 
 function genVoxelFeature(centerX, centerY, height) {
-    var voxelColor = 'rgb(20, 20, 40)';
-    if (height < 10 && height < 60) {
-        voxelColor = 'rgb(40, 60, 160)'; // blue water
-    } else if (height < 80) {
-        voxelColor = 'rgb(60, 120, 80)'; // green grass
-    } else if (height < 100) {
-        voxelColor = 'rgb(60, 170, 80)'; // green grass
-    } else if (height < 140) {
+    var voxelColor;
+    if (height <= 10) {
+        voxelColor = 'rgb(60, 100, 180)'; // blue water
+    } else if (height < 60) {
+        voxelColor = 'rgb(60, 160, 80)'; // green grass
+    } else if (height < 120) {
+        voxelColor = 'rgb(60, 200, 80)'; // green grass
+    } else if (height < 160) {
         voxelColor = 'rgb(170, 160, 80)'; // land
     } else {
         voxelColor = 'rgb(220, 240, 240)'; // mountain
@@ -172,6 +192,22 @@ function genVoxelFeature(centerX, centerY, height) {
       },
       id: `${centerX}${centerY}${height}`
     };
+}
+
+// edit canvas image data by canvas x,y.
+function editHeight(x, y, raise=true) {
+    const canv = document.querySelector('#canvas');
+    const ctx = canv.getContext('2d');
+    const imageData = ctx.getImageData(x, y, 1, 1).data;
+    if (raise && imageData[0] + 5 <= 255) {
+        imageData[0] += 5;
+    } else if (!raise && imageData[1] - 5 >=0) {
+        imageData[0] -= 5;
+    } else {
+        return;
+    }
+    console.warn('changed canvas data..');
+    ctx.putImageData(imageData, x, y);
 }
 
 </script>
