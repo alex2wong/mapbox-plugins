@@ -29,7 +29,7 @@ function addTerrainLayer() {
         'data': voxelGjson,
     });
     map.addLayer({
-        'id': 'room-extrusion',
+        'id': 'terrain-extrusion',
         'type': 'fill-extrusion',
         'source': 'voxelSource',
         'paint': {
@@ -46,7 +46,7 @@ function addTerrainLayer() {
             'fill-extrusion-base': ['get', 'base_height'],
 
             // Make extrusions slightly opaque for see through indoor walls.
-            'fill-extrusion-opacity': 0.7
+            'fill-extrusion-opacity': 1
         }
     });
 }
