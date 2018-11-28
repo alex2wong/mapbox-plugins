@@ -117,25 +117,27 @@ function genVoxelSource(canv, cb) {
 
 // color can comes from imagery.
 
-function genVoxelFeature(centerX, centerY, height, UintArrIndex) {
-    var voxelColor = `rgb(${colorData[UintArrIndex]},${colorData[UintArrIndex+1]},${colorData[UintArrIndex+2]})`;
-    // if (height <= 10) {
-    //     voxelColor = 'rgb(60, 100, 180)'; // blue water
-    // } else if (height < 60) {
-    //     voxelColor = 'rgb(60, 160, 80)'; // green grass
-    // } else if (height < 120) {
-    //     voxelColor = 'rgb(60, 200, 80)'; // green grass
-    // } else if (height < 160) {
-    //     voxelColor = 'rgb(170, 160, 80)'; // land
-    // } else {
-    //     voxelColor = 'rgb(220, 240, 240)'; // mountain
-    // }
+function genVoxelFeature(centerX, centerY, height, UintArrIndex, asBaseheight = false) {
+    var voxelColor;
+    if (UintArrIndex !== undefined || UintArrIndex === null) {
+        voxelColor = `rgb(${colorData[UintArrIndex]},${colorData[UintArrIndex+1]},${colorData[UintArrIndex+2]})`;
+    } else if (height <= 10) {
+        voxelColor = 'rgb(60, 100, 180)'; // blue water
+    } else if (height < 60) {
+        voxelColor = 'rgb(60, 160, 80)'; // green grass
+    } else if (height < 120) {
+        voxelColor = 'rgb(60, 200, 80)'; // green grass
+    } else if (height < 160) {
+        voxelColor = 'rgb(170, 160, 80)'; // land
+    } else {
+        voxelColor = 'rgb(220, 240, 240)'; // mountain
+    }
     return {"type": "Feature",
       "properties": {
         "level": 1,
         "name": "voxel",
-        "height": height*10,
-        "base_height": 0,
+        "height": height * 10 + 1,
+        "base_height": asBaseheight ? height * 10 : 0,
         color: voxelColor
         // "color": `rgb(1, ${height}, ${height})`
       },
@@ -199,6 +201,13 @@ function editHeight(x, y, raise=true) {
     // genVoxelSource(canv, function() {
     //     map.getSource('voxelSource').setData(voxelGjson);
     // });
+
+    //// test baseHeight floors..0.0005
+    voxelGjson.features.push(genVoxelFeature(-87.40694, 41.85525, 60, null, true));
+    voxelGjson.features.push(genVoxelFeature(-87.40694, 41.85525, 65, null, true));
+    voxelGjson.features.push(genVoxelFeature(-87.40694, 41.85525, 70, null, true));
+    console.warn('inserting floors features...');
+    map.getSource('voxelSource').setData(voxelGjson);
 }
 
 /**
