@@ -27,7 +27,7 @@ Note: pls visit all demo with **HTTPS**..
 ![Canvas Line Style](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/canvasLine.jpg)
 canvas line style which can be integrate to any map/chart lib.
 
-![Voxelize terrain data](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/voxelworld.jpg)
+![Voxelize terrain data](https://upload-images.jianshu.io/upload_images/1950967-27728165c2bedf82.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp)
 👆 Voxelize terrain data from a height image.
 
 ## Online demo
