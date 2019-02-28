@@ -31,11 +31,12 @@
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
     "gulp": "^3.9.1",
+    "jest": "^24.1.0",
     "webpack": "^4.19.1",
     "webpack-cli": "^3.1.1"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --no-cache --notify",
     "server": "http-server",
     "babel": "babel src -d lib",
     "build": "webpack -p",
