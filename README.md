@@ -33,7 +33,7 @@ canvas line style which can be integrate to any map/chart lib.
 ## Online demo
 [placeholder]:p
 
-| demo title |  |
+| Demo | Code |
 | :-------- | :--------:|
 | [Sprite track DEMO](https://alex2wong.github.io/mapbox-plugins/examples/sprite) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/sprite) |
 | [Custom dom overlay DEMO](https://alex2wong.github.io/mapbox-plugins/examples/domoverlay) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/domoverlay) |
@@ -51,9 +51,13 @@ canvas line style which can be integrate to any map/chart lib.
 
 > npm install
 
-> npm start
+> npm run dev
 
-visit from localhost:8080/examples/
+then visit from localhost:8080/examples/, HotModuleReload supported.
+
+> npm run build
+
+to Build all plugins into bundle.js with namespace: Mapbox
 
 
 ## how to use

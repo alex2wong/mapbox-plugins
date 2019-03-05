@@ -30,17 +30,23 @@
     "eslint-config-airbnb": "^9.0.1",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "friendly-errors-webpack-plugin": "^1.7.0",
     "gulp": "^3.9.1",
+    "html-loader": "^0.5.5",
+    "html-webpack-plugin": "^3.2.0",
     "jest": "^24.1.0",
+    "portfinder": "^1.0.20",
     "webpack": "^4.19.1",
-    "webpack-cli": "^3.1.1"
+    "webpack-cli": "^3.1.1",
+    "webpack-dev-server": "^3.2.1",
+    "webpack-merge": "^4.2.1"
   },
   "scripts": {
     "test": "jest --no-cache --notify",
     "server": "http-server",
     "babel": "babel src -d lib",
     "build": "webpack -p",
-    "start": "webpack && npm run server",
+    "dev": "webpack-dev-server --progress --config webpack.dev.conf.js",
     "lint": "eslint --cache --ignore-path .gitignore src"
   },
   "repository": {
