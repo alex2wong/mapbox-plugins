@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>Custom webgl layer</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <script src='../../dist/mapbox-gl.js'></script>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />
+    <script src="../../dist/bundle.js"></script>
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+        #status {
+          position: absolute;
+          right: 10px;
+          color: rgb(255, 255, 255);
+        }
+        #canvas {
+          border: 1px solid grey;
+          position: absolute;
+        }
+        #color {
+          position: absolute;
+          left: 5px;
+        }
+        input[type="color"]  {
+            border: 0 solid transparent;
+            border-image: url('');
+            /* -webkit-appearance:  */
+        }
+    </style>
+</head>
+<body>
+<div id='map'></div>
+<script src="./index.js"></script>
+</body>
+</html>
