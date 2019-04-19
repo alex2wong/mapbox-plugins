@@ -4,34 +4,19 @@
     <meta charset='utf-8' />
     <title>Custom webgl layer</title>
     <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-    <script src='../../dist/mapbox-gl.js'></script>
-    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />
-    <script src="../../dist/bundle.js"></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
     <style>
-        body { margin:0; padding:0; }
-        #map { position:absolute; top:0; bottom:0; width:100%; }
-        #status {
-          position: absolute;
-          right: 10px;
-          color: rgb(255, 255, 255);
-        }
-        #canvas {
-          border: 1px solid grey;
-          position: absolute;
-        }
-        #color {
-          position: absolute;
-          left: 5px;
-        }
-        input[type="color"]  {
-            border: 0 solid transparent;
-            border-image: url('');
-            /* -webkit-appearance:  */
+        body { margin:0; padding:0;}
+        #map {
+            height:600px;
         }
     </style>
 </head>
 <body>
+<h4>Custom WebGL layer</h4>
 <div id='map'></div>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+<script src="../../dist/bundle.js"></script>
 <script src="./index.js"></script>
 </body>
 </html>
