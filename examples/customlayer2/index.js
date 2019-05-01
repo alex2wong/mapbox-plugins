@@ -41,14 +41,6 @@ var customLayer = {
         this.camera = new THREE.Camera();
         this.scene = new THREE.Scene();
 
-        // // create two three.js lights to illuminate the model
-        // var directionalLight = new THREE.DirectionalLight(0xffffff);
-        // directionalLight.position.set(0, -70, 100).normalize();
-        // this.scene.add(directionalLight);
-
-        // var ambientlight = new THREE.AmbientLight(0xffffff);
-        // this.scene.add(ambientlight);
-
         var light = new THREE.SpotLight(0xffffffFFF, 1.0);
         light.position.set(0, 50, 20);
         light.angle = Math.PI/6;
@@ -65,21 +57,6 @@ var customLayer = {
         light.shadow.mapSize.height = 512;
         // this.scene.add(light);
 
-        // var directionalLight2 = new THREE.DirectionalLight(0xffffff);
-        // directionalLight2.position.set(0, 70, 100).normalize(); // height 170, zdepth 100.
-        // this.scene.add(directionalLight2);
-
-        // use the three.js GLTF loader to add the 3D model to the three.js scene
-        // var loader = new THREE.GLTFLoader();
-        // loader.load('https://docs.mapbox.com/mapbox-gl-js/assets/34M_17/34M_17.gltf', (function (gltf) {
-        //     this.scene.add(gltf.scene);
-        // }).bind(this));
-        function createSphere(radius, seg, color, isWireframe=true) {
-            return new THREE.Mesh(
-                new THREE.SphereGeometry(radius, seg),
-                new THREE.MeshLambertMaterial({ color: color, wireframe: isWireframe })
-            )
-        }
         function createRect(xlen, ylen, zdepth, color) {
             var cube = new THREE.Mesh(
                 new THREE.CubeGeometry(xlen, ylen, zdepth),
@@ -99,7 +76,6 @@ var customLayer = {
         const plane = createRect(.5, .5, .5, '#0000ff');
         plane.position.set(0, .25, 0); // set Y to make sure 3d obj is above ground.~ 
         // this.scene.add(plane);
-        // // this.scene.add(createSphere(1, 10, 'rgba(0,255,0,.3)'));
         
         // const plane2 = createPlane(1, 1, '#00cc00');
         // plane2.position.set(0, 0, 0);  // height/depth
@@ -148,5 +124,5 @@ var customLayer = {
 
 map.on('style.load', function () {
     console.warn('style loaded, adding THREE layer..');
-    map.addLayer(customLayer);
+    map.addLayer(customLayer, 'roads labels');
 });
