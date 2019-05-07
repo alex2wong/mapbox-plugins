@@ -8,6 +8,11 @@ export let myTween = {
         return this;
     },
     to : function(targets, duration, cb) {
+        if (myTween.timer) {
+            // clear last animation timer.
+            console.log('clear previous tween.to timer~');
+            clearInterval(myTween.timer);
+        }
         this.lastAniParams = [targets, duration];
         if (targets != undefined && duration != undefined && myTween.objs != null) {
             var inter = 1000/myTween.fps,
@@ -42,12 +47,10 @@ export let myTween = {
                             myTween.objs[i] = Object.assign([], myTween.objs[i], objsCopy[i]);
                         }
                         // myTween.objs = Object.assign([], myTween.objs, objsCopy);
-                        console.warn("animation reset ...");
                     } else {
                         myTween.paused = true;
                         clearInterval(myTween.timer);
                         myTween.timerOn = false;
-                        console.warn("animation end !!!");
                     }
                     return;
                 }
