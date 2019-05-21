@@ -1,6 +1,6 @@
 {
   "name": "mapbox-plugins",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Customized Mapbox plugins, including game control, canvasOverlayer, scene animation",
   "main": "index.js",
   "dependencies": {

@@ -2,7 +2,6 @@ const satSource = {
     "custom-tms": {   
         'type': 'raster',
         'tiles': [
-            // "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
             "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}",
             // "https://c.tiles.mapbox.com/v3/osmbuildings.kbpalbpk/{z}/{x}/{y}.png",
             // "http://b.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -32,7 +31,7 @@ const darkSource = {
     },
 }
 
-const tk = "pk.eyJ1IjoiaHVhbmd5aXhpdSIsImEiOiI2WjVWR1hFIn0.1P90Q-tkbHS38BvnrhTI6w";
+const tk = false;
 
 const basicStyle = {
     "version": 8,
