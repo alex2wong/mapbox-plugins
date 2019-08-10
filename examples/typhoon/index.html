@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8' />
+    <title>custom Threejs typhoon</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body { margin:0; padding:0;}
+        .map-cont {
+            position: relative;
+        }
+        #map {
+            height:600px;
+        }
+        #height {
+            display: none;
+        }
+        .controller {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-size: 12px;
+            color: #eee;
+            align-items: center;
+            opacity: .5;
+        }
+        .ctl-row {
+            display: flex;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+<h4>Threejs typhoon</h4>
+<div class="map-cont">
+    <canvas id="height"></canvas>
+    <div id='map'></div>
+    <div class="controller">
+        <div class="ctl-row">
+            <input type="checkbox" checked onclick="toggleTerrain()" id="toggleTerrain">
+            <label for="toggleTerrain">Typhoon Layer</label>
+        </div>
+        <div>
+            <input type="range" value="90" id="opacity" onchange="changeOpacity(this)">
+        </div>
+    </div>
+</div>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.js'></script>
+<script src="../../dist/bundle.js"></script>
+<script src='https://unpkg.com/three@0.102.0/build/three.min.js'></script>
+<script src="https://unpkg.com/three@0.102.0/examples/js/loaders/GLTFLoader.js"></script>
+<script src="https://alex2wong.github.io/ThreejsDemo/TrackballControls.js"></script>
+<script src="./textureloader.js"></script>
+<script src="./index.js"></script>
+</body>
+</html>
