@@ -30,6 +30,9 @@ canvas line style which can be integrate to any map/chart lib.
 ![Voxelize terrain data](https://upload-images.jianshu.io/upload_images/1950967-27728165c2bedf82.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp)
 👆 Voxelize terrain data from a height image.
 
+![Extrude typhoon image](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/threetyphoon.jpg)
+👆 Extrude typhoon radar image.
+
 ## Online demo
 [placeholder]:p
 
@@ -45,6 +48,7 @@ canvas line style which can be integrate to any map/chart lib.
 | [Canvas Line Style](https://alex2wong.github.io/mapbox-plugins/examples/line_style/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/line_style/index.html) |
 | [Canvas Staring Demo](https://alex2wong.github.io/mapbox-plugins/examples/particle_mask/) ||
 | [Tilting Ui Marker](https://alex2wong.github.io/mapbox-plugins/examples/vectortile/)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
+| [Threejs Typhoon](https://alex2wong.github.io/mapbox-plugins/examples/typhoon) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
 
 
 ## run locally
@@ -53,7 +57,7 @@ canvas line style which can be integrate to any map/chart lib.
 
 > npm run dev
 
-then visit from localhost:8080/examples/, HotModuleReload supported.
+then visit from http://localhost:8080/examples/, HotModuleReload supported.
 
 > npm run build
 

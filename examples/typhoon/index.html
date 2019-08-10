@@ -7,6 +7,13 @@
     <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.53.1/mapbox-gl.css' rel='stylesheet' />
     <style>
         body { margin:0; padding:0;}
+        .header {
+            width: 100%;
+            margin: 10px;
+            text-align: center;
+            font-size: 24px;
+            color: #ccc;
+        }
         .map-cont {
             position: relative;
         }
@@ -32,7 +39,7 @@
     </style>
 </head>
 <body>
-<h4>Threejs typhoon</h4>
+<div class="header">Threejs typhoon</div>
 <div class="map-cont">
     <canvas id="height"></canvas>
     <div id='map'></div>
