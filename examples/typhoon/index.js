@@ -1,9 +1,10 @@
 // mapboxgl.accessToken = false;
+const center = [120.608807, 29.262392];
 var map = window.map = new mapboxgl.Map({
     container: 'map',
     style: Mapbox.Config.darkStyle,
-    // style: 'mapbox://styles/mapbox/light-v10',
-    center: [121.638807, 21.762392],
+    // style: 'mapbox://styles/mapbox/dark-v10',
+    center: center,
     zoom: 4.8,
     pitch: 30,
     hash: true
@@ -13,7 +14,7 @@ map.addControl(new mapboxgl.FullscreenControl);
 
 // parameters to ensure the THREE plane is georeferenced correctly on the map
 // var modelOrigin = [19.638807, 0.762392];
-var modelOrigin = [122.638807, 28.76239];
+var modelOrigin = center;
 var modelAltitude = 0;
 var modelRotate = [Math.PI / 2, 0, 0];
 var modelScale = 3.31843220338983e-5;
@@ -83,3 +84,17 @@ map.on('style.load', function () {
     console.warn('style loaded, adding THREE layer..');
     map.addLayer(customLayer);
 });
+
+function rotate() {
+    map.rotateTo(map.getBearing() + 1);
+    reqFrame = requestAnimationFrame(rotate);
+}
+rotate();
+function toggleRotate() {
+    if (reqFrame) {
+        cancelAnimationFrame(reqFrame);
+        reqFrame = 0;
+    } else {
+        rotate();
+    }
+}
