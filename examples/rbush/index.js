@@ -34,7 +34,7 @@ function randomRect(canv) {
     rect.maxY = rect.minY + parseInt(Math.random()*20);
     rect.name = "rect" + itemIndex;
     itemIndex += 1;
-    console.log(JSON.stringify(rect));
+    // console.log(JSON.stringify(rect));
     return rect;
 }
 
@@ -81,9 +81,7 @@ function handler(evt){
     Mapbox.Canvas.drawRect(bbox);
 
     var elapse = getElapse(start);
-    elapses.push(elapse);
-    console.warn("selected complete elapseTime(ms): " + elapse);
-    
+    elapses.push(elapse);    
 }
 
 var selected = [];

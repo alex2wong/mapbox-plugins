@@ -54,6 +54,7 @@ function loadTerrainLayer() {
     image.onload = (evt) => {
         imgWidth = evt.target.width;
         imgHeight = evt.target.height;
+        // !!important, align vertice and imgPix count by - 1.
         bufferPlane = bufferPlaneGeom(imgWidth - 1, imgHeight - 1, imgWidth - 1, imgHeight - 1);
         loadHeight();
     }
@@ -143,7 +144,7 @@ function attachHeight(geometry, data) {
     var flatArray = geometry.attributes.position.array;
     var verticesCount = flatArray.length / 3.0;
     console.warn('bufferGeom Vertices Array length: '+ verticesCount);
-    // Actually you would find triangle verticeCount is more than imgWidth*imgHeight by (imgWidth + imgHeight + 1)
+    // Actually you would find triangle verticeCount is more than imgWidth*imgHeight by (imgWidth + imgHeight + 1). Align required.
     for ( var i = 0, j = 0; i < verticesCount; i ++, j += 3 ) {
         if (data[i] === undefined) {
             console.warn(`data[${i}] is  undefined..`);
