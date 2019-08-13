@@ -1,8 +1,7 @@
 
 import Const from './const';
 import Bullet from './bullet';
-import { readonly, log } from './util';
-import { Sprite, randomName } from './sprites/sprite';
+import { Sprite } from './sprites/sprite';
 
 // // Drone model script
 // const firingTime = 1200, MAXSPEED = 3.900;
