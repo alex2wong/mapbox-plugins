@@ -1,4 +1,4 @@
-# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master) [![FOSSA Status](https://app.fossa.io/api/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins.svg?type=shield)](https://app.fossa.io/projects/git%2Bgithub.com%2Falex2wong%2Fmapbox-plugins?ref=badge_shield)
+# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master) [![Netlify Status](https://api.netlify.com/api/v1/badges/218aee4f-8771-4bb6-bb22-0df0a4a221a3/deploy-status)](https://app.netlify.com/sites/cocky-thompson-95a9bc/deploys)
 
 Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
 
