@@ -48,7 +48,7 @@ canvas line style which can be integrate to any map/chart lib.
 | [Canvas Line Style](https://alex2wong.github.io/mapbox-plugins/examples/line_style/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/line_style/index.html) |
 | [Canvas Staring Demo](https://alex2wong.github.io/mapbox-plugins/examples/particle_mask/) ||
 | [Tilting Ui Marker](https://alex2wong.github.io/mapbox-plugins/examples/vectortile/)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
-| [Threejs Typhoon](https://alex2wong.github.io/mapbox-plugins/examples/typhoon) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
+| [Threejs Typhoon](https://maphub.netlify.com/examples/typhoon/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
 
 
 ## run locally
