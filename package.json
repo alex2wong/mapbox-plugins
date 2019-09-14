@@ -1,6 +1,6 @@
 {
   "name": "mapbox-plugins",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Customized Mapbox plugins, including game control, canvasOverlayer, scene animation",
   "main": "dist/Mapbox.cjs.js",
   "module": "dist/Mapbox.esm.js",
