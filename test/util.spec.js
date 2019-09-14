@@ -38,11 +38,11 @@ describe('util.js', function(){
         expect(domContainer.querySelector('img') instanceof HTMLImageElement).toBe(true);
     })
 
-    it('set chart to domContainer', () => {
-        const chartContainer = document.createElement('div');
-        Util.setChart(chartContainer, { labels: ['type1', 'type2'], data: [22, 43] }, 'bar', 100);
-        expect(chartContainer.querySelector('canvas') instanceof HTMLCanvasElement).toBe(true);
-    })
+    // it('set chart to domContainer', () => {
+    //     const chartContainer = document.createElement('div');
+    //     Util.setChart(chartContainer, { labels: ['type1', 'type2'], data: [22, 43] }, 'bar', 100);
+    //     expect(chartContainer.querySelector('canvas') instanceof HTMLCanvasElement).toBe(true);
+    // })
 
     it('random points and circle', () => {
         const data = Util.rdObjs(1, [121, 30]);
