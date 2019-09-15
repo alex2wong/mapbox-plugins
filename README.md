@@ -1,4 +1,4 @@
-# mapbox-plugins ![travisStatus](https://travis-ci.org/alex2wong/mapbox-plugins.svg?branch=master) [![Netlify Status](https://api.netlify.com/api/v1/badges/218aee4f-8771-4bb6-bb22-0df0a4a221a3/deploy-status)](https://app.netlify.com/sites/cocky-thompson-95a9bc/deploys)
+# mapbox-plugins [![Netlify Status](https://api.netlify.com/api/v1/badges/218aee4f-8771-4bb6-bb22-0df0a4a221a3/deploy-status)](https://app.netlify.com/sites/cocky-thompson-95a9bc/deploys) <img src="https://img.shields.io/npm/v/mapbox-plugins" /> <img src="https://img.shields.io/npm/l/mapbox-plugins.svg" alt="license">
 
 Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
 
@@ -31,6 +31,7 @@ canvas line style which can be integrate to any map/chart lib.
 👆 Voxelize terrain data from a height image.
 
 ![Extrude typhoon image](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/threetyphoon.jpg)
+
 👆 Extrude typhoon radar image.
 
 ## Online demo
@@ -50,6 +51,22 @@ canvas line style which can be integrate to any map/chart lib.
 | [Tilting Ui Marker](https://alex2wong.github.io/mapbox-plugins/examples/vectortile/)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
 | [Threejs Typhoon](https://maphub.netlify.com/examples/typhoon/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
 
+## install and use
+
+> npm i mapbox-plugins
+
+For node.js:
+```
+var Mapbox = require('mapbox-plugins')
+console.warn(Mapbox.Config);
+```
+More often, for es6 development:
+```
+import { Config, CanvasOverlayer } from 'mapbox-plugins';
+var canvasLayer = new Mapbox.CanvasOverlayer({
+    map: map, // bind canvasOverlay with mapbox map instance..
+});
+```
 
 ## run locally
 
