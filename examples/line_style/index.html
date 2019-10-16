@@ -10,12 +10,12 @@
     <div id='map' style='width: 600px; height: 400px; background-color:#222;'></div>
 </body>
 <script src="../../dist/mapbox-gl.js"></script>
-<script src="../../dist/bundle.js"></script>
+<script src="../../dist/Mapbox.umd.js"></script>
 <script>    
     mapboxgl.accessToken = false;
     var mapCenter = [120.66, 30.01];
     var map = new mapboxgl.Map({
-        style: Mapbox.Config.lightStyle,
+        style: Mapbox.Config.emptyStyle,
         center: mapCenter,
         pitch: 15,
         zoom: 8,
@@ -29,7 +29,7 @@
             map,
             data: [[120.21, 30.21], [120.66, 30.01], [120.59, 29.70], [120.83, 29.81]],
             lineWidth: 2,
-            render: Mapbox.drawArrowLine
+            render: Mapbox.drawIconLine
         });
     }
 

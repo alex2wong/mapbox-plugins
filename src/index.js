@@ -11,7 +11,7 @@ import { CanvasOverlayer } from "./layers/canvasOverlay";
 import { DomOverlayer } from "./layers/domOverlay";
 import { WindLayer } from "./layers/windLayer";
 import * as Config from "./config";
-import { drawArrowLine } from "./layers/canvasUtil";
+import { drawIconLine } from "./layers/canvasUtil";
 import rbush from 'rbush';
 
 if (typeof mapboxgl != "undefined") mapboxgl.accessToken = Config.tk;
@@ -28,6 +28,6 @@ export {
   WindLayer,
   rbush,
   Config,
-  drawArrowLine,
+  drawIconLine,
   xMarker
 };
