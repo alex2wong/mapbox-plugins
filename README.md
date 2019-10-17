@@ -46,9 +46,9 @@ canvas line style which can be integrate to any map/chart lib.
 | [Integrate with Chart.js](https://alex2wong.github.io/mapbox-plugins/examples/chartlayer)  | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/chartlayer) |
 | [Glow animation](https://alex2wong.github.io/mapbox-plugins/examples/glowstyle) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/glowstyle) |
 | [Cool Route Animation](https://alex2wong.github.io/mapbox-plugins/examples/line_animation) | [view code](https://github.com/alex2wong/mapbox-plugins/tree/master/examples/line_animation) |
-| [Canvas Line Style](https://alex2wong.github.io/mapbox-plugins/examples/line_style/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/line_style/index.html) |
+| [Canvas Line Style](https://maphub.netlify.com/examples/line_style) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/line_style/index.html) |
 | [Canvas Staring Demo](https://alex2wong.github.io/mapbox-plugins/examples/particle_mask/) ||
-| [Tilting Ui Marker](https://alex2wong.github.io/mapbox-plugins/examples/vectortile/)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
+| [Tilting Ui Marker](https://maphub.netlify.com/examples/vectortile)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
 | [Threejs Typhoon](https://maphub.netlify.com/examples/typhoon/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
 
 ## install and use
@@ -63,7 +63,7 @@ console.warn(Mapbox.Config);
 More often, for es6 development:
 ```
 import { Config, CanvasOverlayer } from 'mapbox-plugins';
-var canvasLayer = new Mapbox.CanvasOverlayer({
+var canvasLayer = new CanvasOverlayer({
     map: map, // bind canvasOverlay with mapbox map instance..
 });
 ```
@@ -96,7 +96,7 @@ var canvasLayer = new Mapbox.CanvasOverlayer({
 // create a Drone inherites Sprite Class
 var drone = new Mapbox.Drone({
     direction: 45,
-    icon: "https://alex2wong.github.io/mapbox-plugins/assets/tri2.png"
+    icon: "drone.jpg"
 });
 
 // add keyboard control to Sprite.
@@ -112,5 +112,4 @@ update();
 ```
 
 
-### Any **☆Star, Enhancement and PR** are welcome :)
-
+### **☆Star, Enhancement and PR** are welcome :)

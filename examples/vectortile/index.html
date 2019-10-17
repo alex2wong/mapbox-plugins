@@ -31,13 +31,12 @@
     <div id='map' style='width: 600px; height: 400px; background-color:#222;'></div>
 </body>
 <script src="../../dist/mapbox-gl.js"></script>
-<script src="../../dist/bundle.js"></script>
+<script src="https://maphub.netlify.com/dist/Mapbox.umd.js"></script>
 <script>    
     mapboxgl.accessToken = false;
     var mapCenter = [-121.8175,37.297];
     var map = new mapboxgl.Map({
         style: Mapbox.Config.lightStyle,
-        // style: './mapStyle.json',
         center: mapCenter,
         pitch: 40,
         minZoom: 12,

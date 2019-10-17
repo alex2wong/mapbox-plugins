@@ -14,8 +14,8 @@ const lightSource = {
     "custom-tms": {   
         'type': 'raster',
         'tiles': [
-            'https://cartodb-basemaps-1.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
-            // 'http://www.google.cn/maps/vt?pb=!1m5!1m4!1i{z}!2i{x}!3i{y}!4i256!2m3!1e0!2sm!3i342009817!3m9!2sen-US!3sCN!5e18!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0&token=32965',
+            // 'https://cartodb-basemaps-1.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png'
+            'https://www.google.cn/maps/vt?pb=!1m5!1m4!1i{z}!2i{x}!3i{y}!4i256!2m3!1e0!2sm!3i342009817!3m9!2sen-US!3sCN!5e18!12m1!1e47!12m3!1e37!2m1!1ssmartmaps!4e0&token=32965',
         ],
         'tileSize': 256
     },
@@ -25,7 +25,7 @@ const darkSource = {
     "custom-tms": {
         'type': 'raster',
         'tiles': [
-            'https://cartodb-basemaps-2.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+            'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
         ],
         'tileSize': 256
     },

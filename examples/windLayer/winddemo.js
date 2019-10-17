@@ -4,29 +4,7 @@
 mapboxgl.accessToken = false;
 var mapCenter = [118.0066, 30.6135];
 var map = new mapboxgl.Map({        
-    style: {
-        "version": 8,
-        "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
-        "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
-        "sources": {
-            "custom-tms": {   
-                'type': 'raster',
-                'tiles': [
-                    "https://huangyixiu.co:3003/proxy?proxyURI=http://map.geoq.cn/ArcGIS/rest/services/ChinaOnlineStreetPurplishBlue/MapServer/tile/{z}/{y}/{x}",
-                    // "http://www.google.cn/maps/vt?lyrs=s@702&gl=cn&x={x}&y={y}&z={z}"
-                ],
-                'tileSize': 256
-            },
-        },
-        "layers": [
-            // {
-            //     'id': 'custom-tms',
-            //     'type': 'raster',
-            //     'source': 'custom-tms',
-            //     'paint': {}
-            // },
-        ]
-    },
+    style: Mapbox.Config.emptyStyle,
     center: mapCenter,
     zoom: 2,
     pitch: 15,
@@ -37,7 +15,6 @@ var map = new mapboxgl.Map({
 map.on('load', function() {
     Mapbox.Util.getJSON("../../assets/countries.geojson")
         .then((res) => {
-            console.log("got jsonData..: " + res);
             data = res;
             map.addSource("world", {
                 "type": "geojson",
@@ -55,24 +32,24 @@ map.on('load', function() {
                 // "filter": ["==", "$type", "Polygon"]
             });
         });
-    Mapbox.myTween.fps = 10;
+    Mapbox.myTween.fps = 50;
     Mapbox.myTween.loop = true;
     setTimeout(init, 500);
 });
 
 function init() {
-    var objNum = 10, windlayer = new Mapbox.WindLayer({
+    var windlayer = new Mapbox.WindLayer({
         map: map,
         shadow: true,
         blurWidth: 0,
         radius: 1
     });
-    var windImage = new Image(), geojson = false;
+    var windImage = new Image(), mapboxRenderer = false;
     windImage.src = '../../assets/2016112000.png';
     windImage.onload = function() {
         // updateWind should include myTween things below..
-        windlayer.updateWind(windImage, geojson, 2);
-        if (!geojson) {
+        windlayer.updateWind(windImage, mapboxRenderer, 2);
+        if (!mapboxRenderer) {
             objs = windlayer.particles; targets = genWinTarget(objs);
             // hello, nice2meet you. calc targets depend on its angle, use 1 degree as dist.
             Mapbox.myTween.get(objs).to(targets, 8000, windlayer.redraw);
