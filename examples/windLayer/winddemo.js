@@ -32,8 +32,6 @@ map.on('load', function() {
                 // "filter": ["==", "$type", "Polygon"]
             });
         });
-    Mapbox.myTween.fps = 50;
-    Mapbox.myTween.loop = true;
     setTimeout(init, 500);
 });
 
@@ -50,12 +48,16 @@ function init() {
         // updateWind should include myTween things below..
         windlayer.updateWind(windImage, mapboxRenderer, 2);
         if (!mapboxRenderer) {
-            objs = windlayer.particles; targets = genWinTarget(objs);
-            // hello, nice2meet you. calc targets depend on its angle, use 1 degree as dist.
-            Mapbox.myTween.get(objs).to(targets, 8000, windlayer.redraw);
-            map.on('moveend', function(){
-                windlayer.redraw(objs);
-            });
+            var windParticles = Mapbox.Util.deepClone(windlayer.particles);
+            // calc targets depend on its angle, use 1 degree as dist.
+            function animate() {
+                windMoving(windParticles)
+                windlayer.redraw(windParticles);
+                requestAnimationFrame(animate);
+            }
+            animate();
+            // reset windParticle every 3 sec
+            setInterval(function(){ windParticles = Mapbox.Util.deepClone(windlayer.particles); }, 3000)
         } else {
             map.addSource("wind", {
                 "type": "geojson",
@@ -81,23 +83,21 @@ function init() {
 /**
  * calc targets depend on its angle, use 1 degree as dist.
  * @param {*array of wind particles} source 
+ * @param {*distance in gratitude the wind particle survive } dist
  */
-function genWinTarget(source, dist=6) {
+function windMoving(source, dist=.5) {
     if (source instanceof Array) {
-        var targets = [];
         for(var i=0; i<source.length;i++) {
-            var targ = {};
             if (source[i].lon == undefined 
                 || source[i].angle == undefined 
                 || source[i].color == undefined) continue;
             xDelta = Math.cos(source[i].angle) * dist;
             yDelta = Math.sin(source[i].angle) * dist;
-            if (source[i].lat + yDelta > 84 || source[i].lat + yDelta < -84) targ.lat = source[i].lat;
-            else targ.lat = source[i].lat + yDelta;
-            targ.lon = source[i].lon + xDelta;
-            targ.color = source[i].color;
-            targets.push(targ);
+            // get rid of overflow particles..
+            if (source[i].lat + yDelta > 84 || source[i].lat + yDelta < -84) source[i] = {};
+            else source[i].lat = source[i].lat + yDelta;
+            source[i].lon = source[i].lon + xDelta;
+            source[i].color = source[i].color;
         }
-        return targets;
     }
 }

@@ -42,8 +42,8 @@
   },
   "scripts": {
     "test": "jest --no-cache --notify",
-    "rbuild": "rollup -c",
-    "rdev": "rollup -c -w",
+    "rbuild": "npx rollup -c",
+    "rdev": "npx rollup -c -w",
     "build": "webpack --config webpack.config.js",
     "dev": "webpack-dev-server --progress --config webpack.dev.conf.js",
     "lint": "eslint --cache --ignore-path .gitignore src"

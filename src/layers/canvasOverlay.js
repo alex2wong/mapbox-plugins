@@ -149,9 +149,11 @@ function _redraw(data) {
         }
         initCtx(ctx,this.blurWidth,"rgba(255,255,255,.4");
         for(let i=0;i<objs.length;i++) {
+            if (objs[i] === undefined || objs[i] === {}) continue;
             let x = objs[i][this.xfield], y = objs[i][this.yfield], 
                 radius = objs[i]['radius'] || 3, icon = objs[i]['icon'],
                 label = objs[i]['name'], rotate = objs[i]['direction'] || 0;
+            if (x === undefined || y === undefined) continue;
             radius = Math.abs(radius);
             let pix = this.lnglat2pix(x, y);
             if (pix == null) continue;
