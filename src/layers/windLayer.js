@@ -13,29 +13,21 @@ export class WindLayer extends CanvasOverlayer {
     }
     
     /**
-     * render particles based on image
+     * parse particles based on image
      * @param {*grid wind image} image 
+     * @param {*return geojson data to layer.particles or not }  renderInMapboxgl
+     * @param {*sample ratio of wind grid, bigger -> fewer grids } compressRatio 
      */
-    updateWind(image, geojson, compressRatio) {
-        let canvas = this.canvas, pix2render = [],
-            ctx = this.canvas.getContext("2d");
+    updateWind(image, renderInMapboxgl, compressRatio) {
         if (this.particles == undefined) {
             console.log("generating particles...");
-            this.particles = genParticles(image, geojson, compressRatio, this.radius);
-        }
-        // ctx.globalAlpha = 0.95;
-        if (!geojson) {
-            console.log("generating particles complete! num: " + this.particles.length);
-            this.redraw(this.particles);
-        } else {
-            // wind data should be rendered as mapboxgl vector.
-            console.log("generating particles complete! num: " + this.particles.features.length + " in geojson.");
+            this.particles = genParticles(image, renderInMapboxgl, compressRatio, this.radius);
         }
     }
 }
 
 function _redraw() {
-    // this.particles
+    // extends from canvasOverlay
 }
 
 /**

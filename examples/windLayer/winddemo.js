@@ -49,9 +49,8 @@ function init() {
         windlayer.updateWind(windImage, mapboxRenderer, 2);
         if (!mapboxRenderer) {
             var windParticles = Mapbox.Util.deepClone(windlayer.particles);
-            // calc targets depend on its angle, use 1 degree as dist.
             function animate() {
-                windMoving(windParticles)
+                windMoving(windParticles);
                 windlayer.redraw(windParticles);
                 requestAnimationFrame(animate);
             }
@@ -94,7 +93,7 @@ function windMoving(source, dist=.5) {
             xDelta = Math.cos(source[i].angle) * dist;
             yDelta = Math.sin(source[i].angle) * dist;
             // get rid of overflow particles..
-            if (source[i].lat + yDelta > 84 || source[i].lat + yDelta < -84) source[i] = {};
+            if (source[i].lat + yDelta > 84 || source[i].lat + yDelta < -84) continue;
             else source[i].lat = source[i].lat + yDelta;
             source[i].lon = source[i].lon + xDelta;
             source[i].color = source[i].color;
