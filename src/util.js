@@ -109,6 +109,7 @@ export default class util {
      */
     static setResource(dom, res) {
         if (!(res instanceof Array)) return;
+        dom.innerHTML = '';
         for (let i = 0; i < res.length; i ++) {
             let filetype = this.getFiletype(res[i]);
             if (filetype !== "") {
@@ -118,7 +119,7 @@ export default class util {
                 ele.src = res[i];
                 dom.style.borderRadius = "50%";
                 dom.appendChild(ele);
-            } 
+            }
             if (filetype == 'video') {
                 ele.setAttribute('autoplay', true);
             }

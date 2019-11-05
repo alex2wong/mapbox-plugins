@@ -65,7 +65,7 @@ map.on('load', function() {
                 lat: mapCenter[1]
             },
             {
-                resources: ['https://wx1.sinaimg.cn/mw690/4507b64aly1fmju1qfe03j21kw11t7wj.jpg'],
+                resources: ['../../assets/drone.png'],
                 content: "ready to load picture",
                 class: 'bounceIn',
                 lon: mapCenter[0]-1.5,
