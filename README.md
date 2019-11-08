@@ -34,6 +34,11 @@ canvas line style which can be integrate to any map/chart lib.
 
 👆 Extrude typhoon radar image.
 
+![Animated Lines](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/lines.gif)
+
+👆 Animated Lines/Particle system.
+
+
 ## Online demo
 [placeholder]:p
 
@@ -50,6 +55,7 @@ canvas line style which can be integrate to any map/chart lib.
 | [Canvas Staring Demo](https://alex2wong.github.io/mapbox-plugins/examples/particle_mask/) ||
 | [Tilting Ui Marker](https://maphub.netlify.com/examples/vectortile)|[view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/vectortile/index.html)|
 | [Threejs Typhoon](https://maphub.netlify.com/examples/typhoon/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
+| [Line_Pattern](https://maphub.netlify.com/examples/line_pattern/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/index.html) |
 
 ## install and use
 
@@ -79,6 +85,10 @@ then visit from http://localhost:8080/examples/, HotModuleReload supported.
 > npm run build
 
 to Build all plugins into bundle.js with namespace: Mapbox
+
+> npm run rbuild
+
+to build all plugins into Mapbox.umd.js/Mapbox.esm.js
 
 
 ## how to use

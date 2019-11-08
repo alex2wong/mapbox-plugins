@@ -1,0 +1,141 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title> Line Style in canvas </title>
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+    }
+    .pallete {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        display: flex;
+    }
+</style>
+<body>
+    <div id='map' style='width: 100%; height: 100%; background: #222'></div>
+</body>
+<script src="../../dist/mapbox-gl.js"></script>
+<script src="../../dist/Mapbox.umd.js"></script>
+<script>    
+    mapboxgl.accessToken = false;
+    var canvasLayer;
+    var mapCenter = [119.66, 30.01];
+    var map = new mapboxgl.Map({
+        style: Mapbox.Config.emptyStyle,
+        center: mapCenter,
+        pitch: 15,
+        zoom: 8,
+        container: 'map',
+    });
+
+    map.on('load', init);
+
+    function init() {
+        canvasLayer = new Mapbox.CanvasOverlayer({
+            map,
+            data: rdLines(30),
+            render: drawLineTrail,
+        });
+        // start move MeshLine and render animation
+        animate();
+    }
+
+    function rdLines(cnt=20) {
+        var lines = [];
+        for (var i = 0; i < cnt; i++) {
+            var start = [Math.random() * 2 + 119.0, Math.random() * 2 + 29.0];
+            lines.push({
+                start,
+                getLength,
+                end: start,
+                life: Math.random() * 10,
+                width: Math.random() * 4 + 2,
+                maxLength: Math.random() * .6,
+                direction: -1.2,
+                color: [pallette[Math.floor(Math.random() * 5)]],
+            });
+        }
+        return lines;
+    }
+
+    var background = ['#eda163', '#e9767b'];
+    var pallette = ['#e98c30', '#4aa7e9', '#d4cebc', '#dc3b2f', '#9050f0'];
+
+    /**
+     * only for render..
+     **/
+    function drawLineTrail() {
+        var ctx = this.canvas.getContext('2d');
+        var bkground = ctx.createLinearGradient(0, 0, this.canvas.width, 0);
+        bkground.addColorStop(0, background[0]);
+        bkground.addColorStop(1, background[1]);
+        ctx.fillStyle = bkground;
+        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        ctx.shadowColor = '#fff';
+        ctx.shadowBlur = 2;
+        for (var i = 0; i < this.data.length; i++) {
+            var meshLine = this.data[i];
+            var start = this.map.project({ lng: meshLine.start[0], lat: meshLine.start[1] });
+            var end = this.map.project({ lng: meshLine.end[0], lat: meshLine.end[1]});
+            (ctx).strokeStyle = meshLine.color[0];
+            ctx.lineWidth = meshLine.width;
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+        }
+    }
+
+    /**
+     *  update MeshLines data.. 
+     **/
+    function updateLineTrail() {
+        // console.warn('meshLine data count: ', this.data);
+        var deadLines = [];
+        for (var i = 0; i < this.data.length; i++) {
+            var meshLine = this.data[i];
+            meshLine.life -= .1;
+            if (meshLine.life <=0) {
+                // life is the only condition to become dead.
+                deadLines.push(i);
+                continue;
+            }
+            // each frame meshLine move .01 grad ahead. and grow for .02 grad in length.
+            var deltaX = .01 * Math.sin(meshLine.direction);
+            var deltaY = .01 * Math.cos(meshLine.direction);
+            // stop growth if maxlength reached..
+            if (meshLine.getLength() >= meshLine.maxLength) {
+                meshLine.end = [meshLine.end[0] + deltaX, meshLine.end[1] + deltaY];
+            } else {
+                meshLine.end = [meshLine.end[0] + deltaX * 2, meshLine.end[1] + deltaY * 2];
+            }
+            meshLine.start = [meshLine.start[0] + deltaX, meshLine.start[1] + deltaY];
+        }
+        // prune dead ones
+        if (deadLines.length >= 1) {
+            (this.data).splice(deadLines[0], 1);
+            this.data.push(rdLines(1)[0]);
+        }
+        
+    }
+
+    function getLength() {
+        return Math.pow((this.start[0] - this.end[0]), 2) + Math.pow((this.start[1] - this.end[1]), 2);
+    }
+
+    function animate() {
+        // update all MeshLine data then redraw
+        updateLineTrail.bind(canvasLayer)();
+        canvasLayer.redraw();
+        requestAnimationFrame(animate);
+    }
+
+</script>
+</html>
