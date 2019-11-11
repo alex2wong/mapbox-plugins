@@ -42,7 +42,10 @@
             map,
             data: rdLines(30),
             render: drawLineTrail,
+            shadow: true,
         });
+
+        canvasLayer.canvas.style.background = `linear-gradient(0deg, ${background[0]}, ${background[1]})`;
         // start move MeshLine and render animation
         animate();
     }
@@ -55,9 +58,9 @@
                 start,
                 getLength,
                 end: start,
-                life: Math.random() * 10,
+                life: Math.random() * 20,
                 width: Math.random() * 4 + 2,
-                maxLength: Math.random() * .6,
+                maxLength: Math.random() * .1,
                 direction: -1.2,
                 color: [pallette[Math.floor(Math.random() * 5)]],
             });
@@ -74,12 +77,19 @@
     function drawLineTrail() {
         var ctx = this.canvas.getContext('2d');
         var bkground = ctx.createLinearGradient(0, 0, this.canvas.width, 0);
-        bkground.addColorStop(0, background[0]);
-        bkground.addColorStop(1, background[1]);
-        ctx.fillStyle = bkground;
-        ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        ctx.shadowColor = '#fff';
-        ctx.shadowBlur = 2;
+        
+        if (this.shadow) {
+            // enable line trail, keep last frame image by .95 alpha !!
+            Mapbox.Util._preSetCtx(ctx, null, .95);    
+            ctx.shadowColor = '#fff';
+            ctx.shadowBlur = 2;
+        } else {
+            bkground.addColorStop(0, background[0]);
+            bkground.addColorStop(1, background[1]);
+            ctx.fillStyle = bkground;
+            ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        }
+        
         for (var i = 0; i < this.data.length; i++) {
             var meshLine = this.data[i];
             var start = this.map.project({ lng: meshLine.start[0], lat: meshLine.start[1] });
@@ -96,7 +106,7 @@
     /**
      *  update MeshLines data.. 
      **/
-    function updateLineTrail() {
+    function updateLineTrail(speed=0.02) {
         // console.warn('meshLine data count: ', this.data);
         var deadLines = [];
         for (var i = 0; i < this.data.length; i++) {
@@ -108,8 +118,8 @@
                 continue;
             }
             // each frame meshLine move .01 grad ahead. and grow for .02 grad in length.
-            var deltaX = .01 * Math.sin(meshLine.direction);
-            var deltaY = .01 * Math.cos(meshLine.direction);
+            var deltaX = speed * Math.sin(meshLine.direction);
+            var deltaY = speed * Math.cos(meshLine.direction);
             // stop growth if maxlength reached..
             if (meshLine.getLength() >= meshLine.maxLength) {
                 meshLine.end = [meshLine.end[0] + deltaX, meshLine.end[1] + deltaY];

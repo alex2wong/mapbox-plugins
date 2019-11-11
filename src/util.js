@@ -243,5 +243,19 @@ export default class util {
             }, delay);
         }
     }
+
+    static _preSetCtx(context, fillStyle='', trailAlpha=.95, compositeMode='destination-in') {
+        // default: source-over
+        let prev = context.globalCompositeOperation;
+        // render frame's overlaps part: source-in, source, destination-in
+        context.globalCompositeOperation = compositeMode;
+        // set destination frame alpha
+        context.globalAlpha = trailAlpha;
+        // fill nothing
+        context.fillStyle = fillStyle;
+        context.fillRect(0, 0, context.canvas.width, context.canvas.height);
+        context.globalCompositeOperation = prev;
+    }
+        
     
 }
