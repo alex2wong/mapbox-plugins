@@ -4,27 +4,35 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title> Line Style in canvas </title>
-    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />    
+    <link href='../../dist/mapbox-gl.css' rel='stylesheet' />
 </head>
 <style>
     html, body {
         margin: 0;
         padding: 0;
     }
-    .pallete {
+    .header {
         position: absolute;
-        top: 10px;
-        left: 10px;
-        display: flex;
+        top: 0;
+        height: 100px;
+        width: 100%;
     }
 </style>
 <body>
     <div id='map' style='width: 100%; height: 100%; background: #222'></div>
+    <div class="header">
+        <div style="position: fixed; top: 0; left: 0" id="pane"></div>
+        <a href="https://github.com/alex2wong/mapbox-plugins" target="_blank">
+        　　<img style="position: fixed; top: -7px; right: -7px; border: 0;" src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_orange_ff7600.png">
+        </a>
+    </div>
 </body>
+<script src="https://cdn.jsdelivr.net/npm/tweakpane@1.1.0/dist/tweakpane.min.js"></script>
 <script src="../../dist/mapbox-gl.js"></script>
 <script src="../../dist/Mapbox.umd.js"></script>
 <script>    
     mapboxgl.accessToken = false;
+    var pane = new Tweakpane({ container: document.querySelector('#pane') });
     var canvasLayer;
     var mapCenter = [119.66, 30.01];
     var map = new mapboxgl.Map({
@@ -35,12 +43,30 @@
         container: 'map',
     });
 
+    var PARAMS = {
+        maxLength: .1,
+        maxLife: 20,
+        maxWidth: 6,
+        direction: .2,
+        speed: .03,
+        enableTrail: false,
+    }
+    const f1 = pane.addFolder({
+        title: 'Params',
+    });
+    f1.addInput(PARAMS, 'maxLength', { step: .1, min: 0, max: .5 });
+    f1.addInput(PARAMS, 'maxLife', { min: 0, max: 100 });
+    f1.addInput(PARAMS, 'maxWidth', { step: 1, min: 0, max: 100 });
+    f1.addInput(PARAMS, 'direction', { step: .1, min: 0, max: 3.14 });
+    f1.addInput(PARAMS, 'speed', { step: .01, min: -0.1, max: .1 });
+    f1.addInput(PARAMS, 'enableTrail');
+
     map.on('load', init);
 
     function init() {
         canvasLayer = new Mapbox.CanvasOverlayer({
             map,
-            data: rdLines(30),
+            data: rdLines(40),
             render: drawLineTrail,
             shadow: true,
         });
@@ -48,6 +74,7 @@
         canvasLayer.canvas.style.background = `linear-gradient(0deg, ${background[0]}, ${background[1]})`;
         // start move MeshLine and render animation
         animate();
+        map.on('moveend', clearCanv.bind(canvasLayer));
     }
 
     function rdLines(cnt=20) {
@@ -58,10 +85,10 @@
                 start,
                 getLength,
                 end: start,
-                life: Math.random() * 20,
-                width: Math.random() * 4 + 2,
-                maxLength: Math.random() * .1,
-                direction: -1.2,
+                life: Math.random() * PARAMS.maxLife,
+                width: Math.random() * PARAMS.maxWidth,
+                maxLength: Math.random() * PARAMS.maxLength,
+                direction: PARAMS.direction,
                 color: [pallette[Math.floor(Math.random() * 5)]],
             });
         }
@@ -78,7 +105,7 @@
         var ctx = this.canvas.getContext('2d');
         var bkground = ctx.createLinearGradient(0, 0, this.canvas.width, 0);
         
-        if (this.shadow) {
+        if (PARAMS.enableTrail) {
             // enable line trail, keep last frame image by .95 alpha !!
             Mapbox.Util._preSetCtx(ctx, null, .95);    
             ctx.shadowColor = '#fff';
@@ -103,10 +130,15 @@
         }
     }
 
+    function clearCanv() {
+        var ctx = this.canvas.getContext('2d');
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
     /**
      *  update MeshLines data.. 
      **/
-    function updateLineTrail(speed=0.02) {
+    function updateLineTrail(speed=PARAMS.speed) {
         // console.warn('meshLine data count: ', this.data);
         var deadLines = [];
         for (var i = 0; i < this.data.length; i++) {
