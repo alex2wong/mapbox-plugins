@@ -10,16 +10,22 @@
     <style>
         body,html {
             padding: 0; margin: 0;
-            width:100%;
-            height: 90%;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content:center;
+            align-items: center;
         }
     </style>
 </head>
 <body>
-    <h4>R-tree search Demo (5000 Rectangles)</h4>
-    <img src='./vincent_sky.jpg' id='pattern' style='display: none;'>
-    <canvas id='map' width="400" height="400" style='border: 1px dotted #aaa; background-color:black'></canvas>
-    <div id="result">Average Search Time (ms): </div>
+    <div class="container">
+        <h4>R-tree search Demo (1w Rectangles)</h4>
+        <img src='./vincent_sky.jpg' id='pattern' style='display: none;'>
+        <canvas id='map' width="400" height="400" style='border: 1px dotted #aaa; background-color:black'></canvas>
+        <div id="result">Search Time (ms): </div>
+        </div>
     <!--<script src='../../dist/mapbox-gl.js'></script>-->
     <!--<script src='https://alex2wong.github.io/mapbox-plugins/dist/mapbox-gl.js'></script>-->
     <script src='https://alex2wong.github.io/mapbox-plugins/dist/bundle.js'></script>

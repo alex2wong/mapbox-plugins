@@ -2,22 +2,37 @@
 // import * as Mapbox from "../../src/index";
 
 var tree = Mapbox.rbush();
+var res = document.querySelector("#result");
+var selected = [];
 var img = new Image();
 img.onload = function(){
     pattern = canv.getContext('2d').createPattern(img, "no-repeat");
 }
 img.src = './vincent_sky.jpg';
 var canv = document.querySelector("#map");
+var memCanv = document.createElement('canvas');
 Mapbox.Canvas.init(canv);
 Mapbox.Canvas.setWidth(1);
 Mapbox.Canvas.setStroke("rgba(255,255,255,0.7)");
+
+var memCtx = memCanv.getContext('2d');
+memCanv.height = canv.height;
+memCanv.width = canv.width;
+memCtx.strokeStyle = "rgba(255,255,255,0.7)";
+
 // random rect and bulk insert to rbush..
 var items = [], itemIndex = 0;
-for(var i = 0; i< 5000; i++) {
+for(var i = 0; i< 10000; i++) {
     var item = randomRect(canv);
     items.push(item);
-    Mapbox.Canvas.drawRect(item);
+    memCtx.rect(item.minX, item.minY, item.maxX - item.minX, item.maxY - item.minY);
 }
+memCtx.stroke();
+drawBasicItemsfromCache();
+function drawBasicItemsfromCache() {
+    canv.getContext('2d').drawImage(memCanv, 0, 0);
+}
+
 // console.log("items")
 tree.load(items);
 
@@ -45,7 +60,6 @@ var bbox = {
     maxX: 80,
     maxY: 70
 }
-var result = tree.search(bbox);
 
 var elapses = [];
 function handler(evt){
@@ -59,50 +73,24 @@ function handler(evt){
     bbox.maxX = x + 20;
     bbox.minY = y - 20;
     bbox.maxY = y + 20;
-    // console.log("bbox rect:  " + JSON.stringify(bbox));
-    var start = new Date();
-    var tmp = tree.search(bbox);
-    selected = tmp;    
+    // // console.log("bbox rect:  " + JSON.stringify(bbox));
+    var start = performance.now();
+    selected = tree.search(bbox);
     
     Mapbox.Canvas.clearCanv();    
-    Mapbox.Canvas.setStroke("rgba(255,255,255,0.7)");
-    items.forEach((item)=>{
-        // redraw all items..
-        Mapbox.Canvas.drawRect(item);
-    });
+    // draw all basic rect from cached canvas image.
+    drawBasicItemsfromCache();
 
     canv.getContext('2d').fillStyle = pattern;
     selected.forEach((item)=>{
-        // redraw all items..
+        // redraw selected items
         Mapbox.Canvas.drawRect(item, fill=true);
     })
 
     Mapbox.Canvas.setStroke("rgba(255,0,0,0.9)");
     Mapbox.Canvas.drawRect(bbox);
 
-    var elapse = getElapse(start);
-    elapses.push(elapse);    
+    res.innerHTML = "Search Time (ms): " + (performance.now()-start).toFixed(3);
 }
 
-var selected = [];
 canv.addEventListener("mousemove", handler);
-setInterval(stat, 2000);
-
-function stat() {
-    var totalTime = 0, totalCounts = 0;
-    elapses.forEach((elapse)=>{
-        totalCounts += 1;
-        totalTime += elapse;
-    });
-    console.log("Average Search Time (ms): " + totalTime/totalCounts);
-    var res = document.querySelector("#result");
-    res.innerHTML = "Average Search Time (ms): " + (totalTime/totalCounts).toFixed(3);
-}
-
-/**
- * return elapse time in ms
- */
-function getElapse(start) {
-    var end = new Date();
-    return (end - start);
-}
