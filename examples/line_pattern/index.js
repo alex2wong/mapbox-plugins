@@ -1,6 +1,6 @@
 mapboxgl.accessToken = false;
 var pane = new Tweakpane({ container: document.querySelector('#pane') });
-var canvasLayer;
+var canvasLayer, animateReq;
 var mapCenter = [119.66, 30.01];
 var map = new mapboxgl.Map({
     style: Mapbox.Config.emptyStyle,
@@ -15,8 +15,9 @@ var PARAMS = {
     maxLife: 20,
     maxWidth: 6,
     direction: .2,
-    speed: .03,
+    speed: .02,
     enableTrail: false,
+    darkTheme: false,
 }
 const f1 = pane.addFolder({
     title: 'Params',
@@ -27,13 +28,16 @@ f1.addInput(PARAMS, 'maxWidth', { step: 1, min: 0, max: 100 });
 f1.addInput(PARAMS, 'direction', { step: .1, min: 0, max: 3.14 });
 f1.addInput(PARAMS, 'speed', { step: .01, min: -0.1, max: .1 });
 f1.addInput(PARAMS, 'enableTrail');
+f1.addInput(PARAMS, 'darkTheme')
+
+var delayStartAnimate = Mapbox.Util.debounce(animate, 500);
 
 map.on('load', init);
 
 function init() {
     canvasLayer = new Mapbox.CanvasOverlayer({
         map,
-        data: rdLines(240),
+        data: rdLines(100),
         render: drawLineTrail,
         shadow: true,
     });
@@ -41,7 +45,13 @@ function init() {
     canvasLayer.canvas.style.background = `linear-gradient(0deg, ${background[0]}, ${background[1]})`;
     // start move MeshLine and render animation
     animate();
-    map.on('moveend', clearCanv.bind(canvasLayer));
+    map.on('movestart', function() {
+        cancelAnimationFrame(animateReq);
+        clearCanv.bind(canvasLayer)();
+    });
+    map.on('moveend', function(evt) {
+        delayStartAnimate()
+    });
 }
 
 function rdLines(cnt=20) {
@@ -71,15 +81,21 @@ var pallette = ['#e98c30', '#4aa7e9', '#d4cebc', '#dc3b2f', '#9050f0'];
 function drawLineTrail() {
     var ctx = this.canvas.getContext('2d');
     var bkground = ctx.createLinearGradient(0, 0, this.canvas.width, 0);
-    
+    if (PARAMS.darkTheme) {
+        bkground.addColorStop(0, '#305670');
+        bkground.addColorStop(1, '#010609');
+    } else {
+        bkground.addColorStop(0, background[0]);
+        bkground.addColorStop(1, background[1]);
+    }
     if (PARAMS.enableTrail) {
         // enable line trail, keep last frame image by .95 alpha !!
         Mapbox.Util._preSetCtx(ctx, null, .95);    
         ctx.shadowColor = '#fff';
         ctx.shadowBlur = 2;
     } else {
-        bkground.addColorStop(0, background[0]);
-        bkground.addColorStop(1, background[1]);
+        ctx.shadowColor = undefined;
+        ctx.shadowBlur = 0;
         ctx.fillStyle = bkground;
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -142,5 +158,5 @@ function animate() {
     // update all MeshLine data then redraw
     updateLineTrail.bind(canvasLayer)();
     canvasLayer.redraw();
-    requestAnimationFrame(animate);
+    animateReq = requestAnimationFrame(animate);
 }
