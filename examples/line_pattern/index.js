@@ -17,7 +17,8 @@ var PARAMS = {
     direction: .2,
     speed: .02,
     enableTrail: false,
-    darkTheme: false,
+    darkTheme: true,
+    enableGlow: true,
 }
 const f1 = pane.addFolder({
     title: 'Params',
@@ -28,9 +29,13 @@ f1.addInput(PARAMS, 'maxWidth', { step: 1, min: 0, max: 100 });
 f1.addInput(PARAMS, 'direction', { step: .1, min: 0, max: 3.14 });
 f1.addInput(PARAMS, 'speed', { step: .01, min: -0.1, max: .1 });
 f1.addInput(PARAMS, 'enableTrail');
-f1.addInput(PARAMS, 'darkTheme')
+f1.addInput(PARAMS, 'darkTheme');
+f1.addInput(PARAMS, 'enableGlow');
 
-var delayStartAnimate = Mapbox.Util.debounce(animate, 500);
+var delayStartAnimate = Mapbox.Util.debounce(function() {
+    clearCanv.bind(canvasLayer)();
+    animate();
+}, 100);
 
 map.on('load', init);
 
@@ -45,13 +50,6 @@ function init() {
     canvasLayer.canvas.style.background = `linear-gradient(0deg, ${background[0]}, ${background[1]})`;
     // start move MeshLine and render animation
     animate();
-    map.on('movestart', function() {
-        cancelAnimationFrame(animateReq);
-        clearCanv.bind(canvasLayer)();
-    });
-    map.on('moveend', function(evt) {
-        delayStartAnimate()
-    });
 }
 
 function rdLines(cnt=20) {
@@ -72,7 +70,7 @@ function rdLines(cnt=20) {
     return lines;
 }
 
-var background = ['#eda163', '#e9767b'];
+var background = ['#305670', '#010609'];
 var pallette = ['#e98c30', '#4aa7e9', '#d4cebc', '#dc3b2f', '#9050f0'];
 
 /**
@@ -85,17 +83,13 @@ function drawLineTrail() {
         bkground.addColorStop(0, '#305670');
         bkground.addColorStop(1, '#010609');
     } else {
-        bkground.addColorStop(0, background[0]);
-        bkground.addColorStop(1, background[1]);
+        bkground.addColorStop(0, '#eda163');
+        bkground.addColorStop(1, '#e9767b');
     }
     if (PARAMS.enableTrail) {
         // enable line trail, keep last frame image by .95 alpha !!
-        Mapbox.Util._preSetCtx(ctx, null, .95);    
-        ctx.shadowColor = '#fff';
-        ctx.shadowBlur = 2;
+        Mapbox.Util._preSetCtx(ctx, null, .95);
     } else {
-        ctx.shadowColor = undefined;
-        ctx.shadowBlur = 0;
         ctx.fillStyle = bkground;
         ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -104,6 +98,20 @@ function drawLineTrail() {
         var meshLine = this.data[i];
         var start = this.map.project({ lng: meshLine.start[0], lat: meshLine.start[1] });
         var end = this.map.project({ lng: meshLine.end[0], lat: meshLine.end[1]});
+        
+        if (PARAMS.enableGlow) {
+            var originalAlpha = (ctx).globalAlpha;
+            (ctx).globalAlpha = .2;
+            (ctx).globalCompositeOperation = 'lighter';
+            ctx.lineWidth = meshLine.width + 4;
+            (ctx).strokeStyle = meshLine.color[0];
+            ctx.beginPath();
+            ctx.moveTo(start.x, start.y);
+            ctx.lineTo(end.x, end.y);
+            ctx.stroke();
+            ctx.globalAlpha = originalAlpha;
+        }
+
         (ctx).strokeStyle = meshLine.color[0];
         ctx.lineWidth = meshLine.width;
         ctx.beginPath();
@@ -111,6 +119,7 @@ function drawLineTrail() {
         ctx.lineTo(end.x, end.y);
         ctx.stroke();
     }
+    (ctx).globalCompositeOperation = 'source-over';
 }
 
 function clearCanv() {
@@ -133,8 +142,8 @@ function updateLineTrail(speed=PARAMS.speed) {
             continue;
         }
         // each frame meshLine move .01 grad ahead. and grow for .02 grad in length.
-        var deltaX = speed * Math.sin(meshLine.direction);
-        var deltaY = speed * Math.cos(meshLine.direction);
+        var deltaX = .5 * speed * Math.sin(meshLine.direction);
+        var deltaY = .5 * speed * Math.cos(meshLine.direction);
         // stop growth if maxlength reached..
         if (meshLine.getLength() >= meshLine.maxLength) {
             meshLine.end = [meshLine.end[0] + deltaX, meshLine.end[1] + deltaY];
