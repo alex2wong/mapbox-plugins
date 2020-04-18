@@ -25,9 +25,9 @@ const darkSource = {
     "custom-tms": {
         'type': 'raster',
         'tiles': [
-            'http://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
-            'http://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
-            'http://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+            'https://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+            'https://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+            'https://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
         ],
         'tileSize': 256
     },
