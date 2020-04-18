@@ -3,7 +3,9 @@ var rotating = true;
 var extrusionRatio = 0.15;
 var imgWidth = 100;
 var imgHeight = 100;
-var imgURL = './typhoon3.png';
+// judge support webp or not.
+var imgURL = Mapbox.Util.compressedImageURL('./typhoon3.png');
+
 var scene;
 
 function TerrainLoader(opt) {

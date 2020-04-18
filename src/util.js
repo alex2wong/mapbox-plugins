@@ -257,5 +257,15 @@ export default class util {
         context.globalCompositeOperation = prev;
     }
         
-    
+    /**
+     * return really effective compressed Image URL end with image ext
+     * if support webp, use webp URL; otherwise do not change.
+     */
+    static compressedImageURL(imgUrl) {
+        var canv = document.createElement("canvas");
+        if (canv.toDataURL('image/webp').indexOf('data:image/webp') === 0) {
+            return imgUrl.replace(/(\.png|\.jpg|\.jpeg|\.PNG|\.JPG|\.JPEG|\.GIF|\.gif)$/g, '.webp');
+        }
+        return imgUrl;
+    }
 }
