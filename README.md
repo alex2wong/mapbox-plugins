@@ -82,10 +82,6 @@ var canvasLayer = new CanvasOverlayer({
 
 then visit from http://localhost:8080/examples/, HotModuleReload supported.
 
-> npm run build
-
-to Build all plugins into bundle.js with namespace: Mapbox
-
 > npm run rbuild
 
 to build all plugins into Mapbox.umd.js/Mapbox.esm.js

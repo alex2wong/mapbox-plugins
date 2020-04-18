@@ -36,6 +36,11 @@
             display: flex;
             align-items: center;
         }
+        .range-controller {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -52,8 +57,9 @@
             <input type="checkbox" checked onclick="toggleTerrain()" id="toggleTerrain">
             <label for="toggleTerrain">Typhoon Layer</label>
         </div>
-        <div>
-            <input type="range" value="90" id="opacity" onchange="changeOpacity(this)">
+        <div class="range-controller">
+            <input type="range" value="20" id="opacity" style="width: 100px;" onchange="changeOpacity(this)">
+            <label for="opacity">Layer Opacity</label>
         </div>
     </div>
 </div>

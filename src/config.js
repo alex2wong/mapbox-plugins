@@ -25,7 +25,9 @@ const darkSource = {
     "custom-tms": {
         'type': 'raster',
         'tiles': [
-            'https://cartodb-basemaps-a.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png',
+            'http://a.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+            'http://b.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
+            'http://c.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}.png',
         ],
         'tileSize': 256
     },
@@ -82,7 +84,7 @@ const darkStyle = {
 
 const emptyStyle = {
     "version": 8,
-    "sprite": "https://alex2wong.github.io/mapbox-plugins/assets/sprite",
+    "sprite": "http://127.0.0.1:8080/assets/sprite",
     "glyphs": "https://alex2wong.github.io/mapbox-plugins/{fontstack}/{range}.pbf",
     "sources": lightSource,
     "layers": []

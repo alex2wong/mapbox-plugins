@@ -42,8 +42,8 @@
   },
   "scripts": {
     "test": "jest --no-cache --notify",
-    "rbuild": "npx rollup -c",
-    "rdev": "npx rollup -c -w",
+    "rbuild": "rollup -c",
+    "rdev": "rollup -c -w",
     "build": "webpack --config webpack.config.js",
     "dev": "webpack-dev-server --progress --config webpack.dev.conf.js",
     "lint": "eslint --cache --ignore-path .gitignore src"
@@ -60,6 +60,9 @@
   ],
   "author": "alex2wong",
   "license": "BSD-2-Clause",
+  "engines": {
+    "node": ">= 12.4.0"
+  },
   "bugs": {
     "url": "https://github.com/alex2wong/mapbox-plugins/issues"
   },
