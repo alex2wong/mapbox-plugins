@@ -1,6 +1,6 @@
 # mapbox-plugins [![Netlify Status](https://api.netlify.com/api/v1/badges/218aee4f-8771-4bb6-bb22-0df0a4a221a3/deploy-status)](https://app.netlify.com/sites/cocky-thompson-95a9bc/deploys) <img src="https://img.shields.io/npm/v/mapbox-plugins" /> <img src="https://img.shields.io/npm/l/mapbox-plugins.svg" alt="license">
 
-Customized Mapbox plugins, including game control, canvasOverlayer, scene animation
+Customized Mapbox plugins, including game control, canvasOverlayer, scene animation.
 
 https://alex2wong.github.io/mapbox-plugins/
 
@@ -25,7 +25,8 @@ Note: pls visit all demo with **HTTPS**..
 ![Rbush demo](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/demo/rbush.gif)
 
 ![Canvas Line Style](https://github.com/alex2wong/mapbox-plugins/blob/master/assets/canvasLine.jpg)
-canvas line style which can be integrate to any map/chart lib.
+
+👆 Canvas line style which can be integrate to any map/chart lib.
 
 ![Voxelize terrain data](https://upload-images.jianshu.io/upload_images/1950967-27728165c2bedf82.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1000/format/webp)
 👆 Voxelize terrain data from a height image.
@@ -57,7 +58,7 @@ canvas line style which can be integrate to any map/chart lib.
 | [Threejs Typhoon](https://maphub.netlify.com/examples/typhoon/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/typhoon/index.js) |
 | [Line_Pattern](https://maphub.netlify.com/examples/line_pattern/) | [view code](https://github.com/alex2wong/mapbox-plugins/blob/master/examples/index.html) |
 
-## install and use
+## Install and use
 
 > npm i mapbox-plugins
 
@@ -74,7 +75,7 @@ var canvasLayer = new CanvasOverlayer({
 });
 ```
 
-## run locally
+## Run locally
 
 > npm install
 
@@ -87,8 +88,8 @@ then visit from http://localhost:8080/examples/, HotModuleReload supported.
 to build all plugins into Mapbox.umd.js/Mapbox.esm.js
 
 
-## how to use
-plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:
+## How to use
+Plugins provide canvasOverlay, domOverlay ,Sprite, gameControl extension etc. for example:
 
 ```javascript
 // create a CanvasOverlayer on Mapbox map instance..
