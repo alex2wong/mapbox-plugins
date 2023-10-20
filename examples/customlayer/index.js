@@ -2,7 +2,7 @@ var map = window.map = new mapboxgl.Map({
     container: 'map',
     zoom: 3,
     center: [7.5, 58],
-    style: Mapbox.Config.lightStyle,
+    style: Mapbox.Config.darkStyle,
 });
 
 var helsinki = mapboxgl.MercatorCoordinate.fromLngLat({ lng: 25.004, lat: 60.239 });

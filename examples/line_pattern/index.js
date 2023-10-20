@@ -12,7 +12,7 @@ var map = new mapboxgl.Map({
 
 var PARAMS = {
     maxLength: .1,
-    maxLife: 20,
+    maxLife: 60,
     maxWidth: 6,
     direction: .2,
     speed: .02,
